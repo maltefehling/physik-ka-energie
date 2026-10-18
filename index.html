@@ -638,7 +638,7 @@ function startView(){S.mode=null;S.ber=null;S.niv=null;
   <li>Du löst jede Aufgabe <b>auf Papier</b> bzw. in deinem Heft. Rechenaufgaben immer im <b>Fünf-Schritt</b>. Bei Rechenaufgaben tippst du nur dein <b>Endergebnis</b> ein – die App prüft es und sagt dir, welcher Fehler dahinterstecken könnte.</li>
   <li>Wenn du nicht weiterkommst, hol dir einen <b>Tipp ▶</b> – bei Rechenaufgaben gibt es mehrere, Schritt für Schritt.</li>
   <li>Dann tippst du auf <b>Ideallösung anzeigen</b>, vergleichst ehrlich und gibst an, wie es lief: ✓ richtig · ◐ teilweise · ✗ noch nicht.</li>
-  <li>Aufgaben mit <b>Material</b> (Text, Tabelle, Diagramm) sind wie die Vergleichsaufgaben des IQB: Lies zuerst genau das Material.</li>
+  <li>Bei Aufgaben mit <b>Material</b> (Text, Tabelle, Diagramm) liest du zuerst genau das Material.</li>
   <li>Bei jedem Durchgang bekommst du <b>neue Aufgaben</b>: gleiches Muster, anderer Zusammenhang, andere Zahlen – aber gleich schwer.</li></ul></div>`;
  VW.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;S.mode==='ka'?nivView():berView();});scrollTo(0,0);}
 function berView(){VW.innerHTML=`<div class="card"><h2>Welchen Bereich?</h2><p class="note">Die Bereiche heißen wie die Seiten in deinem OneNote-Heft.</p><div class="choice">${BER.map(b=>`<button class="big" data-b="${b.nr}"><b>${b.name}</b>${b.info?`<small>${b.info}</small>`:''}</button>`).join('')}</div>
@@ -662,7 +662,6 @@ function tipps(t){
 const sameOpts=rows=>rows.every(r=>r.opts.join('|')===rows[0].opts.join('|'));
 function subHTML(t,k,lab){
  let h=`<div class="teil" id="s${k}">${lab?`<div class="tl">${lab}</div>`:''}`;
- if(t.k)h+=`<div class="chips"><span class="chip k">${KOMP[t.k]}</span><span class="chip">Anforderungsbereich ${t.afb}</span></div>`;
  if(t.svg)h+=`<div class="svgbox">${t.svg}</div>`;
  if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis: <b>${t.erg.l} =</b></span><input inputmode="decimal" autocomplete="off" aria-label="Endergebnis"><span class="u">${t.erg.u}</span><button class="btn" data-a="check">Prüfen</button></div><div class="fbx"></div>`;
  else{h+=`<p class="q">${t.frage}</p>`;
