@@ -161,7 +161,7 @@ const S={q:null,ex:null,stufe:0,hyp:null,rollen:{},rollenOk:false,set:{},rows:[]
 const STUFEN=['Frage','Vermutung','Plan','Versuch','Auswertung','Ergebnis'];
 const ROLLEN=['verändere ich','messe ich','halte ich gleich'];
 function stepsBar(){return `<div class="steps">${STUFEN.map((s,i)=>`<span class="${i===S.stufe?'cur':i<S.stufe?'done':''}">${i+1} ${s}</span>`).join('')}</div>`;}
-const MERK=`<div class="merk"><b>Merke: Einen Versuch planen</b><ol><li><b>Frage:</b> Was will ich herausfinden?</li><li><b>Vermutung:</b> „Je …, desto …“</li><li><b>Plan:</b> Genau <u>eine</u> Größe verändere ich, eine Größe messe ich (mit Messgerät und Einheit), alle anderen halte ich gleich.</li><li><b>Durchführung:</b> Messtabelle, jeden Wert mehrmals messen.</li><li><b>Auswertung:</b> Stimmt meine Vermutung?</li></ol></div>`;
+const MERK=`<div class="merk"><b>Merke: Einen Versuch planen</b><ol><li><b>Frage:</b> Was will ich herausfinden?</li><li><b>Vermutung:</b> „Je …, desto …“</li><li><b>Plan:</b> Genau <u>eine</u> Größe verändere ich, eine Größe messe ich (mit Messgerät und Einheit), alle anderen halte ich gleich.</li><li><b>Durchführung:</b> Messtabelle, jeden Wert mehrmals messen.</li><li><b>Auswertung:</b> Erst die <b>Beobachtung</b> (Was zeigen die Messwerte?), dann der <b>Schluss</b> (Stimmt meine Vermutung?).</li></ol></div>`;
 const TIPPS={
  1:['Eine Vermutung ist eine begründete Erwartung. Denk an den Alltag: Was hast du schon einmal erlebt?','Die Vermutung darf falsch sein – sie wird mit dem Versuch überprüft.'],
  2:['Nur EINE Größe darfst du verändern – nämlich die aus der Frage.','Die Größe, die du misst, ist die, nach deren Wert die Frage fragt (z. B. Tiefe, Höhe, Energie).','Alles andere muss gleich bleiben – sonst weißt du nicht, was die Ursache war.'],
@@ -281,7 +281,7 @@ function auswertung(){S.stufe=4;const M=mittel();
  V.innerHTML=kopf()+`<h2>Auswertung</h2><p>Die App hat für jeden Wert den <b>Mittelwert</b> deiner Messungen berechnet.</p>
  <table class="t"><tr><th>${varName(S.q.z)}</th><th>Messungen</th><th>Mittelwert ${S.ex.mess.n}</th></tr>${M.map(m=>`<tr><td>${m.t}</td><td>${m.n}</td><td class="n">${f(m.m,S.ex.mess.d)} ${S.ex.mess.u}</td></tr>`).join('')}</table>
  <div style="text-align:center;margin:10px 0">${diagramm(M)}</div>
- <p class="q"><b>Was zeigen deine Messwerte?</b></p>${S.hypOrder.map(i=>`<div class="opt ${S.erg===i?'on':''}" data-i="${i}"><span class="box"></span><span>${S.q.hyp[i]}</span></div>`).join('')}
+ <p class="q"><b>Was schließt du aus deinen Beobachtungen (den Mittelwerten)?</b></p>${S.hypOrder.map(i=>`<div class="opt ${S.erg===i?'on':''}" data-i="${i}"><span class="box"></span><span>${S.q.hyp[i]}</span></div>`).join('')}
  <p class="q" style="margin-top:14px"><b>Was könnte dein Ergebnis bei einem echten Versuch verfälschen?</b></p>${S.falschOrder.map(i=>`<div class="opt ${S.falsch===i?'on':''}" data-f="${i}"><span class="box"></span><span>${S.ex.falsch[i]}</span></div>`).join('')}
  <div id="afb"></div>${tippBox(4)}<div class="actions"><button class="btn ghost" id="back">← Versuch</button><button class="btn" id="chk">prüfen</button><button class="btn hide" id="next">zum Ergebnis →</button></div></div>`;
  V.querySelectorAll('[data-i]').forEach(o=>o.onclick=()=>{S.erg=+o.dataset.i;V.querySelectorAll('[data-i]').forEach(p=>p.classList.toggle('on',p===o));});
@@ -297,9 +297,9 @@ function ergebnis(){S.stufe=5;const M=mittel(),stimmt=S.hyp===S.q.w,gl=S.ex.vars
  V.innerHTML=stepsBar()+`<div id="sumCard"><h2 style="font-family:'Patrick Hand',cursive;font-weight:400;font-size:1.9rem">Versuchsprotokoll</h2>
  <div class="zeile"><b>① Frage:</b> ${S.q.f}</div><div class="zeile"><b>② Vermutung:</b> ${S.q.hyp[S.hyp]}</div>
  <div class="zeile"><b>③ Plan:</b> Ich verändere <b>${varName(S.q.z)}</b>. Ich messe <b>${S.ex.mess.n} in ${S.ex.mess.u}</b>. Gleich bleiben: ${gl.map(v=>`${v.n} (${vText(v,S.rows[0].s[v.id])})`).join(', ')}.</div>
- <div class="zeile"><b>④ Messwerte (Mittelwerte):</b> ${M.map(m=>`${m.t}: ${f(m.m,S.ex.mess.d)} ${S.ex.mess.u} (${m.n}×)`).join(' · ')}</div>
+ <div class="zeile"><b>④ Das habe ich beobachtet (Mittelwerte):</b> ${M.map(m=>`${m.t}: ${f(m.m,S.ex.mess.d)} ${S.ex.mess.u} (${m.n}×)`).join(' · ')}</div>
  <div style="text-align:center">${diagramm(M)}</div>
- <div class="zeile"><b>⑤ Ergebnis:</b> ${S.q.hyp[S.q.w]} Meine Vermutung war <b>${stimmt?'richtig':'falsch'}</b>.</div>
+ <div class="zeile"><b>⑤ Das schließe ich daraus:</b> ${S.q.hyp[S.q.w]} Meine Vermutung war <b>${stimmt?'richtig':'falsch'}</b>.</div>
  <div class="zeile"><b>Fehlerquelle beim echten Versuch:</b> ${S.ex.falsch[0]}</div></div>
  <div class="card" style="margin-top:14px"><p>✎ Mach einen <b>Screenshot</b> vom Protokoll und füge ihn in dein OneNote-Heft ein.</p>
  <div class="actions"><button class="btn" id="neu">Andere Frage untersuchen</button></div></div>`;
@@ -314,7 +314,7 @@ function beamer(){document.body.classList.add('beamer');document.getElementById(
   if(phase===0){V.innerHTML=`<div class="card">${bild}<p style="font-size:1.3rem;margin:14px 0 0">Lena will herausfinden, welcher Wasserkocher <b>sparsamer</b> ist. Sie misst, wie viel Energie jeder braucht, bis das Wasser kocht.</p>
    <div class="actions"><button class="btn" id="zeig">Lenas Messergebnis zeigen</button></div></div>`;document.getElementById('zeig').onclick=()=>{phase=1;draw();};return;}
   V.innerHTML=`<div class="card"><div style="max-width:420px;margin:0 auto 12px">${bild}</div><div class="duo">${mk('A',A,EA,!fair&&reveal)}${mk('B',B,EB,!fair&&reveal)}</div>
-  <p style="font-size:1.2rem;margin-top:14px">${fair?'<b>Fairer Versuch:</b> Beide bekommen 1 L Leitungswasser. Jetzt braucht <b>B weniger</b> Energie – B ist der sparsamere!':'<b>Lena:</b> „A braucht viel weniger Energie. A ist also der sparsamere Wasserkocher!“'}</p>
+  <p style="font-size:1.2rem;margin-top:14px">${fair?'<b>Fairer Versuch:</b> Beide bekommen 1 L Leitungswasser. Jetzt braucht <b>B weniger</b> Energie – B ist der sparsamere!':(reveal?'<b>Lena hat richtig gemessen.</b> Falsch ist nicht ihre <b>Beobachtung</b> (210 kJ und 419 kJ), sondern ihr <b>Schluss</b> „A ist sparsamer“ – denn sie hat nicht nur den Wasserkocher, sondern auch Wassermenge und Temperatur verändert.':'<b>Lena:</b> „A braucht viel weniger Energie. A ist also der sparsamere Wasserkocher!“')}</p>
   <div class="actions">${!fair?`<button class="btn" id="rev">${reveal?'Unterschiede markiert':'Was ist unfair?'}</button>`:''}<button class="btn ghost" id="fair">${fair?'Lenas Versuch zeigen':'Fairer Versuch'}</button></div></div>
   <div class="card"><div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap"><div class="qr">${QR}</div><div><h2>Jetzt plant ihr selbst!</h2><p style="font-size:1.15rem">Scannt den Code: Jede Gruppe untersucht eine andere Frage.<br><b>maltefehling.github.io/physik-ka-energie/versuch.html</b></p></div></div></div>`;
   const r=document.getElementById('rev');if(r)r.onclick=()=>{reveal=true;draw();};document.getElementById('fair').onclick=()=>{fair=!fair;draw();};};
