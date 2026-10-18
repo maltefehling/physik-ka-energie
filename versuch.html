@@ -307,15 +307,18 @@ function ergebnis(){S.stufe=5;const M=mittel(),stimmt=S.hyp===S.q.w,gl=S.ex.vars
 
 /* ============ Einstieg für den Beamer ============ */
 function beamer(){document.body.classList.add('beamer');document.getElementById('h1').textContent='Welcher Wasserkocher ist sparsamer?';
- document.getElementById('sub').textContent='Lena hat einen Versuch gemacht.';let fair=false;
+ document.getElementById('sub').textContent='Lena macht einen Versuch.';let fair=false;
  const draw=()=>{const A=fair?{m:1,t:20}:{m:.5,t:20},B=fair?{m:1,t:20}:{m:1,t:8},eA=.8,eB=.92,EA=A.m*4.19*(100-A.t)/eA,EB=B.m*4.19*(100-B.t)/eB;
   const mk=(n,o,E,rot)=>`<div class="kessel"><h3>Wasserkocher ${n}</h3><div class="w">Wassermenge: <b class="${rot?'rot':''}">${f(o.m,1)} L</b></div><div class="w">Wasser aus: <b class="${rot&&o.t!==20?'rot':''}">${o.t===20?'der Leitung (20 °C)':'dem Kühlschrank (8 °C)'}</b></div><div class="w">Energie bis zum Kochen:</div><div class="anzeige">${f(E,0)} kJ</div></div>`;
-  V.innerHTML=`<div class="card"><div class="duo">${mk('A',A,EA,!fair&&reveal)}${mk('B',B,EB,!fair&&reveal)}</div>
+  const bild=`<img src="img/lena-wasserkocher.jpg" alt="Lena vor zwei Wasserkochern: links wenig Leitungswasser, rechts randvoll mit kaltem Wasser aus dem Kühlschrank; beide an einem Energiemessgerät" style="width:100%;border-radius:12px;border:2px solid var(--ink);display:block">`;
+  if(phase===0){V.innerHTML=`<div class="card">${bild}<p style="font-size:1.3rem;margin:14px 0 0">Lena will herausfinden, welcher Wasserkocher <b>sparsamer</b> ist. Sie misst, wie viel Energie jeder braucht, bis das Wasser kocht.</p>
+   <div class="actions"><button class="btn" id="zeig">Lenas Messergebnis zeigen</button></div></div>`;document.getElementById('zeig').onclick=()=>{phase=1;draw();};return;}
+  V.innerHTML=`<div class="card"><div style="max-width:420px;margin:0 auto 12px">${bild}</div><div class="duo">${mk('A',A,EA,!fair&&reveal)}${mk('B',B,EB,!fair&&reveal)}</div>
   <p style="font-size:1.2rem;margin-top:14px">${fair?'<b>Fairer Versuch:</b> Beide bekommen 1 L Leitungswasser. Jetzt braucht <b>B weniger</b> Energie – B ist der sparsamere!':'<b>Lena:</b> „A braucht viel weniger Energie. A ist also der sparsamere Wasserkocher!“'}</p>
   <div class="actions">${!fair?`<button class="btn" id="rev">${reveal?'Unterschiede markiert':'Was ist unfair?'}</button>`:''}<button class="btn ghost" id="fair">${fair?'Lenas Versuch zeigen':'Fairer Versuch'}</button></div></div>
   <div class="card"><div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap"><div class="qr">${QR}</div><div><h2>Jetzt plant ihr selbst!</h2><p style="font-size:1.15rem">Scannt den Code: Jede Gruppe untersucht eine andere Frage.<br><b>maltefehling.github.io/physik-ka-energie/versuch.html</b></p></div></div></div>`;
   const r=document.getElementById('rev');if(r)r.onclick=()=>{reveal=true;draw();};document.getElementById('fair').onclick=()=>{fair=!fair;draw();};};
- let reveal=false;draw();}
+ let reveal=false,phase=0;draw();}
 
 if(/[?&]beamer/.test(location.search))beamer();else start();
 </script>
