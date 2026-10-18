@@ -82,6 +82,11 @@ input:focus{outline:3px solid var(--marker);border-color:var(--ink)}
 .fb{margin-top:10px;border-radius:10px;padding:8px 12px}
 .fb.ok{background:var(--ok-bg);border:2px solid var(--green)}
 .fb.bad{background:var(--bad-bg);border:2px solid var(--heat)}
+.tipp{background:#F1EAF8;border:2px solid #B79BD6;border-radius:10px;padding:8px 12px;margin-top:8px}
+.tipp b{color:var(--lila)}
+.btn.tippbtn{background:#fff;border-color:var(--lila);color:var(--lila);box-shadow:3px 3px 0 var(--lila)}
+.btn.tippbtn:disabled{box-shadow:none}
+.chip.zus{border-color:#FBD9A8;color:#8A5A12;background:var(--hilfe)}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
 .btn{border:2px solid var(--ink);background:var(--marker);color:var(--ink);font:800 16px "Nunito",sans-serif;padding:9px 18px;border-radius:10px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);min-height:44px}
 .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
@@ -378,6 +383,46 @@ function l8i(){const v=pick([{n:'Ein Wasserkocher mit 1 Liter Wasser',P:pick([1.
 /* ---------- Wissensaufgaben (mit Kontext-Varianten) ---------- */
 const mcOk=(ok,falsch)=>{const o=shuffle([ok,...falsch]);return {opts:o,richtig:o.indexOf(ok)};};
 const mcMulti=list=>{const o=shuffle(list);return {opts:o.map(x=>x[1]),richtig:o.map((x,i)=>x[0]?i:-1).filter(i=>i>=0)};};
+// Tipps zu den Wissensaufgaben (Schlüssel = Titel); verraten nie die ganze Lösung
+const TIPP={
+ 'Was ist Energie?':'Der Satz beginnt mit „Energie ist die Fähigkeit, …“. Danach kommen drei Dinge: Arbeit …, Licht … und Wärme …',
+ 'Formelzeichen und Einheit':'Die Einheit ist nach dem Physiker James Prescott … benannt. „Kilo“ heißt immer tausend.',
+ 'Einheiten umrechnen':'Kilo = 1 000 · 1 min = 60 s · 1 h = 3 600 s · 1 m = 100 cm · 1 t = 1 000 kg. Von der großen zur kleinen Einheit rechnest du mal, von der kleinen zur großen geteilt.',
+ 'Der Fünf-Schritt':'Erst sammelst du, was du hast und was du suchst. Dann kommt die Formel, dann die Rechnung – und zum Schluss der Satz.',
+ 'Die Gesucht-Zeile':'In die Gesucht-Zeile gehören genau zwei Dinge: das Formelzeichen und die Einheit.',
+ 'Der Antwortsatz':'Ein Antwortsatz ist ein ganzer Satz – mit Formelzeichen, Zahl und Einheit.',
+ 'Fehler finden':'Schau dir die Einheiten an: Wurde alles in kg, m, s, J und W umgerechnet, bevor eingesetzt wurde?',
+ 'Energieformen erkennen':'Achte auf Schlüsselwörter: bewegt → kinetisch · Höhe → potenziell · verformt → Spannenergie · heiß → thermisch · Strom → elektrisch · Reaktion → chemisch · Licht → Strahlung · Atomkern → Kernenergie.',
+ 'Fachausdrücke':'Kinetisch kommt vom griechischen Wort für „bewegen“, thermisch von „warm“. Potenziell heißt „möglich“ – die Energie steckt in der Höhe und kann noch freigesetzt werden.',
+ 'Energieformen im Alltag':'Frag dich bei jedem Beispiel: Bewegt es sich? Ist es hoch? Ist es gespannt? Ist es heiß? Kann man es essen oder verbrennen? Leuchtet es? Fließt Strom?',
+ 'Welche Energieformen?':'Geh alle Energieformen der Reihe nach durch: Höhe? Bewegung? Treibstoff oder Akku? Wärme? Licht? Strom? Mehrere Antworten sind richtig.',
+ 'Trampolinspringen':'Drei Energieformen: Höhe → …, Geschwindigkeit → …, Verformung des Tuchs → …',
+ 'Stabhochsprung':'Drei Energieformen: Anlauf (Geschwindigkeit) → …, gebogener Stab → …, Höhe über der Latte → …',
+ 'Pfeil und Bogen':'Drei Energieformen: gespannter Bogen → …, fliegender Pfeil → …, Pfeil steigt nach oben → …',
+ 'Energiewandler':'Zugeführt ist, was hineingeht: Steckdose → elektrisch, Benzin oder Batterie → chemisch, Sonne → Licht. Erwünscht ist das, wofür man das Gerät kauft.',
+ 'Energiewandler mit unerwünschter Energie':'Zugeführt ist, was hineingeht; erwünscht ist, wofür man das Gerät kauft. Die unerwünschte Energie ist fast immer dieselbe – was spürst du, wenn du das Gerät anfasst?',
+ 'Von der Sonne bis zum Sprint':'Fang bei der Sonne an und schreib jede Station mit Pfeil: Sonnenlicht → Pflanze → Nahrung → Muskeln. Vergiss die Wärme am Ende nicht.',
+ 'Von der Sonne bis zur Autofahrt':'Fang bei der Sonne an: Sonnenlicht → Pflanzen vor Millionen Jahren → Erdöl → Benzin → Motor. Vergiss die Wärme am Ende nicht.',
+ 'Vom Wind bis zum Föhn':'Fang beim Wind an: Wind → Rotor → Generator → Leitung → Föhn. Was macht der Föhn mit dem Strom – zwei Dinge?',
+ 'Energieerhaltungssatz':'„Erhaltung“ heißt: Die Menge bleibt gleich.',
+ '„Energieverlust“':'Energie verschwindet nie. Wohin geht sie, wenn ein Gerät warm wird?',
+ 'Hin und her':'Ganz oben bleibt der Körper kurz stehen. Ganz unten ist er am schnellsten – und am tiefsten.',
+ 'Energie auf der Bahn':'Je höher, desto mehr potenzielle Energie. Je schneller, desto mehr kinetische Energie. Am Umkehrpunkt steht der Körper kurz still.',
+ 'Summe der Energien':'Was sagt der Energieerhaltungssatz über die gesamte Energie?',
+ 'Stellung nehmen':'Beginne mit deinem Urteil (stimmt / stimmt nicht). Verwende die Wörter Energieerhaltungssatz, Reibung, Wärme und entwertet.',
+ 'Höher als der Start?':'Woher kommt die ganze Energie? Kann daraus mehr werden?',
+ 'Ein Diagramm lesen':'Es geht keine Energie verloren: zugeführte Energie = Nutzenergie + Wärme.',
+ 'Welches Diagramm stimmt?':'Prüfe zwei Dinge: Ergeben die beiden Pfeile zusammen die zugeführte Energie? Ist der größere Wert auch der breitere Pfeil?',
+ 'Stimmt das?':'Vergleiche, was hineingeht und was herauskommt. Was sagt der Energieerhaltungssatz dazu?',
+ 'Was bedeutet ein großer Wirkungsgrad?':'Großer Wirkungsgrad heißt: Ein großer Anteil wird genutzt, nur ein kleiner Anteil wird zu Wärme. Zwei Antworten sind richtig.',
+ 'Typische Wirkungsgrade':'Eine Glühlampe wird sehr heiß und gibt wenig Licht. Ein Elektromotor wird kaum warm. Ein Automotor liegt dazwischen.',
+ 'Immer unter 100 %':'Zwei Gründe: Was sagt der Energieerhaltungssatz? Und was passiert bei jeder Umwandlung mit einem Teil der Energie?',
+ 'Mehr Reibung':'Reibung macht Wärme. Was bleibt dann für die Nutzenergie übrig – und was heißt das für η?',
+ 'Wovon hängt die potenzielle Energie ab?':'Schau dir die Formel an: E<sub>pot</sub> = m · g · h.',
+ 'Was ist Leistung?':'Leistung sagt, wie schnell Energie umgewandelt wird – also wie viel Energie pro …?',
+ 'Formelzeichen und Einheit der Leistung':'Das Formelzeichen kommt vom englischen Wort „power“. Die Einheit ist nach James Watt benannt. „Kilo“ heißt tausend.',
+ 'Gleiche Energie, andere Leistung':'Gleiche Masse und gleiche Höhe – ist dann auch die Energie gleich? Vergleiche danach die Zeiten mit P = E : t.',
+};
 const T={
  def:()=>({typ:'offen',titel:'Was ist Energie?',punkte:2,frage:'Beschreibe, was man in der Physik unter Energie versteht.',
    ideal:'<b>Energie ist die Fähigkeit, Arbeit zu verrichten, Licht auszustrahlen und Wärme abzugeben.</b>',krit:['„Fähigkeit“','Arbeit verrichten','Licht ausstrahlen','Wärme abgeben']}),
@@ -481,12 +526,12 @@ const IQB={
    const mat=`<div class="ml">Material</div>${d.gleich}: Jede gibt pro Sekunde <b>${f(d.nutz)} J</b> ${d.nw} ab.
    <table class="t"><tr><th>${d.ein}</th><th>zugeführte elektrische Energie pro Sekunde</th><th>Lebensdauer</th><th>Preis</th></tr>${d.G.map(x=>`<tr><td>${x.n}</td><td class="n">${f(x.z)} J</td><td class="n">${f(x.life)} ${d.lu}</td><td class="n">${eu(x.p)}</td></tr>`).join('')}</table>`;
    return {mat,T:[
-    MZ('K','I',{niv:[1,2],typ:'mc',frage:`Wie viel elektrische Energie bekommt die ${B.n} pro Sekunde?`,...mcOk(`${f(B.z)} J`,[`${f(d.nutz)} J`,`${f(A.z)} J`,`${f(C.z)} J`])}),
-    MZ('S','II',{niv:[1],typ:'zahl',frage:`Berechne den Wirkungsgrad der ${C.n} mit η = ${NU} : ${ZU}.`,rows:[{l:'η =',w:eta(C),u:'%'}],erkl:`η = ${f(d.nutz)} J : ${f(C.z)} J = ${f(eta(C)/100,4)} = ${f(eta(C))} %`}),
-    MZ('S','II',{niv:[2,3],typ:'zahl',frage:`Berechne die Wirkungsgrade der ${A.n} und der ${C.n}.`,rows:[{l:`η ${A.n} =`,w:eta(A),u:'%'},{l:`η ${C.n} =`,w:eta(C),u:'%'}],erkl:`${A.n}: η = ${f(d.nutz)} J : ${f(A.z)} J = ${f(eta(A))} % · ${C.n}: η = ${f(d.nutz)} J : ${f(C.z)} J = ${f(eta(C))} %`}),
-    MZ('S','II',{niv:[1],typ:'mc',frage:`Warum braucht die ${A.n} so viel mehr Energie, obwohl alle ${d.alle}?`,...mcOk('Sie wandelt den größten Teil der Energie in Wärme um.',[`Sie gibt mehr ${d.nw.split(' (')[0]} ab.`,'Sie vernichtet Energie.','Sie hält länger.'])}),
-    MZ('K','II',{niv:[2],typ:'offen',frage:`Erkläre mithilfe des Materials, warum die ${A.n} viel mehr Energie braucht als die ${C.n}.`,ideal:`Beide geben nur ${f(d.nutz)} J pro Sekunde ab. Die ${A.n} bekommt aber ${f(A.z)} J. Die restlichen ${f(A.z-d.nutz)} J werden in <b>Wärme</b> umgewandelt und sind entwertet. Ihr Wirkungsgrad ist deshalb sehr klein (${f(eta(A))} %).`,krit:[`gleiche Nutzenergie ${f(d.nutz)} J`,'Rest wird zu Wärme (entwertet)','kleiner Wirkungsgrad']}),
-    MZ('B','III',{niv:[2,3],typ:'offen',punkte:3,frage:`Opa sagt: „Die ${A.n} ist am billigsten, die kaufe ich.“ Beurteile seine Aussage. Nutze mindestens zwei Kriterien aus dem Material.`,
+    MZ('K','I',{tipp:`Such in der Tabelle die Zeile „${B.n}“ und die Spalte „zugeführte elektrische Energie“.`,niv:[1,2],typ:'mc',frage:`Wie viel elektrische Energie bekommt die ${B.n} pro Sekunde?`,...mcOk(`${f(B.z)} J`,[`${f(d.nutz)} J`,`${f(A.z)} J`,`${f(C.z)} J`])}),
+    MZ('S','II',{tipp:'Die Nutzenergie steht über der Tabelle (pro Sekunde abgegeben), die zugeführte Energie in der Tabelle. Dann η = Nutzenergie : zugeführte Energie, mal 100.',niv:[1],typ:'zahl',frage:`Berechne den Wirkungsgrad der ${C.n} mit η = ${NU} : ${ZU}.`,rows:[{l:'η =',w:eta(C),u:'%'}],erkl:`η = ${f(d.nutz)} J : ${f(C.z)} J = ${f(eta(C)/100,4)} = ${f(eta(C))} %`}),
+    MZ('S','II',{tipp:'Die Nutzenergie steht über der Tabelle (pro Sekunde abgegeben), die zugeführte Energie in der Tabelle. Dann η = Nutzenergie : zugeführte Energie, mal 100.',niv:[2,3],typ:'zahl',frage:`Berechne die Wirkungsgrade der ${A.n} und der ${C.n}.`,rows:[{l:`η ${A.n} =`,w:eta(A),u:'%'},{l:`η ${C.n} =`,w:eta(C),u:'%'}],erkl:`${A.n}: η = ${f(d.nutz)} J : ${f(A.z)} J = ${f(eta(A))} % · ${C.n}: η = ${f(d.nutz)} J : ${f(C.z)} J = ${f(eta(C))} %`}),
+    MZ('S','II',{tipp:'Es kommt bei allen gleich viel Nutzenergie heraus. Wohin geht der Rest der zugeführten Energie?',niv:[1],typ:'mc',frage:`Warum braucht die ${A.n} so viel mehr Energie, obwohl alle ${d.alle}?`,...mcOk('Sie wandelt den größten Teil der Energie in Wärme um.',[`Sie gibt mehr ${d.nw.split(' (')[0]} ab.`,'Sie vernichtet Energie.','Sie hält länger.'])}),
+    MZ('K','II',{tipp:'Vergleiche die Nutzenergie mit der zugeführten Energie. Was passiert mit der Differenz – und was heißt das für den Wirkungsgrad?',niv:[2],typ:'offen',frage:`Erkläre mithilfe des Materials, warum die ${A.n} viel mehr Energie braucht als die ${C.n}.`,ideal:`Beide geben nur ${f(d.nutz)} J pro Sekunde ab. Die ${A.n} bekommt aber ${f(A.z)} J. Die restlichen ${f(A.z-d.nutz)} J werden in <b>Wärme</b> umgewandelt und sind entwertet. Ihr Wirkungsgrad ist deshalb sehr klein (${f(eta(A))} %).`,krit:[`gleiche Nutzenergie ${f(d.nutz)} J`,'Rest wird zu Wärme (entwertet)','kleiner Wirkungsgrad']}),
+    MZ('B','III',{tipp:'Nimm mindestens zwei Spalten der Tabelle als Kriterien: Preis, Lebensdauer, Energiebedarf. Wie viele billige Geräte bräuchte man in der Lebensdauer des teuersten? Schreib am Ende dein Urteil.',niv:[2,3],typ:'offen',punkte:3,frage:`Opa sagt: „Die ${A.n} ist am billigsten, die kaufe ich.“ Beurteile seine Aussage. Nutze mindestens zwei Kriterien aus dem Material.`,
      ideal:`Beim <b>Kaufpreis</b> hat Opa recht (${eu(A.p)} statt ${eu(C.p)}). Aber: Die ${C.n} hält ${f(C.life)} ${d.lu} – in dieser Zeit bräuchte man <b>${f(anz)} Stück</b> der ${A.n} (${eu(anz*A.p)}). Außerdem braucht die ${A.n} pro Sekunde <b>${f(A.z)} J statt ${f(C.z)} J</b>, also ${f(A.z/C.z)}-mal so viel elektrische Energie – das kostet Strom und belastet die Umwelt.<br><b>Urteil:</b> Nur auf den Kaufpreis zu schauen, ist kein gutes Kriterium. Auf Dauer ist die ${C.n} sparsamer${anz*A.p>C.p?' und sogar günstiger':''}.`,
      krit:['Kriterium Kaufpreis',`Kriterium Lebensdauer (${f(anz)} Stück)`,`Kriterium Energiebedarf (${f(A.z)} J statt ${f(C.z)} J)`,'eigenes, begründetes Urteil']})]};}},
  // Höhe nimmt ab: Beobachtung, Erklärung, Experiment planen
@@ -495,14 +540,14 @@ const IQB={
   const h0=pick([100,120,150]),q=pick([.75,.8]);return {titel:'Der Flummi springt immer niedriger',h:[0,1,2,3,4,5].map(i=>rd(h0*q**i,1)),txt:'Mara lässt einen Flummi auf den Boden fallen. Nach jedem Aufprall misst sie, wie hoch er wieder springt.',sp:'Aufprall',ding:'der Flummi',wer:'Mara',hyp:'„Auf einem Holzboden springt der Flummi höher als auf einem Teppich.“',vari:'Art des Bodens',konst:'gleicher Flummi, gleiche Fallhöhe, fallen lassen statt werfen',erkl:'Beim Aufprall wird ein Teil der Energie in Wärme umgewandelt.',wo:'(Verformung beim Aufprall, Luft)'};},
   build:d=>{const H=d.h,ab=H[0]-H[5],mat=`<div class="ml">Material: Messung von ${d.wer}</div>${d.txt}<table class="t"><tr><th>${d.sp}</th>${H.map((_,i)=>`<td class="n">${i}</td>`).join('')}</tr><tr><th>Höhe in cm</th>${H.map(x=>`<td class="n">${f(x,1)}</td>`).join('')}</tr></table>`;
    return {mat,T:[
-    MZ('E','I',{niv:[1,2,3],typ:'mc',frage:`Was beobachtet ${d.wer}?`,...mcOk('Die Höhe nimmt mit jedem Mal ab.',['Die Höhe bleibt gleich.','Die Höhe nimmt zu.','Die Höhe schwankt zufällig.'])}),
-    MZ('E','I',{niv:[1],typ:'zahl',frage:`Um wie viele Zentimeter hat die Höhe bis zum 5. Mal insgesamt abgenommen?`,rows:[{l:'Abnahme:',w:ab,u:'cm'}],erkl:`${f(H[0],1)} cm − ${f(H[5],1)} cm = ${f(ab,1)} cm`}),
-    MZ('E','II',{niv:[1,2],typ:'select',frage:'Ist die Aussage eine Beobachtung (Messwert) oder eine Erklärung (Deutung)?',rows:shuffle([
+    MZ('E','I',{tipp:'Lies die Höhen in der Tabelle von links nach rechts.',niv:[1,2,3],typ:'mc',frage:`Was beobachtet ${d.wer}?`,...mcOk('Die Höhe nimmt mit jedem Mal ab.',['Die Höhe bleibt gleich.','Die Höhe nimmt zu.','Die Höhe schwankt zufällig.'])}),
+    MZ('E','I',{tipp:'Erste Höhe minus letzte Höhe.',niv:[1],typ:'zahl',frage:`Um wie viele Zentimeter hat die Höhe bis zum 5. Mal insgesamt abgenommen?`,rows:[{l:'Abnahme:',w:ab,u:'cm'}],erkl:`${f(H[0],1)} cm − ${f(H[5],1)} cm = ${f(ab,1)} cm`}),
+    MZ('E','II',{tipp:'Eine Beobachtung ist das, was man misst oder sieht (Zahlen aus der Tabelle). Eine Erklärung sagt, warum es so ist.',zusatz:1,niv:[1,2],typ:'select',frage:'Ist die Aussage eine Beobachtung (Messwert) oder eine Erklärung (Deutung)?',rows:shuffle([
      {l:`Beim 5. Mal kommt ${d.ding} nur noch ${f(H[5],1)} cm hoch.`,opts:['Beobachtung','Erklärung'],r:'Beobachtung'},{l:d.erkl,opts:['Beobachtung','Erklärung'],r:'Erklärung'},
      {l:`Die Höhe nimmt von ${f(H[0],1)} cm auf ${f(H[1],1)} cm ab.`,opts:['Beobachtung','Erklärung'],r:'Beobachtung'},{l:`Weil die Höhe abnimmt, hat ${d.ding} oben weniger potenzielle Energie.`,opts:['Beobachtung','Erklärung'],r:'Erklärung'}])}),
-    MZ('S','II',{niv:[2,3],typ:'offen',frage:`Max sagt: „${cap(d.ding)} verliert Energie – also stimmt der Energieerhaltungssatz nicht.“ Nimm Stellung.`,
+    MZ('S','II',{tipp:'Geht die Energie wirklich verloren? Wohin geht sie? Verwende das Wort „entwertet“.',niv:[2,3],typ:'offen',frage:`Max sagt: „${cap(d.ding)} verliert Energie – also stimmt der Energieerhaltungssatz nicht.“ Nimm Stellung.`,
      ideal:`Max hat <b>nicht recht</b>. Die Energie geht nicht verloren: Durch Reibung ${d.wo} wird ein Teil in <b>Wärme</b> umgewandelt und an die Umgebung abgegeben. Für die Bewegung ist diese Energie <b>entwertet</b>, deshalb wird die Höhe kleiner. Insgesamt bleibt die Energie erhalten.`,krit:['Max hat nicht recht','Umwandlung in Wärme','Energie bleibt insgesamt erhalten / entwertet']}),
-    MZ('E','III',{niv:[3],typ:'offen',punkte:3,frage:`${d.wer} vermutet: ${d.hyp} Beschreibe ein Experiment, mit dem die Vermutung geprüft werden kann.`,
+    MZ('E','III',{tipp:'Ein fairer Versuch: nur eine Sache verändern, alles andere gleich lassen. Was misst du – und wie oft?',zusatz:1,niv:[3],typ:'offen',punkte:3,frage:`${d.wer} vermutet: ${d.hyp} Beschreibe ein Experiment, mit dem die Vermutung geprüft werden kann.`,
      ideal:`Man verändert <b>nur eine Größe: die ${d.vari}</b>. Alles andere bleibt gleich: ${d.konst}. Man misst bei beiden Versuchen die Höhen wie in der Tabelle und vergleicht sie. Die Messung wird mehrmals wiederholt. Passen die Ergebnisse zur Vermutung, ist sie gestützt.`,
      krit:[`nur die ${d.vari} verändern`,'alles andere gleich halten','Höhen messen und vergleichen','Messung wiederholen']})]};}},
  // Perpetuum mobile in der Werbung
@@ -513,10 +558,10 @@ const IQB={
     wid:`Der Dynamo lädt mehr Energie in den Akku (${f(X*k)} J), als der Motor braucht (${X} J) – ohne Treten.`,neben:['Das E-Bike hat einen Akku.','Im Vorderrad ist ein Dynamo.','Ein Influencer hat es getestet.'],beleg:'„Ein bekannter Influencer hat es getestet“',ding:'das Endlos-E-Bike'}]);},
   build:d=>{const X=d.X,mat=`<div class="ml">Material: Werbung im Internet</div><div class="ad">${d.ad}</div>`;
    return {mat,T:[
-    MZ('K','I',{niv:[1,2,3],typ:'mc',frage:'Welche Aussage der Werbung widerspricht dem Energieerhaltungssatz?',...mcOk(d.wid,d.neben)}),
-    MZ('S','II',{niv:[1,2],typ:'mc',frage:`Ein echtes Gerät bekommt ${X} J. Welcher Energiefluss ist möglich?`,...mcOk(`${X} J → ${f(X*.7)} J Nutzenergie + ${f(X*.3)} J Wärme`,[`${X} J → ${f(X*1.5)} J Nutzenergie`,`${X} J → ${X} J Nutzenergie + ${f(X*.2)} J Wärme`,`${X} J → ${X} J Nutzenergie, keine Wärme`]),erkl:'Zugeführte Energie = Nutzenergie + entwertete Energie, und es wird immer etwas entwertet.'}),
-    MZ('K','II',{niv:[2,3],typ:'mc',frage:`Die Werbung schreibt ${d.beleg}. Ist das ein Beleg dafür, dass das Gerät funktioniert?`,...mcOk('Nein – das ist keine Messung. Ein Beleg wäre eine überprüfbare Messung von zugeführter und abgegebener Energie.',['Ja – das ist ein Beweis.','Ja, wenn genug Leute es glauben.'])}),
-    MZ('B','III',{niv:[2,3],typ:'offen',punkte:3,frage:`Dein Onkel will ${d.ding} kaufen. Beurteile, ob er das tun sollte, und begründe physikalisch.`,
+    MZ('K','I',{tipp:'Welche Aussage behauptet, dass mehr Energie herauskommt, als hineingeht?',niv:[1,2,3],typ:'mc',frage:'Welche Aussage der Werbung widerspricht dem Energieerhaltungssatz?',...mcOk(d.wid,d.neben)}),
+    MZ('S','II',{tipp:'Zugeführte Energie = Nutzenergie + Wärme – und ein bisschen Wärme entsteht immer.',niv:[1,2],typ:'mc',frage:`Ein echtes Gerät bekommt ${X} J. Welcher Energiefluss ist möglich?`,...mcOk(`${X} J → ${f(X*.7)} J Nutzenergie + ${f(X*.3)} J Wärme`,[`${X} J → ${f(X*1.5)} J Nutzenergie`,`${X} J → ${X} J Nutzenergie + ${f(X*.2)} J Wärme`,`${X} J → ${X} J Nutzenergie, keine Wärme`]),erkl:'Zugeführte Energie = Nutzenergie + entwertete Energie, und es wird immer etwas entwertet.'}),
+    MZ('K','II',{tipp:'Was wäre ein echter physikalischer Beleg: Meinungen oder Messungen?',niv:[2,3],typ:'mc',frage:`Die Werbung schreibt ${d.beleg}. Ist das ein Beleg dafür, dass das Gerät funktioniert?`,...mcOk('Nein – das ist keine Messung. Ein Beleg wäre eine überprüfbare Messung von zugeführter und abgegebener Energie.',['Ja – das ist ein Beweis.','Ja, wenn genug Leute es glauben.'])}),
+    MZ('B','III',{tipp:'Wie nennt man eine Maschine, die ohne Energiezufuhr ewig läuft? Begründe mit dem Energieerhaltungssatz und schreib ein klares Urteil.',niv:[2,3],typ:'offen',punkte:3,frage:`Dein Onkel will ${d.ding} kaufen. Beurteile, ob er das tun sollte, und begründe physikalisch.`,
      ideal:'Er sollte es <b>nicht kaufen</b>. Das Gerät soll dauerhaft mehr Energie abgeben, als ihm zugeführt wird – das ist ein <b>Perpetuum mobile</b>. Nach dem <b>Energieerhaltungssatz</b> kann keine Energie erzeugt werden; außerdem wird bei jeder Umwandlung ein Teil entwertet. Es kann also nicht funktionieren, das Geld wäre verloren.',krit:['klares Urteil','Perpetuum mobile','Energieerhaltungssatz','Entwertung']})]};}},
  // zwei Antriebe im Energieflussdiagramm, Herkunft des Stroms
  antrieb:{bereich:6,make:()=>pick([
@@ -525,11 +570,11 @@ const IQB={
   build:d=>{const mat=`<div class="ml">Material: Energieflussdiagramme (je 100 J)</div><div class="svgbox">${sankey({bz:100,bn:d.ea,bw:100-d.ea,lz:'100 J chemische Energie',ln:d.ea+' J Bewegung',lw:(100-d.ea)+' J Wärme',dev:d.a,s:.8})}</div><div class="svgbox">${sankey({bz:100,bn:d.eb,bw:100-d.eb,lz:'100 J elektrische Energie',ln:d.eb+' J Bewegung',lw:(100-d.eb)+' J Wärme',dev:d.b,s:.8})}</div>`;
    const kette=d.ek*d.eb/100;
    return {mat,T:[
-    MZ('K','I',{niv:[1,2],typ:'zahl',frage:`Lies ab: Wie viel Energie wird ${d.dem} entwertet?`,rows:[{l:'entwertet:',w:100-d.ea,u:'J'}]}),
-    MZ('S','II',{niv:[1,2,3],typ:'zahl',frage:'Berechne die Wirkungsgrade der beiden Antriebe.',rows:[{l:`η ${d.a} =`,w:d.ea,u:'%'},{l:`η ${d.b} =`,w:d.eb,u:'%'}],erkl:`${d.a}: η = ${d.ea} J : 100 J = ${d.ea} % · ${d.b}: η = ${d.eb} J : 100 J = ${d.eb} %`}),
-    MZ('S','III',{niv:[3],typ:'zahl',punkte:2,frage:`Der Strom für die/das ${d.b} kommt aus einem ${d.kw} mit dem Wirkungsgrad ${d.ek} %. Von 100 J chemischer Energie im Brennstoff: Wie viel kommt am Ende als Bewegungsenergie an?`.replace('die/das E-Auto','das E-Auto').replace('die/das E-Lok','die E-Lok'),rows:[{l:'Bewegungsenergie:',w:kette,u:'J'}],
+    MZ('K','I',{tipp:'Die entwertete Energie ist der Pfeil, der nach unten abzweigt.',niv:[1,2],typ:'zahl',frage:`Lies ab: Wie viel Energie wird ${d.dem} entwertet?`,rows:[{l:'entwertet:',w:100-d.ea,u:'J'}]}),
+    MZ('S','II',{tipp:'η = Bewegungsenergie : zugeführte Energie (100 J), dann mal 100.',niv:[1,2,3],typ:'zahl',frage:'Berechne die Wirkungsgrade der beiden Antriebe.',rows:[{l:`η ${d.a} =`,w:d.ea,u:'%'},{l:`η ${d.b} =`,w:d.eb,u:'%'}],erkl:`${d.a}: η = ${d.ea} J : 100 J = ${d.ea} % · ${d.b}: η = ${d.eb} J : 100 J = ${d.eb} %`}),
+    MZ('S','III',{tipp:'Rechne in zwei Schritten: Wie viel Strom macht das Kraftwerk aus 100 J? Wie viel Bewegung macht das Fahrzeug aus diesem Strom?',niv:[3],typ:'zahl',punkte:2,frage:`Der Strom für die/das ${d.b} kommt aus einem ${d.kw} mit dem Wirkungsgrad ${d.ek} %. Von 100 J chemischer Energie im Brennstoff: Wie viel kommt am Ende als Bewegungsenergie an?`.replace('die/das E-Auto','das E-Auto').replace('die/das E-Lok','die E-Lok'),rows:[{l:'Bewegungsenergie:',w:kette,u:'J'}],
      erkl:`${d.kw}: ${f(d.ek/100)} · 100 J = ${d.ek} J elektrische Energie · ${d.b}: ${f(d.eb/100)} · ${d.ek} J = ${f(kette)} J Bewegungsenergie`}),
-    MZ('B','III',{niv:[2,3],typ:'offen',punkte:3,frage:`In einer Zeitung steht: „Elektrisch angetriebene ${d.fahr} nutzen die Energie immer viel besser.“ Beurteile die Aussage.`,
+    MZ('B','III',{tipp:'Vergleiche die Wirkungsgrade der Antriebe. Überlege dann: Woher kommt der Strom? Schreib am Ende dein Urteil zum Wort „immer“.',niv:[2,3],typ:'offen',punkte:3,frage:`In einer Zeitung steht: „Elektrisch angetriebene ${d.fahr} nutzen die Energie immer viel besser.“ Beurteile die Aussage.`,
      ideal:`Der <b>Antrieb</b> selbst ist viel besser (${d.eb} % statt ${d.ea} %). Es kommt aber darauf an, <b>woher der Strom kommt</b>: Aus einem ${d.kw} (${d.ek} %) kommen von 100 J im Brennstoff nur ${f(kette)} J als Bewegung an – ${kette>=d.ea*1.4?'zwar mehr als':'kaum mehr als'} die ${d.ea} J ${d.dem}. Mit Strom aus Wind oder Sonne ist der elektrische Antrieb klar besser.<br><b>Urteil:</b> „Immer viel besser“ stimmt so nicht – es hängt von der Stromquelle ab.`,krit:['Wirkungsgrade verglichen','Herkunft des Stroms berücksichtigt','begründetes Urteil („immer“ stimmt nicht)']})]};}},
  // drei Geräte im Test: Leistung, Energie, Wirkungsgrad, Bewertung
  test3:{bereich:8,make:()=>{let d;
@@ -538,11 +583,11 @@ const IQB={
   d.dv.forEach(x=>{x.t=Math.round(d.Q/(x.e*x.P));x.E=x.P*x.t;x.eta=d.Q/x.E*100;});return d;},
   build:d=>{const [A,B,C]=d.dv,mat=`<div class="ml">Material: Test</div>${d.txt}<table class="t"><tr><th>${d.ein}</th><th>Leistung</th><th>Zeit ${d.ziel}</th></tr>${d.dv.map(x=>`<tr><td>${x.n}</td><td class="n">${f(x.P)} W</td><td class="n">${x.t} s</td></tr>`).join('')}</table>`;
    return {mat,T:[
-    MZ('K','I',{niv:[1,2],typ:'mc',frage:`Welcher ${d.ein} hat die größte Leistung?`,opts:['A','B','C'],richtig:2}),
-    MZ('E','II',{niv:[1,2],typ:'mc',multi:true,frage:'Was muss bei allen drei Messungen gleich sein, damit der Test fair ist? Notiere alle richtigen Buchstaben.',...mcMulti(d.fair)}),
-    MZ('S','II',{niv:[1,2,3],typ:'zahl',frage:`Berechne die elektrische Energie, die ${d.ein} A ${d.ziel} umwandelt (E = P · t).`,rows:[{l:'E =',w:A.E,u:'J'}],erkl:`E = P · t = ${f(A.P)} W · ${A.t} s = ${f(A.E)} J`}),
-    MZ('S','III',{niv:[2,3],typ:'zahl',punkte:2,frage:`Berechne den Wirkungsgrad von ${d.ein} B.`,rows:[{l:'η =',w:B.eta,u:'%'}],erkl:`${ZU} = ${f(B.P)} W · ${B.t} s = ${f(B.E)} J · ${NU} = ${f(d.Q)} J · η = ${f(d.Q)} J : ${f(B.E)} J ≈ ${f(B.eta/100,4)} = ${f(B.eta)} %`}),
-    MZ('B','III',{niv:[3],typ:'offen',punkte:3,frage:`Max sagt: „Der stärkste ${d.ein} ist der beste.“ Beurteile die Aussage mit zwei Kriterien.`,
+    MZ('K','I',{tipp:'Die Leistung steht in Watt in der Tabelle – die größte Zahl gewinnt.',niv:[1,2],typ:'mc',frage:`Welcher ${d.ein} hat die größte Leistung?`,opts:['A','B','C'],richtig:2}),
+    MZ('E','II',{tipp:'Ein Test ist fair, wenn alles gleich ist – außer dem Gerät, das getestet wird.',zusatz:1,niv:[1,2],typ:'mc',multi:true,frage:'Was muss bei allen drei Messungen gleich sein, damit der Test fair ist? Notiere alle richtigen Buchstaben.',...mcMulti(d.fair)}),
+    MZ('S','II',{tipp:'E = P · t – Leistung und Zeit stehen in der Tabelle.',niv:[1,2,3],typ:'zahl',frage:`Berechne die elektrische Energie, die ${d.ein} A ${d.ziel} umwandelt (E = P · t).`,rows:[{l:'E =',w:A.E,u:'J'}],erkl:`E = P · t = ${f(A.P)} W · ${A.t} s = ${f(A.E)} J`}),
+    MZ('S','III',{tipp:'Erst die zugeführte Energie mit E = P · t ausrechnen. Die Nutzenergie steht über der Tabelle. Dann η = Nutzenergie : zugeführte Energie.',niv:[2,3],typ:'zahl',punkte:2,frage:`Berechne den Wirkungsgrad von ${d.ein} B.`,rows:[{l:'η =',w:B.eta,u:'%'}],erkl:`${ZU} = ${f(B.P)} W · ${B.t} s = ${f(B.E)} J · ${NU} = ${f(d.Q)} J · η = ${f(d.Q)} J : ${f(B.E)} J ≈ ${f(B.eta/100,4)} = ${f(B.eta)} %`}),
+    MZ('B','III',{tipp:'Zwei Kriterien: Wie schnell? Wie viel Energie wird gebraucht? Rechne für alle drei E = P · t aus.',niv:[3],typ:'offen',punkte:3,frage:`Max sagt: „Der stärkste ${d.ein} ist der beste.“ Beurteile die Aussage mit zwei Kriterien.`,
      ideal:`Kriterium <b>Zeit</b>: C ist am schnellsten (${C.t} s). Kriterium <b>Energiebedarf / Wirkungsgrad</b>: C braucht ${f(C.E)} J (η ≈ ${f(C.eta,0)} %), A ${f(A.E)} J (η ≈ ${f(A.eta,0)} %), B nur ${f(B.E)} J (η ≈ ${f(B.eta,0)} %). C entwertet also am meisten Energie.<br><b>Urteil:</b> „Der Beste“ hängt vom Kriterium ab – am schnellsten ist C, am sparsamsten ist B. Max’ Aussage stimmt so nicht.`,krit:['Kriterium Zeit','Kriterium Energie/Wirkungsgrad mit Werten','begründetes Urteil']})]};}},
  // Energiespeicher durch Heben
  speicher:{bereich:7,make:()=>{let d;
@@ -555,12 +600,13 @@ const IQB={
   d.Ep=d.m*g*d.h;d.zu=Math.round(d.Ep/d.ez/100000)*100;d.ab=Math.round(d.Ep*d.ea/100000)*100;return d;},
   build:d=>{const mat=`<div class="ml">Material</div>${d.txt}`,eta=d.ab/d.zu*100;
    return {mat,T:[
-    MZ('S','I',{niv:[1,2],typ:'select',frage:'Ergänze die Energieumwandlungen beim Stromerzeugen.',rows:[{l:d.s[0],opts:optU,r:'potenzielle Energie'},{l:d.s[1],opts:optU,r:'kinetische Energie'},{l:d.s[2],opts:optU,r:'elektrische Energie'}]}),
-    MZ('S','II',{niv:[1,2,3],typ:'zahl',frage:`Berechne die potenzielle Energie, die ${d.ding} hat.`,rows:[{l:EP+' =',w:d.Ep,u:'J'}],erkl:`${EP} = m · g · h = ${f(d.m)} kg · 9,81 N/kg · ${d.h} m = ${f(d.Ep)} J`}),
-    MZ('S','III',{niv:[2,3],typ:'zahl',punkte:2,frage:`Zum ${d.hoch} werden ${f(d.zu)} kJ elektrische Energie gebraucht. Beim ${d.run} liefert der Generator ${f(d.ab)} kJ. Berechne den Wirkungsgrad des ganzen Speichers.`,rows:[{l:'η =',w:eta,u:'%'}],erkl:`η = ${f(d.ab)} kJ : ${f(d.zu)} kJ ≈ ${f(eta/100,4)} = ${f(eta)} %`}),
-    MZ('B','III',{niv:[3],typ:'offen',punkte:3,frage:`Beim Speichern werden rund ${f(100-eta,0)} % der Energie entwertet. Trotzdem baut man solche Speicher. Bewerte, ob sich das lohnt.`,
+    MZ('S','I',{tipp:'Oben → Höhe, nach unten bewegen → Bewegung, Generator → Strom.',niv:[1,2],typ:'select',frage:'Ergänze die Energieumwandlungen beim Stromerzeugen.',rows:[{l:d.s[0],opts:optU,r:'potenzielle Energie'},{l:d.s[1],opts:optU,r:'kinetische Energie'},{l:d.s[2],opts:optU,r:'elektrische Energie'}]}),
+    MZ('S','II',{tipp:'E<sub>pot</sub> = m · g · h – Masse und Höhe stehen im Material, g = 9,81 N/kg.',niv:[1,2,3],typ:'zahl',frage:`Berechne die potenzielle Energie, die ${d.ding} hat.`,rows:[{l:EP+' =',w:d.Ep,u:'J'}],erkl:`${EP} = m · g · h = ${f(d.m)} kg · 9,81 N/kg · ${d.h} m = ${f(d.Ep)} J`}),
+    MZ('S','III',{tipp:'η = was herauskommt : was hineingesteckt wurde.',niv:[2,3],typ:'zahl',punkte:2,frage:`Zum ${d.hoch} werden ${f(d.zu)} kJ elektrische Energie gebraucht. Beim ${d.run} liefert der Generator ${f(d.ab)} kJ. Berechne den Wirkungsgrad des ganzen Speichers.`,rows:[{l:'η =',w:eta,u:'%'}],erkl:`η = ${f(d.ab)} kJ : ${f(d.zu)} kJ ≈ ${f(eta/100,4)} = ${f(eta)} %`}),
+    MZ('B','III',{tipp:'Wann gibt es Wind- und Solarstrom – und wann braucht man ihn? Nenne ein Argument dafür, eins dagegen und dann dein Urteil.',niv:[3],typ:'offen',punkte:3,frage:`Beim Speichern werden rund ${f(100-eta,0)} % der Energie entwertet. Trotzdem baut man solche Speicher. Bewerte, ob sich das lohnt.`,
      ideal:'<b>Dafür:</b> Wind- und Solarstrom gibt es nicht immer dann, wenn man ihn braucht. Überschüssiger Strom wäre sonst ungenutzt (Windräder würden abgeschaltet). Mit dem Speicher steht er nachts oder bei Windstille zur Verfügung. <b>Dagegen:</b> Ein Teil wird entwertet, und der Bau ist ein großer Eingriff in Natur und Landschaft.<br><b>Urteil:</b> Für eine Versorgung mit erneuerbaren Energien lohnt es sich, weil gespeicherte Energie besser ist als ungenutzte Überschüsse.',krit:['Argument für den Speicher','Argument dagegen (Entwertung/Natur)','abgewogenes Urteil']})]};}},
 };
+const TIPP_KETTE='Geh Schritt für Schritt: Ist es hoch oben? Bewegt es sich? Fließt Strom? Wird es in einem Akku gespeichert (chemisch)? Leuchtet es?';
 function iqb(key,n){const u=IQB[key],d=u.make(),{mat,T:TT}=u.build(d);
  return {typ:'einheit',titel:d.titel,material:mat,bereich:u.bereich,teile:TT.filter(t=>t.niv.includes(n)).map(t=>({...t,punkte:t.punkte||(t.typ==='offen'?2:t.typ==='mc'?1:Math.max(1,(t.rows||[]).length*.5))}))};}
 
@@ -576,10 +622,10 @@ const BER=[
  {nr:7,name:'7 Potenzielle Energie',info:'',tasks:n=>n===1?[T.epotAbh(),p7a(),p7b(),p7c(),iqb('speicher',1)]:n===2?[p7d(),p7e(),p7f(),iqb('speicher',2)]:[p7g(),p7h(),p7i(),iqb('speicher',3)],ka:n=>[n===1?pick([p7a,p7b,p7c])():n===2?pick([p7d,p7e,p7f])():pick([p7g,p7h,p7i])()]},
  {nr:8,name:'8 Leistung',info:'',tasks:n=>n===1?[T.leistungIst(),T.leistungZeichen(),l8a(),l8b(),l8c(),iqb('test3',1)]:n===2?[T.leistungZeichen(),l8d(),l8e(),l8f(),T.vergleich(),iqb('test3',2)]:[l8g(),l8h(),l8i(),iqb('test3',3)],ka:n=>[n===1?pick([l8a,l8b,l8c])():n===2?pick([l8d,l8e,l8f])():pick([l8g,l8h,l8i])()]},
 ];
-function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});L.push(iqb(pick(Object.keys(IQB)),n));return L;}
+function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});const u=iqb(pick(Object.keys(IQB)),n);u.teile=u.teile.filter(t=>!t.zusatz);L.push(u);return L;}
 
 /* ============ Zustand + Ansichten ============ */
-const S={mode:null,ber:null,niv:null,list:[],i:0,res:{},inp:{}};
+const S={mode:null,ber:null,niv:null,list:[],i:0,res:{},inp:{},tip:{}};
 const VW=document.getElementById('view');
 const NIV={1:['★','Grundlagen','Größen stehen mit Formelzeichen und Einheit im Text. Einfache Fragen.'],2:['★★','Standard','Ohne Formelzeichen, manche Einheiten musst du erst umrechnen.'],3:['★★★','Profi','Mehrere Rechnungen verknüpfen, überflüssige Angaben aussortieren, Aussagen beurteilen.']};
 const FUENF='<div class="fuenf">✎ <b>Rechne im Heft im Fünf-Schritt:</b><ol><li>① <b>gegeben:</b> Formelzeichen = Wert mit Einheit (umgerechnet)</li><li>② <b>gesucht:</b> Formelzeichen und Einheit</li><li>③ <b>Formel</b> (umgestellt, gesuchte Größe vorne)</li><li>④ <b>Rechnung</b> mit Formelzeichen und Einheiten</li><li>⑤ <b>Antwortsatz</b> mit Formelzeichen, Zahl und Einheit</li></ol></div>';
@@ -591,6 +637,7 @@ function startView(){S.mode=null;S.ber=null;S.niv=null;
   <button class="big" data-m="ber"><b>Einen Bereich</b><small>Alle Aufgaben zu einer Seite aus deinem OneNote-Heft.</small></button></div></div>
   <div class="card"><h2>So funktioniert's</h2><ul>
   <li>Du löst jede Aufgabe <b>auf Papier</b> bzw. in deinem Heft. Rechenaufgaben immer im <b>Fünf-Schritt</b>. Bei Rechenaufgaben tippst du nur dein <b>Endergebnis</b> ein – die App prüft es und sagt dir, welcher Fehler dahinterstecken könnte.</li>
+  <li>Wenn du nicht weiterkommst, hol dir einen <b>Tipp ▶</b> – bei Rechenaufgaben gibt es mehrere, Schritt für Schritt.</li>
   <li>Dann tippst du auf <b>Ideallösung anzeigen</b>, vergleichst ehrlich und gibst an, wie es lief: ✓ richtig · ◐ teilweise · ✗ noch nicht.</li>
   <li>Aufgaben mit <b>Material</b> (Text, Tabelle, Diagramm) sind wie die Vergleichsaufgaben des IQB: Lies zuerst genau das Material.</li>
   <li>Bei jedem Durchgang bekommst du <b>neue Aufgaben</b>: gleiches Muster, anderer Zusammenhang, andere Zahlen – aber gleich schwer.</li></ul></div>`;
@@ -601,13 +648,22 @@ function berView(){VW.innerHTML=`<div class="card"><h2>Welchen Bereich?</h2><p c
 function nivView(){VW.innerHTML=`<div class="card"><h2>${S.mode==='ka'?'Ganze Klassenarbeit':BER[S.ber].name}: Welches Niveau?</h2><div class="choice">${[1,2,3].map(n=>`<button class="big" data-n="${n}"><b><span class="stars">${NIV[n][0]}</span> ${NIV[n][1]}</b><small>${NIV[n][2]}</small></button>`).join('')}</div>
  <div class="actions"><button class="btn ghost" id="back">← zurück</button></div></div>`;
  VW.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{S.niv=+b.dataset.n;go();});document.getElementById('back').onclick=()=>S.mode==='ka'?startView():berView();scrollTo(0,0);}
-function go(){S.list=S.mode==='ka'?klassenarbeit(S.niv):BER[S.ber].tasks(S.niv).map(t=>({bereich:S.ber,...t}));S.i=0;S.res={};S.inp={};taskView();}
+function go(){S.list=S.mode==='ka'?klassenarbeit(S.niv):BER[S.ber].tasks(S.niv).map(t=>({bereich:S.ber,...t}));S.i=0;S.res={};S.inp={};S.tip={};taskView();}
 
 /* ---------- Aufgabe anzeigen (nur lesen, Lösung auf Papier) ---------- */
+// Tipps einer Teilaufgabe: eigene Tipps, sonst aus der Rechnung abgeleitet (gestuft)
+function tipps(t){
+ if(t.typ==='rechnen'){const L=[`Gesucht ist <b>${t.ges}</b>. Schreib zuerst ① gegeben: alle Größen mit Formelzeichen und Einheit.`];
+  const um=t.geg.filter(x=>(x.match(/=/g)||[]).length>1);if(um.length)L.push('Erst umrechnen: '+um.join(' · '));
+  if(t.schritte.length>1)L.push(`Das geht in ${t.schritte.length} Schritten. Rechne zuerst: ${t.schritte[0].t.replace('Zwischenschritt: ','')}. Formel: ${t.schritte[0].formel}`);
+  L.push(`Diese Formel brauchst du${t.schritte.length>1?' danach':''}: ${t.schritte[t.schritte.length-1].formel}`);
+  if(t.hin)L.push(t.hin);return L;}
+ const x=t.tipp||TIPP[t.titel]||(t.titel&&t.titel.startsWith('Umwandlungskette')?TIPP_KETTE:null);
+ return x?[].concat(x):['Lies die Aufgabe noch einmal genau und unterstreiche die wichtigen Wörter.'];}
 const sameOpts=rows=>rows.every(r=>r.opts.join('|')===rows[0].opts.join('|'));
 function subHTML(t,k,lab){
  let h=`<div class="teil" id="s${k}">${lab?`<div class="tl">${lab}</div>`:''}`;
- if(t.k)h+=`<div class="chips"><span class="chip k">${KOMP[t.k]}</span><span class="chip">Anforderungsbereich ${t.afb}</span></div>`;
+ if(t.k)h+=`<div class="chips"><span class="chip k">${KOMP[t.k]}</span><span class="chip">Anforderungsbereich ${t.afb}</span>${t.zusatz?'<span class="chip zus">Zusatz – kam im Unterricht noch nicht dran</span>':''}</div>`;
  if(t.svg)h+=`<div class="svgbox">${t.svg}</div>`;
  if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis: <b>${t.erg.l} =</b></span><input inputmode="decimal" autocomplete="off" aria-label="Endergebnis"><span class="u">${t.erg.u}</span><button class="btn" data-a="check">Prüfen</button></div><div class="fbx"></div>`;
  else{h+=`<p class="q">${t.frage}</p>`;
@@ -617,7 +673,7 @@ function subHTML(t,k,lab){
    h+=`<div class="zr">${t.rows.map((r,i)=>`<span class="nr">${i+1}.</span><span>${r.l}${same?'':` <span class="note">(${r.opts.join(' / ')})</span>`}</span>`).join('')}</div><p class="note">Schreib zu jeder Nummer die passende Antwort auf.</p>`;}
   if(t.typ==='zahl')h+=`<div class="zr">${t.rows.map((r,i)=>`<span class="nr">${i+1}.</span><span>${r.l} <span class="leer"></span> ${r.u}</span>`).join('')}</div>`;
   if(t.typ==='offen')h+=`<div class="heft">✎ Schreib deine Antwort in ganzen Sätzen ins Heft.</div>`;}
- h+=`<div class="actions"><button class="btn ${t.typ==='rechnen'?'ghost':''}" data-a="ideal">${t.typ==='rechnen'?'Ich komme nicht weiter – Ideallösung zeigen':'Ideallösung anzeigen'}</button></div><div class="ideal hide">${idealHTML(t)}</div>
+ h+=`<div class="tipps"></div><div class="actions"><button class="btn tippbtn" data-a="tipp">Tipp ▶</button><button class="btn ${t.typ==='rechnen'?'ghost':''}" data-a="ideal">${t.typ==='rechnen'?'Ich komme nicht weiter – Ideallösung zeigen':'Ideallösung anzeigen'}</button></div><div class="ideal hide">${idealHTML(t)}</div>
   <div class="rate hide"><span>Wie lief's?</span><button data-r="ok">✓ richtig</button><button data-r="teil">◐ teilweise</button><button data-r="nein">✗ noch nicht</button></div></div>`;
  return h;}
 function idealHTML(t){
@@ -634,6 +690,9 @@ function bindSub(el,key,t){
  const setR=r=>{S.res[key]=r;rate.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));progress();};
  rate.querySelectorAll('button').forEach(b=>b.onclick=()=>setR(b.dataset.r));
  btn.onclick=()=>{ideal.classList.toggle('hide');rate.classList.remove('hide');btn.textContent=ideal.classList.contains('hide')?'Ideallösung anzeigen':'Ideallösung ausblenden';};
+ const tb=el.querySelector('[data-a="tipp"]'),tbox=el.querySelector('.tipps'),TL=tipps(t);let tn=0;
+ const zeig=n=>{tbox.innerHTML=TL.slice(0,n).map((x,i)=>`<div class="tipp"><b>Tipp${TL.length>1?' '+(i+1):''}:</b> ${x}</div>`).join('');tb.textContent=n<TL.length?(n?'Noch ein Tipp ▶':'Tipp ▶'):'Keine weiteren Tipps';tb.disabled=n>=TL.length;};
+ tb.onclick=()=>{tn++;S.tip[key]=tn;zeig(tn);};if(S.tip[key]){tn=S.tip[key];zeig(tn);}else zeig(0);
  const chk=el.querySelector('[data-a="check"]');
  if(chk){const inp=el.querySelector('.erg input'),box=el.querySelector('.erg'),fbx=el.querySelector('.fbx');
   const run=()=>{const v=parseDE(inp.value);if(!isFinite(v)){fbx.innerHTML='<div class="fb bad">Gib zuerst dein Endergebnis als Zahl ein.</div>';return;}
