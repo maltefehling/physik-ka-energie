@@ -86,7 +86,6 @@ input:focus{outline:3px solid var(--marker);border-color:var(--ink)}
 .tipp b{color:var(--lila)}
 .btn.tippbtn{background:#fff;border-color:var(--lila);color:var(--lila);box-shadow:3px 3px 0 var(--lila)}
 .btn.tippbtn:disabled{box-shadow:none}
-.chip.zus{border-color:#FBD9A8;color:#8A5A12;background:var(--hilfe)}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
 .btn{border:2px solid var(--ink);background:var(--marker);color:var(--ink);font:800 16px "Nunito",sans-serif;padding:9px 18px;border-radius:10px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);min-height:44px}
 .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
@@ -542,12 +541,12 @@ const IQB={
    return {mat,T:[
     MZ('E','I',{tipp:'Lies die Höhen in der Tabelle von links nach rechts.',niv:[1,2,3],typ:'mc',frage:`Was beobachtet ${d.wer}?`,...mcOk('Die Höhe nimmt mit jedem Mal ab.',['Die Höhe bleibt gleich.','Die Höhe nimmt zu.','Die Höhe schwankt zufällig.'])}),
     MZ('E','I',{tipp:'Erste Höhe minus letzte Höhe.',niv:[1],typ:'zahl',frage:`Um wie viele Zentimeter hat die Höhe bis zum 5. Mal insgesamt abgenommen?`,rows:[{l:'Abnahme:',w:ab,u:'cm'}],erkl:`${f(H[0],1)} cm − ${f(H[5],1)} cm = ${f(ab,1)} cm`}),
-    MZ('E','II',{tipp:'Eine Beobachtung ist das, was man misst oder sieht (Zahlen aus der Tabelle). Eine Erklärung sagt, warum es so ist.',zusatz:1,niv:[1,2],typ:'select',frage:'Ist die Aussage eine Beobachtung (Messwert) oder eine Erklärung (Deutung)?',rows:shuffle([
+    MZ('E','II',{tipp:'Eine Beobachtung ist das, was man misst oder sieht (Zahlen aus der Tabelle). Eine Erklärung sagt, warum es so ist.',niv:[1,2],typ:'select',frage:'Ist die Aussage eine Beobachtung (Messwert) oder eine Erklärung (Deutung)?',rows:shuffle([
      {l:`Beim 5. Mal kommt ${d.ding} nur noch ${f(H[5],1)} cm hoch.`,opts:['Beobachtung','Erklärung'],r:'Beobachtung'},{l:d.erkl,opts:['Beobachtung','Erklärung'],r:'Erklärung'},
      {l:`Die Höhe nimmt von ${f(H[0],1)} cm auf ${f(H[1],1)} cm ab.`,opts:['Beobachtung','Erklärung'],r:'Beobachtung'},{l:`Weil die Höhe abnimmt, hat ${d.ding} oben weniger potenzielle Energie.`,opts:['Beobachtung','Erklärung'],r:'Erklärung'}])}),
     MZ('S','II',{tipp:'Geht die Energie wirklich verloren? Wohin geht sie? Verwende das Wort „entwertet“.',niv:[2,3],typ:'offen',frage:`Max sagt: „${cap(d.ding)} verliert Energie – also stimmt der Energieerhaltungssatz nicht.“ Nimm Stellung.`,
      ideal:`Max hat <b>nicht recht</b>. Die Energie geht nicht verloren: Durch Reibung ${d.wo} wird ein Teil in <b>Wärme</b> umgewandelt und an die Umgebung abgegeben. Für die Bewegung ist diese Energie <b>entwertet</b>, deshalb wird die Höhe kleiner. Insgesamt bleibt die Energie erhalten.`,krit:['Max hat nicht recht','Umwandlung in Wärme','Energie bleibt insgesamt erhalten / entwertet']}),
-    MZ('E','III',{tipp:'Ein fairer Versuch: nur eine Sache verändern, alles andere gleich lassen. Was misst du – und wie oft?',zusatz:1,niv:[3],typ:'offen',punkte:3,frage:`${d.wer} vermutet: ${d.hyp} Beschreibe ein Experiment, mit dem die Vermutung geprüft werden kann.`,
+    MZ('E','III',{tipp:'Ein fairer Versuch: nur eine Sache verändern, alles andere gleich lassen. Was misst du – und wie oft?',niv:[3],typ:'offen',punkte:3,frage:`${d.wer} vermutet: ${d.hyp} Beschreibe ein Experiment, mit dem die Vermutung geprüft werden kann.`,
      ideal:`Man verändert <b>nur eine Größe: die ${d.vari}</b>. Alles andere bleibt gleich: ${d.konst}. Man misst bei beiden Versuchen die Höhen wie in der Tabelle und vergleicht sie. Die Messung wird mehrmals wiederholt. Passen die Ergebnisse zur Vermutung, ist sie gestützt.`,
      krit:[`nur die ${d.vari} verändern`,'alles andere gleich halten','Höhen messen und vergleichen','Messung wiederholen']})]};}},
  // Perpetuum mobile in der Werbung
@@ -584,7 +583,7 @@ const IQB={
   build:d=>{const [A,B,C]=d.dv,mat=`<div class="ml">Material: Test</div>${d.txt}<table class="t"><tr><th>${d.ein}</th><th>Leistung</th><th>Zeit ${d.ziel}</th></tr>${d.dv.map(x=>`<tr><td>${x.n}</td><td class="n">${f(x.P)} W</td><td class="n">${x.t} s</td></tr>`).join('')}</table>`;
    return {mat,T:[
     MZ('K','I',{tipp:'Die Leistung steht in Watt in der Tabelle – die größte Zahl gewinnt.',niv:[1,2],typ:'mc',frage:`Welcher ${d.ein} hat die größte Leistung?`,opts:['A','B','C'],richtig:2}),
-    MZ('E','II',{tipp:'Ein Test ist fair, wenn alles gleich ist – außer dem Gerät, das getestet wird.',zusatz:1,niv:[1,2],typ:'mc',multi:true,frage:'Was muss bei allen drei Messungen gleich sein, damit der Test fair ist? Notiere alle richtigen Buchstaben.',...mcMulti(d.fair)}),
+    MZ('E','II',{tipp:'Ein Test ist fair, wenn alles gleich ist – außer dem Gerät, das getestet wird.',niv:[1,2],typ:'mc',multi:true,frage:'Was muss bei allen drei Messungen gleich sein, damit der Test fair ist? Notiere alle richtigen Buchstaben.',...mcMulti(d.fair)}),
     MZ('S','II',{tipp:'E = P · t – Leistung und Zeit stehen in der Tabelle.',niv:[1,2,3],typ:'zahl',frage:`Berechne die elektrische Energie, die ${d.ein} A ${d.ziel} umwandelt (E = P · t).`,rows:[{l:'E =',w:A.E,u:'J'}],erkl:`E = P · t = ${f(A.P)} W · ${A.t} s = ${f(A.E)} J`}),
     MZ('S','III',{tipp:'Erst die zugeführte Energie mit E = P · t ausrechnen. Die Nutzenergie steht über der Tabelle. Dann η = Nutzenergie : zugeführte Energie.',niv:[2,3],typ:'zahl',punkte:2,frage:`Berechne den Wirkungsgrad von ${d.ein} B.`,rows:[{l:'η =',w:B.eta,u:'%'}],erkl:`${ZU} = ${f(B.P)} W · ${B.t} s = ${f(B.E)} J · ${NU} = ${f(d.Q)} J · η = ${f(d.Q)} J : ${f(B.E)} J ≈ ${f(B.eta/100,4)} = ${f(B.eta)} %`}),
     MZ('B','III',{tipp:'Zwei Kriterien: Wie schnell? Wie viel Energie wird gebraucht? Rechne für alle drei E = P · t aus.',niv:[3],typ:'offen',punkte:3,frage:`Max sagt: „Der stärkste ${d.ein} ist der beste.“ Beurteile die Aussage mit zwei Kriterien.`,
@@ -622,7 +621,7 @@ const BER=[
  {nr:7,name:'7 Potenzielle Energie',info:'',tasks:n=>n===1?[T.epotAbh(),p7a(),p7b(),p7c(),iqb('speicher',1)]:n===2?[p7d(),p7e(),p7f(),iqb('speicher',2)]:[p7g(),p7h(),p7i(),iqb('speicher',3)],ka:n=>[n===1?pick([p7a,p7b,p7c])():n===2?pick([p7d,p7e,p7f])():pick([p7g,p7h,p7i])()]},
  {nr:8,name:'8 Leistung',info:'',tasks:n=>n===1?[T.leistungIst(),T.leistungZeichen(),l8a(),l8b(),l8c(),iqb('test3',1)]:n===2?[T.leistungZeichen(),l8d(),l8e(),l8f(),T.vergleich(),iqb('test3',2)]:[l8g(),l8h(),l8i(),iqb('test3',3)],ka:n=>[n===1?pick([l8a,l8b,l8c])():n===2?pick([l8d,l8e,l8f])():pick([l8g,l8h,l8i])()]},
 ];
-function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});const u=iqb(pick(Object.keys(IQB)),n);u.teile=u.teile.filter(t=>!t.zusatz);L.push(u);return L;}
+function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});L.push(iqb(pick(Object.keys(IQB)),n));return L;}
 
 /* ============ Zustand + Ansichten ============ */
 const S={mode:null,ber:null,niv:null,list:[],i:0,res:{},inp:{},tip:{}};
@@ -663,7 +662,7 @@ function tipps(t){
 const sameOpts=rows=>rows.every(r=>r.opts.join('|')===rows[0].opts.join('|'));
 function subHTML(t,k,lab){
  let h=`<div class="teil" id="s${k}">${lab?`<div class="tl">${lab}</div>`:''}`;
- if(t.k)h+=`<div class="chips"><span class="chip k">${KOMP[t.k]}</span><span class="chip">Anforderungsbereich ${t.afb}</span>${t.zusatz?'<span class="chip zus">Zusatz – kam im Unterricht noch nicht dran</span>':''}</div>`;
+ if(t.k)h+=`<div class="chips"><span class="chip k">${KOMP[t.k]}</span><span class="chip">Anforderungsbereich ${t.afb}</span></div>`;
  if(t.svg)h+=`<div class="svgbox">${t.svg}</div>`;
  if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis: <b>${t.erg.l} =</b></span><input inputmode="decimal" autocomplete="off" aria-label="Endergebnis"><span class="u">${t.erg.u}</span><button class="btn" data-a="check">Prüfen</button></div><div class="fbx"></div>`;
  else{h+=`<p class="q">${t.frage}</p>`;
