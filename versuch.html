@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Versuchslabor Energie</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1F2A44;--blue:#3B6FB6;--dblue:#1F4E79;--green:#2E9E5B;--heat:#E4572E;--marker:#FFD447;--grid:#DCE7F5;--muted:#5C6780;--line:#C9D3E3;
+ --ok-bg:#E3F4EA;--bad-bg:#FDE8E2;--merk:#DDE8F5;--hilfe:#FDF6EA;--hilfe-rand:#FBD9A8;--lila:#6D4A9E}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:17px/1.5 "Nunito",system-ui,-apple-system,sans-serif;background:#fff;
+ background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px;-webkit-text-size-adjust:100%}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+h1{font-family:"Patrick Hand",cursive;font-weight:400;font-size:2.4rem;line-height:1.1;margin:8px 0 4px}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:4px 4px 0 var(--ink)}
+.card h2{font-family:"Patrick Hand",cursive;font-weight:400;font-size:1.75rem;margin:0 0 8px;line-height:1.15}
+.note{font-size:.93rem;color:var(--muted)}
+.hide{display:none!important}
+.choice{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.big{display:block;text-align:left;border:2px solid var(--ink);border-radius:12px;background:#fff;padding:12px 14px;cursor:pointer;font:inherit;color:inherit;box-shadow:3px 3px 0 var(--ink)}
+.big b{display:block;font-size:1.05rem}.big small{color:var(--muted);display:block;line-height:1.35}
+.btn{border:2px solid var(--ink);background:var(--marker);color:var(--ink);font:800 16px "Nunito",sans-serif;padding:9px 18px;border-radius:10px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);min-height:44px}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{background:#fff;box-shadow:none;font-weight:700}
+.btn.tippbtn{background:#fff;border-color:var(--lila);color:var(--lila);box-shadow:3px 3px 0 var(--lila)}
+.btn:disabled{opacity:.45;cursor:default}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;padding:8px 0;border-bottom:2px solid var(--ink);position:sticky;top:0;background:rgba(255,255,255,.95);z-index:5}
+.steps span{border:2px solid var(--line);border-radius:999px;padding:3px 12px;font-weight:800;font-size:.9rem;color:var(--muted);background:#fff}
+.steps span.cur{background:var(--ink);border-color:var(--ink);color:#fff}
+.steps span.done{border-color:var(--green);color:var(--green)}
+.frage{background:var(--merk);border:2px solid #9DB9DE;border-radius:12px;padding:10px 14px;font-weight:800;font-size:1.1rem;margin:4px 0 12px}
+.merk{background:var(--merk);border:2px solid #9DB9DE;border-radius:12px;padding:10px 14px;margin:8px 0}
+.merk ol{margin:4px 0;padding-left:1.4em}
+.tipp{background:#F1EAF8;border:2px solid #B79BD6;border-radius:10px;padding:8px 12px;margin-top:8px}
+.tipp b{color:var(--lila)}
+.fb{margin-top:10px;border-radius:10px;padding:8px 12px}
+.fb.ok{background:var(--ok-bg);border:2px solid var(--green)}
+.fb.bad{background:var(--bad-bg);border:2px solid var(--heat)}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:10px;cursor:pointer;background:#fff;margin:6px 0}
+.opt .box{width:22px;height:22px;border:2px solid var(--ink);border-radius:50%;flex:0 0 auto;margin-top:2px}
+.opt.on{border-color:var(--ink);background:#FFFBEA}.opt.on .box{background:var(--ink);box-shadow:inset 0 0 0 3px #fff}
+.opt.right{border-color:var(--green);background:var(--ok-bg)}.opt.wrong{border-color:var(--heat);background:var(--bad-bg)}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th{text-align:left;color:var(--dblue);border-bottom:1.5px solid var(--dblue);padding:4px 6px;font-weight:800}
+table.t td{border-bottom:1px solid var(--line);padding:5px 6px}
+table.t td.n{text-align:right;font-weight:800;white-space:nowrap}
+table.t th.diff,table.t td.diff{background:var(--bad-bg)}
+table.t th.ziel,table.t td.ziel{background:#FFF6D6}
+.rolle{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:2px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0;background:#fff}
+.rolle.right{border-color:var(--green);background:var(--ok-bg)}.rolle.wrong{border-color:var(--heat);background:var(--bad-bg)}
+select{font:700 16px "Nunito",sans-serif;color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;min-height:40px;max-width:100%}
+.lab{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:720px){.lab{grid-template-columns:1fr}h1{font-size:2rem}}
+.stage{border:2px solid var(--line);border-radius:12px;background:#FBFCFE;padding:6px}
+.stage svg{width:100%;height:auto;display:block}
+.ctl{margin:8px 0}
+.ctl label{display:block;font-weight:800;color:var(--dblue)}
+.ctl input[type=range]{width:100%;accent-color:var(--dblue)}
+.ctl .val{font-weight:800}
+.anzeige{font:800 1.4rem "Nunito",sans-serif;border:2px solid var(--ink);border-radius:10px;padding:6px 12px;display:inline-block;background:#fff;min-width:150px;text-align:center}
+.warn{background:var(--bad-bg);border:2px solid var(--heat);border-radius:10px;padding:8px 12px;margin:8px 0;font-weight:700}
+.okk{background:var(--ok-bg);border:2px solid var(--green);border-radius:10px;padding:8px 12px;margin:8px 0;font-weight:700}
+.del{border:none;background:none;color:var(--heat);font-weight:800;cursor:pointer;font-size:1.1rem}
+.beamer h1{font-size:3rem}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:720px){.duo{grid-template-columns:1fr}}
+.kessel{border:2px solid var(--ink);border-radius:14px;padding:12px;text-align:center;background:#fff}
+.kessel h3{margin:0;font-family:"Patrick Hand",cursive;font-weight:400;font-size:1.7rem}
+.kessel .w{font-size:1.15rem;margin:4px 0}
+.kessel .w b.rot{background:var(--bad-bg);border-radius:6px;padding:0 6px;color:var(--heat)}
+.qr svg{width:180px;height:180px}
+.foot{margin-top:28px;font-size:.88rem;color:var(--muted)}.foot a{color:var(--muted)}
+#sumCard{border:2px solid var(--ink);border-radius:14px;padding:14px 16px;background:#fff;font-size:15px}
+#sumCard h2{margin:0 0 4px}
+#sumCard .zeile{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <h1 id="h1">Versuchslabor Energie</h1>
+ <p class="sub" id="sub">Physik Klasse 8 · Einen fairen Versuch planen, durchführen und auswerten</p>
+ <section id="view"></section>
+ <p class="foot">Fehling · Versuchslabor Energie · <a href="./">Fit für die Klassenarbeit</a> · <a href="?beamer">Einstieg für den Beamer</a></p>
+</div>
+<script>
+"use strict";
+/* ============ Hilfen ============ */
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const rd=(x,d=1)=>Math.round(x*10**d)/10**d;
+function f(x,d=1){const r=rd(x,d);let [i,fr]=Math.abs(r).toFixed(d).split('.');fr=(fr||'').replace(/0+$/,'');i=i.replace(/\B(?=(\d{3})+(?!\d))/g,' ');return (r<0?'−':'')+i+(fr?','+fr:'');}
+const rausch=(x,p)=>x*(1+(Math.random()*2-1)*p);   // Messunsicherheit
+const V=document.getElementById('view');
+const QR=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 280" class="segno"><path transform="scale(8)" class="qrline" stroke="#1f2a44" d="M1 1.5h7m2 0h2m1 0h2m2 0h1m1 0h4m1 0h1m2 0h7m-33 1h1m5 0h1m2 0h1m4 0h5m7 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h3m2 0h1m3 0h3m4 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m8 0h1m1 0h2m1 0h1m3 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h4m1 0h1m2 0h1m2 0h3m1 0h1m2 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m1 0h2m1 0h1m1 0h5m4 0h1m3 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h1m3 0h1m1 0h3m2 0h1m1 0h1m-22 1h1m1 0h5m2 0h1m3 0h1m3 0h1m4 0h1m1 0h1m1 0h5m-30 1h3m1 0h1m5 0h2m3 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h4m-33 1h1m3 0h4m1 0h1m1 0h1m3 0h1m4 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m-32 1h3m2 0h1m2 0h4m4 0h1m2 0h4m2 0h2m1 0h3m-31 1h2m2 0h1m1 0h2m1 0h1m1 0h1m5 0h1m2 0h1m1 0h1m1 0h2m1 0h3m2 0h1m-32 1h3m1 0h1m1 0h1m1 0h1m2 0h2m2 0h6m1 0h1m2 0h1m4 0h2m-32 1h3m1 0h2m1 0h3m4 0h1m2 0h1m1 0h3m1 0h3m2 0h3m-32 1h2m2 0h2m1 0h2m1 0h4m1 0h2m3 0h4m1 0h2m1 0h3m-30 1h6m1 0h8m1 0h1m4 0h2m1 0h1m1 0h3m2 0h1m-33 1h2m1 0h1m1 0h1m7 0h2m4 0h2m2 0h1m2 0h2m1 0h2m1 0h1m-33 1h2m4 0h5m3 0h2m1 0h2m2 0h1m2 0h1m2 0h2m1 0h2m-31 1h3m1 0h1m1 0h6m1 0h1m4 0h4m2 0h1m1 0h4m-30 1h12m2 0h3m1 0h1m2 0h3m2 0h3m-30 1h1m1 0h3m2 0h2m1 0h2m1 0h1m2 0h1m1 0h3m2 0h1m2 0h2m2 0h1m1 0h1m-33 1h1m2 0h4m1 0h3m2 0h1m1 0h1m5 0h1m3 0h2m1 0h2m1 0h1m-32 1h1m1 0h1m2 0h1m3 0h5m1 0h1m2 0h4m3 0h1m1 0h5m-32 1h1m1 0h3m1 0h1m2 0h2m3 0h1m2 0h1m4 0h1m1 0h5m2 0h2m-25 1h1m4 0h1m2 0h6m2 0h1m3 0h1m1 0h3m-33 1h7m2 0h3m1 0h4m1 0h1m1 0h5m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h1m2 0h1m3 0h2m1 0h1m2 0h4m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h2m1 0h4m3 0h6m1 0h2m-33 1h1m1 0h3m1 0h1m1 0h1m2 0h3m2 0h5m2 0h3m2 0h1m2 0h2m-33 1h1m1 0h3m1 0h1m1 0h4m3 0h1m2 0h1m1 0h3m1 0h1m1 0h2m1 0h2m-31 1h1m5 0h1m4 0h1m2 0h1m1 0h1m1 0h4m3 0h2m1 0h3m-31 1h7m1 0h1m2 0h4m1 0h2m1 0h1m2 0h4m1 0h1m3 0h1"/></svg>
+`;
+
+/* ============ Versuche (Modelle bewusst einfach, Größenordnungen realistisch) ============ */
+const EXP={
+ krater:{titel:'Kugel fällt in Sand',mess:{n:'Kratertiefe',u:'cm',d:1},
+  vars:[{id:'h',n:'Fallhöhe',u:'m',typ:'r',min:.2,max:2,step:.1,def:.5,d:1},
+        {id:'mat',n:'Kugel',typ:'s',opts:['Holz (20 g)','Glas (50 g)','Stahl (110 g)'],def:0,m:[20,50,110]},
+        {id:'sand',n:'Sand',typ:'s',opts:['trocken','feucht'],def:0,k:[1,.7]}],
+  model:s=>1.1*Math.pow(EXP.krater.vars[1].m[s.mat]*s.h,.33)*EXP.krater.vars[2].k[s.sand],p:.05,
+  falsch:['Der Sand wird nach einem Versuch nicht wieder glattgestrichen.','Die Kugel ist rund.','Man misst mit einem Lineal.']},
+ flummi:{titel:'Ball springt auf dem Boden',mess:{n:'Sprunghöhe',u:'cm',d:0},
+  vars:[{id:'h',n:'Fallhöhe',u:'m',typ:'r',min:.5,max:2,step:.1,def:1,d:1},
+        {id:'boden',n:'Boden',typ:'s',opts:['Holz','Fliesen','Teppich','Rasen'],def:0,k:[.72,.8,.35,.25]},
+        {id:'ball',n:'Ball',typ:'s',opts:['Flummi','Tennisball','Knetkugel'],def:0,k:[1,.75,0]}],
+  model:s=>s.h*100*EXP.flummi.vars[1].k[s.boden]*EXP.flummi.vars[2].k[s.ball],p:.04,
+  falsch:['Man schaut schräg auf das Maßband und liest ungenau ab.','Der Ball ist rund.','Man lässt den Ball fallen.']},
+ wasser:{titel:'Wasser zum Kochen bringen',mess:{n:'Energie (Messgerät)',u:'kJ',d:0},
+  vars:[{id:'geraet',n:'Gerät',typ:'s',opts:['Wasserkocher','Topf auf dem Herd'],def:0},
+        {id:'deckel',n:'Deckel',typ:'s',opts:['mit Deckel','ohne Deckel'],def:0},
+        {id:'menge',n:'Wassermenge',u:'L',typ:'r',min:.25,max:1.5,step:.25,def:.5,d:2},
+        {id:'start',n:'Starttemperatur',typ:'s',opts:['10 °C (Kühlschrank)','20 °C (Leitung)','40 °C (lauwarm)'],def:1,t:[10,20,40]}],
+  model:s=>{const eta=s.geraet===0?(s.deckel===0?.9:.75):(s.deckel===0?.6:.45);return s.menge*4.19*(100-EXP.wasser.vars[3].t[s.start])/eta;},p:.03,
+  falsch:['Das Wasser ist beim nächsten Versuch noch warm vom letzten Mal.','Man liest das Messgerät ab.','Das Wasser kocht.']},
+ auto:{titel:'Aufziehauto fährt',mess:{n:'Fahrstrecke',u:'cm',d:0},
+  vars:[{id:'umdr',n:'Umdrehungen beim Aufziehen',typ:'r',min:1,max:10,step:1,def:3,d:0},
+        {id:'boden',n:'Boden',typ:'s',opts:['Fliesen','Holz','Teppich'],def:0,k:[1,.9,.45]},
+        {id:'last',n:'Beladung',typ:'s',opts:['ohne','mit 50 g Knete'],def:0,k:[1,.75]}],
+  model:s=>30*s.umdr*EXP.auto.vars[1].k[s.boden]*EXP.auto.vars[2].k[s.last],p:.06,
+  falsch:['Das Auto stößt mal gegen ein Tischbein.','Das Auto hat vier Räder.','Man misst mit einem Maßband.']},
+ solar:{titel:'Solarzelle unter der Lampe',mess:{n:'Leistung',u:'mW',d:0},
+  vars:[{id:'winkel',n:'Neigung der Solarzelle',u:'°',typ:'r',min:0,max:80,step:10,def:0,d:0},
+        {id:'abstand',n:'Abstand zur Lampe',u:'cm',typ:'r',min:20,max:80,step:10,def:30,d:0},
+        {id:'lampe',n:'Lampe',typ:'s',opts:['LED-Strahler','Halogenstrahler'],def:0,k:[1,1.6]}],
+  model:s=>120*Math.cos(s.winkel*Math.PI/180)*Math.pow(30/s.abstand,2)*EXP.solar.vars[2].k[s.lampe],p:.03,
+  falsch:['Durch das Fenster scheint zusätzlich die Sonne auf die Solarzelle.','Die Lampe leuchtet.','Man liest das Messgerät ab.']},
+ standby:{titel:'Fernseher am Energiemessgerät',mess:{n:'Energie (Messgerät)',u:'kJ',d:1},
+  vars:[{id:'zustand',n:'Zustand',typ:'s',opts:['eingeschaltet','Standby','Steckerleiste aus'],def:1,k:[80,.5,0]},
+        {id:'dauer',n:'Messdauer',u:'h',typ:'r',min:1,max:8,step:1,def:1,d:0},
+        {id:'geraet',n:'Gerät',typ:'s',opts:['Fernseher','Spielkonsole'],def:0,k:[1,1.4]}],
+  model:s=>EXP.standby.vars[0].k[s.zustand]*EXP.standby.vars[2].k[s.geraet]*s.dauer*3.6,p:.02,
+  falsch:['Die Messdauer ist bei den Messungen unterschiedlich lang.','Der Fernseher ist schwarz.','Man liest das Messgerät ab.']},
+};
+/* Fragen: gleiches Planungsmuster, immer ein anderer Versuch */
+const Q=[
+ {e:'krater',z:'h',f:'Hängt die Tiefe des Kraters von der Fallhöhe der Kugel ab?',hyp:['Je größer die Fallhöhe, desto tiefer der Krater.','Je größer die Fallhöhe, desto flacher der Krater.','Die Fallhöhe hat keinen Einfluss auf die Kratertiefe.'],w:0},
+ {e:'krater',z:'mat',f:'Hängt die Tiefe des Kraters von der Masse der Kugel ab?',hyp:['Je schwerer die Kugel, desto tiefer der Krater.','Je schwerer die Kugel, desto flacher der Krater.','Die Masse hat keinen Einfluss auf die Kratertiefe.'],w:0},
+ {e:'flummi',z:'boden',f:'Springt ein Ball auf Holz höher als auf Teppich?',hyp:['Auf Holz springt der Ball höher als auf Teppich.','Auf Teppich springt der Ball höher als auf Holz.','Der Boden hat keinen Einfluss auf die Sprunghöhe.'],w:0},
+ {e:'flummi',z:'h',f:'Springt ein Ball höher zurück, wenn man ihn aus größerer Höhe fallen lässt?',hyp:['Je größer die Fallhöhe, desto höher springt der Ball zurück.','Je größer die Fallhöhe, desto niedriger springt der Ball zurück.','Die Fallhöhe hat keinen Einfluss auf die Sprunghöhe.'],w:0},
+ {e:'wasser',z:'deckel',f:'Spart ein Deckel beim Wasserkochen Energie?',hyp:['Mit Deckel braucht man weniger Energie.','Mit Deckel braucht man mehr Energie.','Der Deckel hat keinen Einfluss auf die Energie.'],w:0},
+ {e:'wasser',z:'menge',f:'Braucht man für doppelt so viel Wasser doppelt so viel Energie?',hyp:['Doppelt so viel Wasser braucht etwa doppelt so viel Energie.','Doppelt so viel Wasser braucht genauso viel Energie.','Die Wassermenge hat keinen Einfluss auf die Energie.'],w:0},
+ {e:'wasser',z:'geraet',f:'Braucht der Wasserkocher weniger Energie als der Topf auf dem Herd?',hyp:['Der Wasserkocher braucht weniger Energie als der Topf.','Der Topf braucht weniger Energie als der Wasserkocher.','Beide brauchen gleich viel Energie.'],w:0},
+ {e:'auto',z:'umdr',f:'Fährt ein Aufziehauto weiter, wenn man es öfter aufzieht?',hyp:['Je öfter man aufzieht, desto weiter fährt das Auto.','Je öfter man aufzieht, desto kürzer fährt das Auto.','Das Aufziehen hat keinen Einfluss auf die Fahrstrecke.'],w:0},
+ {e:'auto',z:'boden',f:'Fährt das Aufziehauto auf Fliesen weiter als auf Teppich?',hyp:['Auf Fliesen fährt das Auto weiter als auf Teppich.','Auf Teppich fährt das Auto weiter als auf Fliesen.','Der Boden hat keinen Einfluss auf die Fahrstrecke.'],w:0},
+ {e:'solar',z:'winkel',f:'Liefert eine Solarzelle weniger, wenn sie schräg zur Lampe steht?',hyp:['Je schräger die Solarzelle steht, desto weniger Leistung liefert sie.','Je schräger die Solarzelle steht, desto mehr Leistung liefert sie.','Die Neigung hat keinen Einfluss auf die Leistung.'],w:0},
+ {e:'solar',z:'abstand',f:'Liefert eine Solarzelle weniger, wenn die Lampe weiter weg ist?',hyp:['Je größer der Abstand, desto weniger Leistung liefert die Solarzelle.','Je größer der Abstand, desto mehr Leistung liefert die Solarzelle.','Der Abstand hat keinen Einfluss auf die Leistung.'],w:0},
+ {e:'standby',z:'zustand',f:'Braucht ein Fernseher im Standby Energie?',hyp:['Im Standby braucht er Energie – weniger als eingeschaltet, aber mehr als an der ausgeschalteten Steckerleiste.','Im Standby braucht er keine Energie.','Im Standby braucht er genauso viel Energie wie eingeschaltet.'],w:0},
+];
+
+/* ============ Zustand ============ */
+const S={q:null,ex:null,stufe:0,hyp:null,rollen:{},rollenOk:false,set:{},rows:[],erg:null,falsch:null,tn:{}};
+const STUFEN=['Frage','Vermutung','Plan','Versuch','Auswertung','Ergebnis'];
+const ROLLEN=['verändere ich','messe ich','halte ich gleich'];
+function stepsBar(){return `<div class="steps">${STUFEN.map((s,i)=>`<span class="${i===S.stufe?'cur':i<S.stufe?'done':''}">${i+1} ${s}</span>`).join('')}</div>`;}
+const MERK=`<div class="merk"><b>Merke: Einen Versuch planen</b><ol><li><b>Frage:</b> Was will ich herausfinden?</li><li><b>Vermutung:</b> „Je …, desto …“</li><li><b>Plan:</b> Genau <u>eine</u> Größe verändere ich, eine Größe messe ich (mit Messgerät und Einheit), alle anderen halte ich gleich.</li><li><b>Durchführung:</b> Messtabelle, jeden Wert mehrmals messen.</li><li><b>Auswertung:</b> Stimmt meine Vermutung?</li></ol></div>`;
+const TIPPS={
+ 1:['Eine Vermutung ist eine begründete Erwartung. Denk an den Alltag: Was hast du schon einmal erlebt?','Die Vermutung darf falsch sein – sie wird mit dem Versuch überprüft.'],
+ 2:['Nur EINE Größe darfst du verändern – nämlich die aus der Frage.','Die Größe, die du misst, ist die, nach deren Wert die Frage fragt (z. B. Tiefe, Höhe, Energie).','Alles andere muss gleich bleiben – sonst weißt du nicht, was die Ursache war.'],
+ 3:['Stell zuerst alle Größen, die gleich bleiben sollen, ein – und fass sie danach nicht mehr an.','Miss mindestens drei verschiedene Werte der Größe, die du veränderst (bei zwei Möglichkeiten: beide).','Miss jeden Wert mindestens zweimal – Messwerte schwanken immer etwas.'],
+ 4:['Vergleiche die Mittelwerte: Wird der Messwert größer, kleiner oder bleibt er gleich?','Kleine Unterschiede von 1–2 Einheiten können auch Messschwankungen sein.'],
+};
+function tippBox(n){const L=TIPPS[n]||[];if(!L.length)return'';const k=S.tn[n]||0;
+ return `<div id="tipps">${L.slice(0,k).map((x,i)=>`<div class="tipp"><b>Tipp ${i+1}:</b> ${x}</div>`).join('')}</div><button class="btn tippbtn" id="tippBtn" ${k>=L.length?'disabled':''}>${k>=L.length?'Keine weiteren Tipps':k?'Noch ein Tipp ▶':'Tipp ▶'}</button>`;}
+function bindTipp(n,redraw){const b=document.getElementById('tippBtn');if(b)b.onclick=()=>{S.tn[n]=(S.tn[n]||0)+1;redraw();};}
+const varName=id=>S.ex.vars.find(v=>v.id===id).n;
+const vText=(v,x)=>v.typ==='s'?v.opts[x]:`${f(x,v.d)}${v.u?' '+v.u:''}`;
+
+/* ============ Ansichten ============ */
+function start(){
+ V.innerHTML=`<div class="card"><h2>Wähle deine Forschungsfrage</h2><p class="note">Jede Gruppe untersucht eine andere Frage. Das Vorgehen ist immer gleich.</p>
+ <div class="choice">${Q.map((q,i)=>`<button class="big" data-q="${i}"><b>${q.f}</b><small>${EXP[q.e].titel}</small></button>`).join('')}</div>
+ <div class="actions"><button class="btn ghost" id="zufall">Zufällige Frage</button></div></div>`;
+ V.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>wahl(+b.dataset.q));document.getElementById('zufall').onclick=()=>wahl(Math.floor(Math.random()*Q.length));scrollTo(0,0);}
+function wahl(i){S.q=Q[i];S.ex=EXP[S.q.e];S.stufe=1;S.hyp=null;S.rollen={};S.rollenOk=false;S.rows=[];S.erg=null;S.falsch=null;S.tn={};
+ S.set={};S.ex.vars.forEach(v=>S.set[v.id]=v.def);S.hypOrder=shuffle([0,1,2]);S.falschOrder=shuffle([0,1,2]);vermutung();}
+function kopf(){return stepsBar()+`<div class="card"><div class="frage">Frage: ${S.q.f}</div>`;}
+
+function vermutung(){S.stufe=1;
+ V.innerHTML=kopf()+`<h2>Deine Vermutung</h2><p>Was glaubst du? Wähle eine Vermutung.</p>
+ ${S.hypOrder.map(i=>`<div class="opt ${S.hyp===i?'on':''}" data-i="${i}"><span class="box"></span><span>${S.q.hyp[i]}</span></div>`).join('')}
+ ${tippBox(1)}<div class="actions"><button class="btn ghost" id="back">← andere Frage</button><button class="btn" id="next" ${S.hyp===null?'disabled':''}>weiter zum Plan →</button></div></div>`;
+ V.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{S.hyp=+o.dataset.i;vermutung();});
+ bindTipp(1,vermutung);document.getElementById('back').onclick=start;document.getElementById('next').onclick=plan;}
+
+function plan(){S.stufe=2;
+ const items=[...S.ex.vars.map(v=>({id:v.id,n:v.n})),{id:'_m',n:S.ex.mess.n}];
+ const soll=id=>id==='_m'?1:id===S.q.z?0:2;
+ V.innerHTML=kopf()+`<h2>Dein Plan</h2>${MERK}<p>Was machst du mit diesen Größen?</p>
+ ${items.map(it=>`<div class="rolle" id="r_${it.id}"><span><b>${it.n}</b></span><select data-id="${it.id}"><option value="">– wählen –</option>${ROLLEN.map((r,i)=>`<option value="${i}" ${S.rollen[it.id]==i?'selected':''}>${r}</option>`).join('')}</select></div>`).join('')}
+ <div id="pfb"></div>${tippBox(2)}
+ <div class="actions"><button class="btn ghost" id="back">← Vermutung</button><button class="btn" id="chk">Plan prüfen</button><button class="btn" id="next" ${S.rollenOk?'':'disabled'}>ins Labor →</button></div></div>`;
+ V.querySelectorAll('select').forEach(s=>s.onchange=()=>{S.rollen[s.dataset.id]=s.value===''?undefined:+s.value;});
+ document.getElementById('chk').onclick=()=>{let ok=true,miss=false;
+  items.forEach(it=>{const el=document.getElementById('r_'+it.id),v=S.rollen[it.id];el.classList.remove('right','wrong');if(v===undefined){miss=true;ok=false;return;}const g=v===soll(it.id);el.classList.add(g?'right':'wrong');if(!g)ok=false;});
+  const nVer=items.filter(it=>S.rollen[it.id]===0).length;
+  let msg=miss?'Wähle für jede Größe etwas aus.':ok?'Dein Plan ist fair: Du veränderst nur eine Größe und hältst alles andere gleich.':nVer>1?'Du veränderst mehr als eine Größe. Dann weißt du am Ende nicht, welche Größe das Ergebnis verursacht hat.':nVer===0?'Du veränderst gar nichts – dann kannst du die Frage nicht beantworten.':'Noch nicht ganz. Schau dir die rot markierten Zeilen an: Welche Größe steht in der Frage? Was willst du messen?';
+  S.rollenOk=ok;document.getElementById('pfb').innerHTML=`<div class="fb ${ok?'ok':'bad'}">${msg}</div>`;document.getElementById('next').disabled=!ok;};
+ bindTipp(2,plan);document.getElementById('back').onclick=vermutung;document.getElementById('next').onclick=labor;}
+
+/* ---------- Labor ---------- */
+function ctlHTML(v){const x=S.set[v.id],z=v.id===S.q.z;
+ return `<div class="ctl"><label>${v.n}${z?' <span class="note">(veränderst du)</span>':' <span class="note">(gleich halten)</span>'}: <span class="val" id="val_${v.id}">${vText(v,x)}</span></label>
+ ${v.typ==='r'?`<input type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${x}" data-id="${v.id}">`:`<select data-id="${v.id}">${v.opts.map((o,i)=>`<option value="${i}" ${i===x?'selected':''}>${o}</option>`).join('')}</select>`}</div>`;}
+function analyse(){const R=S.rows,z=S.q.z,v=S.ex.vars;
+ const diff=v.filter(x=>x.id!==z&&new Set(R.map(r=>r.s[x.id])).size>1).map(x=>x.id);
+ const zv=v.find(x=>x.id===z),werte=[...new Set(R.map(r=>r.s[z]))],need=zv.typ==='s'?zv.opts.length:3;
+ const count=werte.map(w=>R.filter(r=>r.s[z]===w).length);
+ return {diff,werte,need,genug:werte.length>=Math.min(need,3)&&count.every(c=>c>=2)&&!diff.length,count};}
+function tabelle(){const R=S.rows,v=S.ex.vars,a=analyse();if(!R.length)return '<p class="note">Noch keine Messung. Stell den Versuch ein und tippe auf „Messen“.</p>';
+ return `<table class="t"><tr><th>Nr.</th>${v.map(x=>`<th class="${x.id===S.q.z?'ziel':a.diff.includes(x.id)?'diff':''}">${x.n}</th>`).join('')}<th>${S.ex.mess.n}</th><th></th></tr>
+ ${R.map((r,i)=>`<tr><td>${i+1}</td>${v.map(x=>`<td class="${x.id===S.q.z?'ziel':a.diff.includes(x.id)?'diff':''}">${vText(x,r.s[x.id])}</td>`).join('')}<td class="n">${f(r.w,S.ex.mess.d)} ${S.ex.mess.u}</td><td><button class="del" data-i="${i}" aria-label="Messung löschen">✕</button></td></tr>`).join('')}</table>`;}
+function labor(){S.stufe=3;const a=analyse();
+ V.innerHTML=kopf()+`<h2>Dein Versuch</h2><div class="lab"><div><div class="stage" id="stage">${zeichne(null)}</div>
+ <div class="actions"><button class="btn" id="mess">Messen</button><span class="anzeige" id="anz">– ${S.ex.mess.u}</span></div></div>
+ <div>${S.ex.vars.map(ctlHTML).join('')}</div></div>
+ <h2 style="margin-top:12px">Messtabelle</h2><div id="tab">${tabelle()}</div><div id="status"></div>${tippBox(3)}
+ <div class="actions"><button class="btn ghost" id="back">← Plan</button><button class="btn" id="next">zur Auswertung →</button></div></div>`;
+ const status=()=>{const a=analyse();let h='';
+  if(a.diff.length)h+=`<div class="warn">⚠ Unfair: In deiner Tabelle hast du auch ${a.diff.map(varName).join(' und ')} verändert. Lösche diese Messungen oder stell den Wert zurück.</div>`;
+  else if(S.rows.length){h+=a.genug?`<div class="okk">✓ Fairer Versuch mit genug Messwerten – du kannst auswerten.</div>`:`<div class="note">Noch nötig: mindestens ${Math.min(a.need,3)} verschiedene Werte von „${varName(S.q.z)}“, jeden mindestens zweimal gemessen. Bisher: ${a.werte.length} Wert(e).</div>`;}
+  document.getElementById('status').innerHTML=h;document.getElementById('next').disabled=!a.genug;};
+ const redrawTab=()=>{document.getElementById('tab').innerHTML=tabelle();V.querySelectorAll('.del').forEach(b=>b.onclick=()=>{S.rows.splice(+b.dataset.i,1);redrawTab();});status();};
+ V.querySelectorAll('[data-id]').forEach(el=>{el.oninput=el.onchange=()=>{const v=S.ex.vars.find(x=>x.id===el.dataset.id);S.set[v.id]=+el.value;document.getElementById('val_'+v.id).textContent=vText(v,S.set[v.id]);document.getElementById('stage').innerHTML=zeichne(null);document.getElementById('anz').textContent='– '+S.ex.mess.u;};});
+ document.getElementById('mess').onclick=()=>{const w=Math.max(0,rausch(S.ex.model(S.set),S.ex.p));const btn=document.getElementById('mess');btn.disabled=true;
+  document.getElementById('stage').innerHTML=zeichne(w,true);document.getElementById('anz').textContent='… misst …';
+  setTimeout(()=>{document.getElementById('stage').innerHTML=zeichne(w,false);document.getElementById('anz').textContent=f(w,S.ex.mess.d)+' '+S.ex.mess.u;S.rows.push({s:{...S.set},w:rd(w,S.ex.mess.d)});redrawTab();btn.disabled=false;},1100);};
+ redrawTab();bindTipp(3,labor);document.getElementById('back').onclick=plan;document.getElementById('next').onclick=auswertung;}
+
+/* ---------- Grafiken der Versuche ---------- */
+function zeichne(w,anim){const s=S.set,e=S.q.e;
+ if(e==='krater'){const y0=200-s.h*80,d=w?Math.min(40,w*5):0,c=['#B5835A','#9FB7C9','#8A8F99'][s.mat],sand=s.sand?'#C9A66B':'#E8D29B';
+  return `<svg viewBox="0 0 320 260"><rect x="20" y="210" width="280" height="40" fill="${sand}"/>${d?`<ellipse cx="160" cy="211" rx="${16+d*.8}" ry="${d/2}" fill="#8C6D3F" opacity=".6"/>`:''}
+  <line x1="290" y1="${y0}" x2="290" y2="210" stroke="#5C6780" stroke-dasharray="4 3"/><text x="284" y="${(y0+210)/2}" text-anchor="end" font-size="12" fill="#5C6780">${f(s.h,1)} m</text>
+  <circle cx="160" cy="${y0}" r="12" fill="${c}" stroke="#1F2A44" stroke-width="2">${anim?`<animate attributeName="cy" from="${y0}" to="${205}" dur=".6s" fill="freeze"/>`:''}</circle></svg>`;}
+ if(e==='flummi'){const y0=230-s.h*90,top=w!=null?230-w*.9:null,fl=['#C8A27A','#D9E2EC','#8E5A6E','#6BA34D'][s.boden],c=['#E4572E','#C8E04A','#9C7BB0'][s.ball];
+  return `<svg viewBox="0 0 320 270"><rect x="20" y="242" width="280" height="22" fill="${fl}"/><line x1="290" y1="40" x2="290" y2="242" stroke="#5C6780"/>${[0,.5,1,1.5,2].map(m=>`<text x="296" y="${242-m*90+4}" font-size="11" fill="#5C6780">${f(m,1)} m</text><line x1="286" y1="${242-m*90}" x2="292" y2="${242-m*90}" stroke="#5C6780"/>`).join('')}
+  <circle cx="150" cy="${y0}" r="11" fill="${c}" stroke="#1F2A44" stroke-width="2">${anim?`<animate attributeName="cy" values="${y0};231;${top};231" keyTimes="0;.45;.75;1" dur="1.1s" fill="freeze"/>`:''}</circle>
+  ${top!=null&&!anim?`<line x1="120" y1="${top}" x2="180" y2="${top}" stroke="#E4572E" stroke-dasharray="4 3"/>`:''}</svg>`;}
+ if(e==='wasser'){const k=s.geraet===0,lv=40+s.menge*40;
+  return `<svg viewBox="0 0 320 240">${k?`<path d="M100 200 L110 80 L210 80 L220 200 Z" fill="#DDE8F5" stroke="#1F2A44" stroke-width="3"/><path d="M210 100 Q250 110 240 160" fill="none" stroke="#1F2A44" stroke-width="6"/><rect x="95" y="200" width="130" height="14" rx="4" fill="#1F2A44"/>`
+   :`<rect x="70" y="${200-0}" width="180" height="12" fill="#5C6780"/><rect x="90" y="110" width="140" height="90" fill="#DDE8F5" stroke="#1F2A44" stroke-width="3"/>${anim?'<rect x="70" y="212" width="180" height="6" fill="#E4572E"/>':''}`}
+  <rect x="${k?112:93}" y="${200-lv}" width="${k?96:134}" height="${lv-2}" fill="#3B6FB6" opacity=".55"/>
+  ${s.deckel===0?`<rect x="${k?104:84}" y="${k?72:102}" width="${k?112:152}" height="8" rx="3" fill="#1F2A44"/>`:''}
+  ${anim?`<g fill="#9DB9DE" opacity=".8"><circle cx="150" cy="${s.deckel===0?60:90}" r="6"><animate attributeName="cy" from="${s.deckel===0?60:95}" to="20" dur="1s" repeatCount="indefinite"/></circle><circle cx="175" cy="70" r="5"><animate attributeName="cy" from="${s.deckel===0?65:100}" to="25" dur="1.2s" repeatCount="indefinite"/></circle></g>`:''}
+  <rect x="250" y="190" width="60" height="40" rx="6" fill="#fff" stroke="#1F2A44" stroke-width="2"/><text x="280" y="215" text-anchor="middle" font-size="12" font-weight="800">${w!=null&&!anim?f(w,0)+' kJ':'kJ'}</text>
+  <text x="160" y="232" text-anchor="middle" font-size="12" fill="#5C6780">${f(s.menge,2)} L · ${EXP.wasser.vars[3].t[s.start]} °C</text></svg>`;}
+ if(e==='auto'){const fl=['#D9E2EC','#C8A27A','#8E5A6E'][s.boden],x=w!=null?Math.min(280,30+w*.8):30;
+  return `<svg viewBox="0 0 320 160"><rect x="10" y="110" width="300" height="20" fill="${fl}"/>${[0,100,200,300].map(c=>`<line x1="${30+c*.8}" y1="130" x2="${30+c*.8}" y2="140" stroke="#5C6780"/><text x="${30+c*.8}" y="152" font-size="10" text-anchor="middle" fill="#5C6780">${c} cm</text>`).join('')}
+  <g ${anim?`><animateTransform attributeName="transform" type="translate" from="0 0" to="${x-30} 0" dur="1s" fill="freeze"/`:`transform="translate(${w!=null?x-30:0} 0)"`}><rect x="10" y="84" width="44" height="18" rx="5" fill="#E4572E" stroke="#1F2A44" stroke-width="2"/>${s.last?'<rect x="20" y="76" width="18" height="9" rx="3" fill="#9C7BB0"/>':''}<circle cx="20" cy="104" r="6" fill="#1F2A44"/><circle cx="44" cy="104" r="6" fill="#1F2A44"/></g>
+  <text x="160" y="30" text-anchor="middle" font-size="12" fill="#5C6780">${s.umdr}× aufgezogen</text></svg>`;}
+ if(e==='solar'){const xl=40,xp=40+s.abstand*3,a=s.winkel;
+  return `<svg viewBox="0 0 320 200"><rect x="${xl-14}" y="60" width="28" height="40" rx="5" fill="${s.lampe?'#F4B942':'#FFE680'}" stroke="#1F2A44" stroke-width="2"/>
+  <polygon points="${xl+14},70 ${xp},${100-40} ${xp},${100+40} ${xl+14},90" fill="#FFE680" opacity="${anim?.6:.35}"/>
+  <g transform="rotate(${a} ${xp} 100)"><rect x="${xp-4}" y="60" width="8" height="80" fill="#1F4E79"/></g><line x1="${xp}" y1="140" x2="${xp}" y2="180" stroke="#5C6780" stroke-width="3"/>
+  <line x1="${xl}" y1="190" x2="${xp}" y2="190" stroke="#5C6780"/><text x="${(xl+xp)/2}" y="186" font-size="11" text-anchor="middle" fill="#5C6780">${s.abstand} cm</text>
+  <rect x="240" y="20" width="70" height="36" rx="6" fill="#fff" stroke="#1F2A44" stroke-width="2"/><text x="275" y="43" text-anchor="middle" font-size="12" font-weight="800">${w!=null&&!anim?f(w,0)+' mW':'mW'}</text></svg>`;}
+ if(e==='standby'){const on=s.zustand===0,sb=s.zustand===1;
+  return `<svg viewBox="0 0 320 200"><rect x="60" y="30" width="160" height="100" rx="8" fill="${on?'#9DB9DE':'#1F2A44'}" stroke="#1F2A44" stroke-width="4"/>${sb?'<circle cx="208" cy="122" r="4" fill="#E4572E"/>':''}
+  <rect x="120" y="130" width="40" height="14" fill="#1F2A44"/><path d="M140 144 L140 170 L240 170" fill="none" stroke="#1F2A44" stroke-width="3"/>
+  <rect x="230" y="150" width="70" height="40" rx="6" fill="#fff" stroke="#1F2A44" stroke-width="2"/><text x="265" y="175" text-anchor="middle" font-size="12" font-weight="800">${w!=null&&!anim?f(w,1)+' kJ':'kJ'}</text>
+  <text x="140" y="196" text-anchor="middle" font-size="11" fill="#5C6780">${EXP.standby.vars[2].opts[s.geraet]} · ${s.dauer} h</text></svg>`;}
+}
+
+/* ---------- Auswertung ---------- */
+function mittel(){const z=S.q.z,zv=S.ex.vars.find(v=>v.id===z);const W=[...new Set(S.rows.map(r=>r.s[z]))].sort((a,b)=>a-b);
+ return W.map(w=>{const L=S.rows.filter(r=>r.s[z]===w).map(r=>r.w);return {x:w,t:vText(zv,w),m:L.reduce((a,b)=>a+b,0)/L.length,n:L.length};});}
+function diagramm(M){const max=Math.max(...M.map(m=>m.m),1),bw=Math.min(70,260/M.length);
+ return `<svg viewBox="0 0 320 210" style="max-width:420px"><line x1="40" y1="170" x2="310" y2="170" stroke="#1F2A44"/><line x1="40" y1="10" x2="40" y2="170" stroke="#1F2A44"/>
+ ${M.map((m,i)=>{const h=m.m/max*150,x=50+i*(260/M.length);return `<rect x="${x}" y="${170-h}" width="${bw-10}" height="${h}" fill="#3B6FB6"/><text x="${x+(bw-10)/2}" y="${165-h}" font-size="11" text-anchor="middle" font-weight="800">${f(m.m,S.ex.mess.d)}</text><text x="${x+(bw-10)/2}" y="186" font-size="10" text-anchor="middle">${m.t.split(' (')[0]}</text>`;}).join('')}
+ <text x="44" y="12" font-size="11" fill="#5C6780">${S.ex.mess.n} in ${S.ex.mess.u}</text><text x="310" y="204" font-size="11" text-anchor="end" fill="#5C6780">${varName(S.q.z)}</text></svg>`;}
+function auswertung(){S.stufe=4;const M=mittel();
+ V.innerHTML=kopf()+`<h2>Auswertung</h2><p>Die App hat für jeden Wert den <b>Mittelwert</b> deiner Messungen berechnet.</p>
+ <table class="t"><tr><th>${varName(S.q.z)}</th><th>Messungen</th><th>Mittelwert ${S.ex.mess.n}</th></tr>${M.map(m=>`<tr><td>${m.t}</td><td>${m.n}</td><td class="n">${f(m.m,S.ex.mess.d)} ${S.ex.mess.u}</td></tr>`).join('')}</table>
+ <div style="text-align:center;margin:10px 0">${diagramm(M)}</div>
+ <p class="q"><b>Was zeigen deine Messwerte?</b></p>${S.hypOrder.map(i=>`<div class="opt ${S.erg===i?'on':''}" data-i="${i}"><span class="box"></span><span>${S.q.hyp[i]}</span></div>`).join('')}
+ <p class="q" style="margin-top:14px"><b>Was könnte dein Ergebnis bei einem echten Versuch verfälschen?</b></p>${S.falschOrder.map(i=>`<div class="opt ${S.falsch===i?'on':''}" data-f="${i}"><span class="box"></span><span>${S.ex.falsch[i]}</span></div>`).join('')}
+ <div id="afb"></div>${tippBox(4)}<div class="actions"><button class="btn ghost" id="back">← Versuch</button><button class="btn" id="chk">prüfen</button><button class="btn hide" id="next">zum Ergebnis →</button></div></div>`;
+ V.querySelectorAll('[data-i]').forEach(o=>o.onclick=()=>{S.erg=+o.dataset.i;V.querySelectorAll('[data-i]').forEach(p=>p.classList.toggle('on',p===o));});
+ V.querySelectorAll('[data-f]').forEach(o=>o.onclick=()=>{S.falsch=+o.dataset.f;V.querySelectorAll('[data-f]').forEach(p=>p.classList.toggle('on',p===o));});
+ document.getElementById('chk').onclick=()=>{if(S.erg===null||S.falsch===null){document.getElementById('afb').innerHTML='<div class="fb bad">Beantworte beide Fragen.</div>';return;}
+  const ok1=S.erg===S.q.w,ok2=S.falsch===0;
+  V.querySelectorAll('[data-i]').forEach(p=>{p.classList.remove('right','wrong');if(+p.dataset.i===S.erg)p.classList.add(ok1?'right':'wrong');});
+  V.querySelectorAll('[data-f]').forEach(p=>{p.classList.remove('right','wrong');if(+p.dataset.f===S.falsch)p.classList.add(ok2?'right':'wrong');});
+  document.getElementById('afb').innerHTML=`<div class="fb ${ok1&&ok2?'ok':'bad'}">${ok1?'✓ Deine Aussage passt zu den Messwerten.':'✗ Schau noch einmal auf die Mittelwerte: Werden sie größer, kleiner oder bleiben sie gleich?'}<br>${ok2?'✓ Richtig – so etwas verfälscht das Ergebnis.':'✗ Das verfälscht nichts. Gesucht ist etwas, das die Messung unfair oder ungenau macht.'}</div>`;
+  if(ok1&&ok2)document.getElementById('next').classList.remove('hide');};
+ bindTipp(4,auswertung);document.getElementById('back').onclick=labor;document.getElementById('next').onclick=ergebnis;}
+function ergebnis(){S.stufe=5;const M=mittel(),stimmt=S.hyp===S.q.w,gl=S.ex.vars.filter(v=>v.id!==S.q.z);
+ V.innerHTML=stepsBar()+`<div id="sumCard"><h2 style="font-family:'Patrick Hand',cursive;font-weight:400;font-size:1.9rem">Versuchsprotokoll</h2>
+ <div class="zeile"><b>① Frage:</b> ${S.q.f}</div><div class="zeile"><b>② Vermutung:</b> ${S.q.hyp[S.hyp]}</div>
+ <div class="zeile"><b>③ Plan:</b> Ich verändere <b>${varName(S.q.z)}</b>. Ich messe <b>${S.ex.mess.n} in ${S.ex.mess.u}</b>. Gleich bleiben: ${gl.map(v=>`${v.n} (${vText(v,S.rows[0].s[v.id])})`).join(', ')}.</div>
+ <div class="zeile"><b>④ Messwerte (Mittelwerte):</b> ${M.map(m=>`${m.t}: ${f(m.m,S.ex.mess.d)} ${S.ex.mess.u} (${m.n}×)`).join(' · ')}</div>
+ <div style="text-align:center">${diagramm(M)}</div>
+ <div class="zeile"><b>⑤ Ergebnis:</b> ${S.q.hyp[S.q.w]} Meine Vermutung war <b>${stimmt?'richtig':'falsch'}</b>.</div>
+ <div class="zeile"><b>Fehlerquelle beim echten Versuch:</b> ${S.ex.falsch[0]}</div></div>
+ <div class="card" style="margin-top:14px"><p>✎ Mach einen <b>Screenshot</b> vom Protokoll und füge ihn in dein OneNote-Heft ein.</p>
+ <div class="actions"><button class="btn" id="neu">Andere Frage untersuchen</button></div></div>`;
+ document.getElementById('neu').onclick=start;scrollTo(0,0);}
+
+/* ============ Einstieg für den Beamer ============ */
+function beamer(){document.body.classList.add('beamer');document.getElementById('h1').textContent='Welcher Wasserkocher ist sparsamer?';
+ document.getElementById('sub').textContent='Lena hat einen Versuch gemacht.';let fair=false;
+ const draw=()=>{const A=fair?{m:1,t:20}:{m:.5,t:20},B=fair?{m:1,t:20}:{m:1,t:8},eA=.8,eB=.92,EA=A.m*4.19*(100-A.t)/eA,EB=B.m*4.19*(100-B.t)/eB;
+  const mk=(n,o,E,rot)=>`<div class="kessel"><h3>Wasserkocher ${n}</h3><div class="w">Wassermenge: <b class="${rot?'rot':''}">${f(o.m,1)} L</b></div><div class="w">Wasser aus: <b class="${rot&&o.t!==20?'rot':''}">${o.t===20?'der Leitung (20 °C)':'dem Kühlschrank (8 °C)'}</b></div><div class="w">Energie bis zum Kochen:</div><div class="anzeige">${f(E,0)} kJ</div></div>`;
+  V.innerHTML=`<div class="card"><div class="duo">${mk('A',A,EA,!fair&&reveal)}${mk('B',B,EB,!fair&&reveal)}</div>
+  <p style="font-size:1.2rem;margin-top:14px">${fair?'<b>Fairer Versuch:</b> Beide bekommen 1 L Leitungswasser. Jetzt braucht <b>B weniger</b> Energie – B ist der sparsamere!':'<b>Lena:</b> „A braucht viel weniger Energie. A ist also der sparsamere Wasserkocher!“'}</p>
+  <div class="actions">${!fair?`<button class="btn" id="rev">${reveal?'Unterschiede markiert':'Was ist unfair?'}</button>`:''}<button class="btn ghost" id="fair">${fair?'Lenas Versuch zeigen':'Fairer Versuch'}</button></div></div>
+  <div class="card"><div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap"><div class="qr">${QR}</div><div><h2>Jetzt plant ihr selbst!</h2><p style="font-size:1.15rem">Scannt den Code: Jede Gruppe untersucht eine andere Frage.<br><b>maltefehling.github.io/physik-ka-energie/versuch.html</b></p></div></div></div>`;
+  const r=document.getElementById('rev');if(r)r.onclick=()=>{reveal=true;draw();};document.getElementById('fair').onclick=()=>{fair=!fair;draw();};};
+ let reveal=false;draw();}
+
+if(/[?&]beamer/.test(location.search))beamer();else start();
+</script>
+</body>
+</html>

@@ -8,3 +8,7 @@
 - Jede Aufgabe hat Kontext-Varianten mit Zufallszahlen aus festen Bereichen (gleiches Niveau), auch die Aufgaben mit Material im IQB-Stil (Kompetenzbereich + Anforderungsbereich).
 
 Reine HTML-Datei, kein Server, keine Datenerfassung.
+
+## Versuchslabor (versuch.html)
+
+Stunde „Einen fairen Versuch planen“: 12 Forschungsfragen zu 6 simulierten Versuchen (Krater im Sand, Ball springt, Wasser kochen, Aufziehauto, Solarzelle, Standby). Schüler gehen Frage → Vermutung → Plan (verändern/messen/gleich halten, wird geprüft) → virtueller Versuch mit Messunsicherheit und Messtabelle (unfaire Vergleiche werden markiert) → Auswertung mit Mittelwerten und Diagramm → Protokoll zum Screenshot. `versuch.html?beamer` zeigt den Einstieg (Lenas unfairer Wasserkocher-Vergleich) mit QR-Code.
