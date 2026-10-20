@@ -75,6 +75,15 @@ select{font:700 16px "Nunito",sans-serif;color:var(--ink);border:2px solid var(-
 .kessel .w{font-size:1.15rem;margin:4px 0}
 .kessel .w b.rot{background:var(--bad-bg);border-radius:6px;padding:0 6px;color:var(--heat)}
 .qr svg{width:180px;height:180px}
+.regel{background:#FFF6D6;border:2px solid #E0B400;border-radius:12px;padding:8px 12px;font-weight:800;margin:0 0 10px;font-size:1.05rem}
+.ctl.ziel,.ctl.fest{border:2px solid var(--line);border-radius:10px;padding:6px 10px}
+.ctl.ziel{background:#FFF6D6;border-color:#E0B400}
+.ctl.fest{background:#F4F6F9}
+.ctl.falsch{background:var(--bad-bg);border-color:var(--heat)}
+.ctl .rolle-tag{font-size:.85rem;font-weight:800;display:block}
+.lena{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px;align-items:center}
+.lena img{width:100%;border-radius:12px;border:2px solid var(--ink)}
+@media (max-width:720px){.lena{grid-template-columns:1fr}}
 .foot{margin-top:28px;font-size:.88rem;color:var(--muted)}.foot a{color:var(--muted)}
 #fitBox{display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
 #sumCard{width:720px;flex:0 0 auto;border:2px solid var(--ink);border-radius:14px;padding:14px 18px 10px;background:#fff;font-size:15px;line-height:1.4;transform-origin:top center}
@@ -187,13 +196,17 @@ const vText=(v,x)=>v.typ==='s'?v.opts[x]:`${f(x,v.d)}${v.u?' '+v.u:''}`;
 
 /* ============ Ansichten ============ */
 function start(){
- V.innerHTML=`<div class="card"><h2>Wähle deine Forschungsfrage</h2><p class="note">Jede Gruppe untersucht eine andere Frage. Das Vorgehen ist immer gleich.</p>
+ V.innerHTML=`<div class="card"><div class="lena"><img src="img/lena-wasserkocher.jpg" alt="Lena vor zwei Wasserkochern"><div><h2>Darauf kommt es heute an</h2>
+ <p>Lena wollte wissen, welcher Wasserkocher sparsamer ist. Sie hat aber nicht nur den Wasserkocher getauscht, sondern auch die <b>Wassermenge</b> und die <b>Temperatur des Wassers</b> verändert. Jetzt weiß sie nicht, woran es lag.</p>
+ <div class="regel">⭐ Die wichtigste Regel: Verändere nur <u>eine</u> Größe. Alles andere bleibt gleich. Nur dann ist ein Versuch fair.</div></div></div></div>
+ <div class="card"><h2>Wähle deine Forschungsfrage</h2><p class="note">Jede Gruppe untersucht eine andere Frage. Das Vorgehen ist immer gleich.</p>
  <div class="choice">${Q.map((q,i)=>`<button class="big" data-q="${i}"><b>${q.f}</b><small>${EXP[q.e].titel}</small></button>`).join('')}</div>
  <div class="actions"><button class="btn ghost" id="zufall">Zufällige Frage</button></div></div>`;
  V.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>wahl(+b.dataset.q));document.getElementById('zufall').onclick=()=>wahl(Math.floor(Math.random()*Q.length));scrollTo(0,0);}
 function wahl(i){S.q=Q[i];S.ex=EXP[S.q.e];S.stufe=1;S.hyp=null;S.rollen={};S.rollenOk=false;S.rows=[];S.erg=null;S.falsch=null;S.tn={};
- S.set={};S.ex.vars.forEach(v=>S.set[v.id]=v.def);S.hypOrder=shuffle([0,1,2]);S.falschOrder=shuffle([0,1,2]);vermutung();}
-function kopf(){return stepsBar()+`<div class="card"><div class="frage">Frage: ${S.q.f}</div>`;}
+ S.set={};S.ex.vars.forEach(v=>S.set[v.id]=v.def);S.hypOrder=shuffle([0,1,2]);S.fair=null;S.fairOrder=shuffle([0,1,2,3]);S.falschOrder=shuffle([0,1,2]);vermutung();}
+const REGEL=()=>`<div class="regel">⭐ Wichtigste Regel: Verändere nur <u>eine</u> Größe – hier: „${varName(S.q.z)}“. Alles andere bleibt gleich.</div>`;
+function kopf(){return stepsBar()+`<div class="card"><div class="frage">Frage: ${S.q.f}</div>${REGEL()}`;}
 
 function vermutung(){S.stufe=1;
  V.innerHTML=kopf()+`<h2>Deine Vermutung</h2><p>Was glaubst du? Wähle eine Vermutung.</p>
@@ -219,7 +232,7 @@ function plan(){S.stufe=2;
 
 /* ---------- Labor ---------- */
 function ctlHTML(v){const x=S.set[v.id],z=v.id===S.q.z;
- return `<div class="ctl"><label>${v.n}${z?' <span class="note">(veränderst du)</span>':' <span class="note">(gleich halten)</span>'}: <span class="val" id="val_${v.id}">${vText(v,x)}</span></label>
+ return `<div class="ctl ${z?'ziel':'fest'}" id="ctl_${v.id}"><span class="rolle-tag">${z?'⭐ Diese Größe veränderst du':'🔒 bleibt gleich'}</span><label>${v.n}: <span class="val" id="val_${v.id}">${vText(v,x)}</span></label>
  ${v.typ==='r'?`<input type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${x}" data-id="${v.id}">`:`<select data-id="${v.id}">${v.opts.map((o,i)=>`<option value="${i}" ${i===x?'selected':''}>${o}</option>`).join('')}</select>`}</div>`;}
 function analyse(){const R=S.rows,z=S.q.z,v=S.ex.vars;
  const diff=v.filter(x=>x.id!==z&&new Set(R.map(r=>r.s[x.id])).size>1).map(x=>x.id);
@@ -232,19 +245,23 @@ function tabelle(){const R=S.rows,v=S.ex.vars,a=analyse();if(!R.length)return '<
 function labor(){S.stufe=3;const a=analyse();
  V.innerHTML=kopf()+`<h2>Dein Versuch</h2><div class="lab"><div><div class="stage" id="stage">${zeichne(null)}</div>
  <div class="actions"><button class="btn" id="mess">Messen</button><span class="anzeige" id="anz">– ${S.ex.mess.u}</span></div></div>
- <div>${S.ex.vars.map(ctlHTML).join('')}</div></div>
+ <div><div id="lockMsg"></div>${S.ex.vars.map(ctlHTML).join('')}</div></div>
  <h2 style="margin-top:12px">Messtabelle</h2><div id="tab">${tabelle()}</div><div id="status"></div>${tippBox(3)}
  <div class="actions"><button class="btn ghost" id="back">← Plan</button><button class="btn" id="next">zur Auswertung →</button></div></div>`;
  const status=()=>{const a=analyse();let h='';
   if(a.diff.length)h+=`<div class="warn">⚠ Unfair: In deiner Tabelle hast du auch ${a.diff.map(varName).join(' und ')} verändert. Lösche diese Messungen oder stell den Wert zurück.</div>`;
   else if(S.rows.length){h+=a.genug?`<div class="okk">✓ Fairer Versuch mit genug Messwerten – du kannst auswerten.</div>`:`<div class="note">Noch nötig: mindestens ${Math.min(a.need,3)} verschiedene Werte von „${varName(S.q.z)}“, jeden mindestens zweimal gemessen. Bisher: ${a.werte.length} Wert(e).</div>`;}
   document.getElementById('status').innerHTML=h;document.getElementById('next').disabled=!a.genug;};
- const redrawTab=()=>{document.getElementById('tab').innerHTML=tabelle();V.querySelectorAll('.del').forEach(b=>b.onclick=()=>{S.rows.splice(+b.dataset.i,1);redrawTab();});status();};
- V.querySelectorAll('[data-id]').forEach(el=>{el.oninput=el.onchange=()=>{const v=S.ex.vars.find(x=>x.id===el.dataset.id);S.set[v.id]=+el.value;document.getElementById('val_'+v.id).textContent=vText(v,S.set[v.id]);document.getElementById('stage').innerHTML=zeichne(null);document.getElementById('anz').textContent='– '+S.ex.mess.u;};});
- document.getElementById('mess').onclick=()=>{const w=Math.max(0,rausch(S.ex.model(S.set),S.ex.p));const btn=document.getElementById('mess');btn.disabled=true;
+ const lock=()=>{const ref=S.rows.length?S.rows[0].s:null;let bad=null;
+  S.ex.vars.forEach(v=>{if(v.id===S.q.z)return;const f2=ref&&S.set[v.id]!==ref[v.id];document.getElementById('ctl_'+v.id).classList.toggle('falsch',!!f2);if(f2&&!bad)bad=v;});
+  const m=document.getElementById('mess');if(m&&m.dataset.busy!=='1')m.disabled=!!bad;
+  document.getElementById('lockMsg').innerHTML=bad?`<div class="warn">✋ Stopp! Du hast „${bad.n}“ verändert. Diese Größe muss gleich bleiben – stell sie zurück auf „${vText(bad,ref[bad.id])}“. Sonst ist dein Versuch unfair.</div>`:(ref?'':`<div class="note" style="margin-bottom:6px">Stell zuerst die 🔒-Größen ein. Ab der ersten Messung darfst du nur noch die ⭐-Größe verändern.</div>`);};
+ const redrawTab=()=>{document.getElementById('tab').innerHTML=tabelle();V.querySelectorAll('.del').forEach(b=>b.onclick=()=>{S.rows.splice(+b.dataset.i,1);redrawTab();lock();});status();};
+ V.querySelectorAll('[data-id]').forEach(el=>{el.oninput=el.onchange=()=>{const v=S.ex.vars.find(x=>x.id===el.dataset.id);S.set[v.id]=+el.value;document.getElementById('val_'+v.id).textContent=vText(v,S.set[v.id]);document.getElementById('stage').innerHTML=zeichne(null);document.getElementById('anz').textContent='– '+S.ex.mess.u;lock();};});
+ document.getElementById('mess').onclick=()=>{const w=Math.max(0,rausch(S.ex.model(S.set),S.ex.p));const btn=document.getElementById('mess');btn.disabled=true;btn.dataset.busy='1';
   document.getElementById('stage').innerHTML=zeichne(w,true);document.getElementById('anz').textContent='… misst …';
-  setTimeout(()=>{document.getElementById('stage').innerHTML=zeichne(w,false);document.getElementById('anz').textContent=f(w,S.ex.mess.d)+' '+S.ex.mess.u;S.rows.push({s:{...S.set},w:rd(w,S.ex.mess.d)});redrawTab();btn.disabled=false;},1100);};
- redrawTab();bindTipp(3,labor);document.getElementById('back').onclick=plan;document.getElementById('next').onclick=auswertung;}
+  setTimeout(()=>{document.getElementById('stage').innerHTML=zeichne(w,false);document.getElementById('anz').textContent=f(w,S.ex.mess.d)+' '+S.ex.mess.u;S.rows.push({s:{...S.set},w:rd(w,S.ex.mess.d)});btn.dataset.busy='';redrawTab();btn.disabled=false;lock();},1100);};
+ redrawTab();lock();bindTipp(3,labor);document.getElementById('back').onclick=plan;document.getElementById('next').onclick=auswertung;}
 
 /* ---------- Grafiken der Versuche ---------- */
 function zeichne(w,anim){const s=S.set,e=S.q.e;
@@ -288,21 +305,25 @@ function diagramm(M){const max=Math.max(...M.map(m=>m.m),1),bw=Math.min(70,260/M
  return `<svg viewBox="0 0 320 210" style="max-width:420px"><line x1="40" y1="170" x2="310" y2="170" stroke="#1F2A44"/><line x1="40" y1="10" x2="40" y2="170" stroke="#1F2A44"/>
  ${M.map((m,i)=>{const h=m.m/max*150,x=50+i*(260/M.length);return `<rect x="${x}" y="${170-h}" width="${bw-10}" height="${h}" fill="#3B6FB6"/><text x="${x+(bw-10)/2}" y="${165-h}" font-size="11" text-anchor="middle" font-weight="800">${f(m.m,S.ex.mess.d)}</text><text x="${x+(bw-10)/2}" y="186" font-size="10" text-anchor="middle">${m.t.split(' (')[0]}</text>`;}).join('')}
  <text x="44" y="12" font-size="11" fill="#5C6780">${S.ex.mess.n} in ${S.ex.mess.u}</text><text x="310" y="204" font-size="11" text-anchor="end" fill="#5C6780">${varName(S.q.z)}</text></svg>`;}
+const FAIR=()=>[`Ich habe nur „${varName(S.q.z)}“ verändert – alles andere blieb gleich.`,'Ich habe sehr oft gemessen.','Das Ergebnis passt zu meiner Vermutung.','Ich habe alle Größen ausprobiert.'];
 function auswertung(){S.stufe=4;const M=mittel();
  V.innerHTML=kopf()+`<h2>Auswertung</h2><p>Die App hat für jeden Wert den <b>Mittelwert</b> deiner Messungen berechnet.</p>
  <table class="t"><tr><th>${varName(S.q.z)}</th><th>Messungen</th><th>Mittelwert ${S.ex.mess.n}</th></tr>${M.map(m=>`<tr><td>${m.t}</td><td>${m.n}</td><td class="n">${f(m.m,S.ex.mess.d)} ${S.ex.mess.u}</td></tr>`).join('')}</table>
  <div style="text-align:center;margin:10px 0">${diagramm(M)}</div>
- <p class="q"><b>Was schließt du aus deinen Beobachtungen (den Mittelwerten)?</b></p>${S.hypOrder.map(i=>`<div class="opt ${S.erg===i?'on':''}" data-i="${i}"><span class="box"></span><span>${S.q.hyp[i]}</span></div>`).join('')}
+ <p class="q"><b>Warum ist dein Versuch fair?</b></p>${S.fairOrder.map(i=>`<div class="opt ${S.fair===i?'on':''}" data-a="${i}"><span class="box"></span><span>${FAIR()[i]}</span></div>`).join('')}
+ <p class="q" style="margin-top:14px"><b>Was schließt du aus deinen Beobachtungen (den Mittelwerten)?</b></p>${S.hypOrder.map(i=>`<div class="opt ${S.erg===i?'on':''}" data-i="${i}"><span class="box"></span><span>${S.q.hyp[i]}</span></div>`).join('')}
  <p class="q" style="margin-top:14px"><b>Was könnte dein Ergebnis bei einem echten Versuch verfälschen?</b></p>${S.falschOrder.map(i=>`<div class="opt ${S.falsch===i?'on':''}" data-f="${i}"><span class="box"></span><span>${S.ex.falsch[i]}</span></div>`).join('')}
  <div id="afb"></div>${tippBox(4)}<div class="actions"><button class="btn ghost" id="back">← Versuch</button><button class="btn" id="chk">prüfen</button><button class="btn hide" id="next">zum Ergebnis →</button></div></div>`;
+ V.querySelectorAll('[data-a]').forEach(o=>o.onclick=()=>{S.fair=+o.dataset.a;V.querySelectorAll('[data-a]').forEach(p=>p.classList.toggle('on',p===o));});
  V.querySelectorAll('[data-i]').forEach(o=>o.onclick=()=>{S.erg=+o.dataset.i;V.querySelectorAll('[data-i]').forEach(p=>p.classList.toggle('on',p===o));});
  V.querySelectorAll('[data-f]').forEach(o=>o.onclick=()=>{S.falsch=+o.dataset.f;V.querySelectorAll('[data-f]').forEach(p=>p.classList.toggle('on',p===o));});
- document.getElementById('chk').onclick=()=>{if(S.erg===null||S.falsch===null){document.getElementById('afb').innerHTML='<div class="fb bad">Beantworte beide Fragen.</div>';return;}
-  const ok1=S.erg===S.q.w,ok2=S.falsch===0;
+ document.getElementById('chk').onclick=()=>{if(S.fair===null||S.erg===null||S.falsch===null){document.getElementById('afb').innerHTML='<div class="fb bad">Beantworte alle drei Fragen.</div>';return;}
+  const ok0=S.fair===0,ok1=S.erg===S.q.w,ok2=S.falsch===0;
+  V.querySelectorAll('[data-a]').forEach(p=>{p.classList.remove('right','wrong');if(+p.dataset.a===S.fair)p.classList.add(ok0?'right':'wrong');});
   V.querySelectorAll('[data-i]').forEach(p=>{p.classList.remove('right','wrong');if(+p.dataset.i===S.erg)p.classList.add(ok1?'right':'wrong');});
   V.querySelectorAll('[data-f]').forEach(p=>{p.classList.remove('right','wrong');if(+p.dataset.f===S.falsch)p.classList.add(ok2?'right':'wrong');});
-  document.getElementById('afb').innerHTML=`<div class="fb ${ok1&&ok2?'ok':'bad'}">${ok1?'✓ Deine Aussage passt zu den Messwerten.':'✗ Schau noch einmal auf die Mittelwerte: Werden sie größer, kleiner oder bleiben sie gleich?'}<br>${ok2?'✓ Richtig – so etwas verfälscht das Ergebnis.':'✗ Das verfälscht nichts. Gesucht ist etwas, das die Messung unfair oder ungenau macht.'}</div>`;
-  if(ok1&&ok2)document.getElementById('next').classList.remove('hide');};
+  document.getElementById('afb').innerHTML=`<div class="fb ${ok0&&ok1&&ok2?'ok':'bad'}">${ok0?'✓ Genau: Fair ist ein Versuch, wenn sich nur eine Größe ändert.':'✗ Viele Messungen sind gut – aber fair wird ein Versuch nur, wenn sich genau eine Größe ändert.'}<br>${ok1?'✓ Deine Aussage passt zu den Messwerten.':'✗ Schau noch einmal auf die Mittelwerte: Werden sie größer, kleiner oder bleiben sie gleich?'}<br>${ok2?'✓ Richtig – so etwas verfälscht das Ergebnis.':'✗ Das verfälscht nichts. Gesucht ist etwas, das die Messung unfair oder ungenau macht.'}</div>`;
+  if(ok0&&ok1&&ok2)document.getElementById('next').classList.remove('hide');};
  bindTipp(4,auswertung);document.getElementById('back').onclick=labor;document.getElementById('next').onclick=ergebnis;}
 function ergebnis(){S.stufe=5;const M=mittel(),stimmt=S.hyp===S.q.w,gl=S.ex.vars.filter(v=>v.id!==S.q.z);
  // Protokoll als feste Karte, die auf den iPad-Bildschirm skaliert wird → ein einziger Screenshot reicht
@@ -310,7 +331,8 @@ function ergebnis(){S.stufe=5;const M=mittel(),stimmt=S.hyp===S.q.w,gl=S.ex.vars
  V.innerHTML=`<div id="fitBox"><div id="sumCard">
  <div class="top"><h2>Versuchsprotokoll</h2><span class="note">${EXP[S.q.e].titel}</span></div>
  <div class="zeile"><b>① Frage:</b> ${S.q.f}</div><div class="zeile"><b>② Vermutung:</b> ${S.q.hyp[S.hyp]}</div>
- <div class="zeile"><b>③ Plan:</b> Ich verändere <b>${varName(S.q.z)}</b>. Ich messe <b>${S.ex.mess.n} in ${S.ex.mess.u}</b>. Gleich bleiben: ${gl.map(v=>`${v.n} (${vText(v,S.rows[0].s[v.id])})`).join(', ')}.</div>
+ <div class="zeile"><b>③ Plan:</b> Ich verändere nur <b>${varName(S.q.z)}</b>. Ich messe <b>${S.ex.mess.n} in ${S.ex.mess.u}</b>. Gleich bleiben: ${gl.map(v=>`${v.n} (${vText(v,S.rows[0].s[v.id])})`).join(', ')}.</div>
+ <div class="zeile"><b>✔ Fair:</b> Nur „${varName(S.q.z)}“ hat sich verändert, alles andere blieb gleich.</div>
  <div class="zwei"><div><div class="zeile"><b>④ Das habe ich beobachtet (Mittelwerte):</b></div>
   <table class="t">${M.map(m=>`<tr><td>${m.t}</td><td class="n">${f(m.m,S.ex.mess.d)} ${S.ex.mess.u}</td><td class="note">${m.n}×</td></tr>`).join('')}</table></div>
   <div class="dia">${diagramm(M)}</div></div>
