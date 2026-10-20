@@ -76,9 +76,20 @@ select{font:700 16px "Nunito",sans-serif;color:var(--ink);border:2px solid var(-
 .kessel .w b.rot{background:var(--bad-bg);border-radius:6px;padding:0 6px;color:var(--heat)}
 .qr svg{width:180px;height:180px}
 .foot{margin-top:28px;font-size:.88rem;color:var(--muted)}.foot a{color:var(--muted)}
-#sumCard{border:2px solid var(--ink);border-radius:14px;padding:14px 16px;background:#fff;font-size:15px}
-#sumCard h2{margin:0 0 4px}
-#sumCard .zeile{margin:4px 0}
+#fitBox{display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
+#sumCard{width:720px;flex:0 0 auto;border:2px solid var(--ink);border-radius:14px;padding:14px 18px 10px;background:#fff;font-size:15px;line-height:1.4;transform-origin:top center}
+#sumCard .top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-bottom:2px solid var(--dblue);padding-bottom:4px;margin-bottom:6px}
+#sumCard h2{font-family:"Patrick Hand",cursive;font-weight:400;font-size:1.9rem;margin:0;line-height:1}
+#sumCard .zeile{margin:5px 0}
+#sumCard .zwei{display:grid;grid-template-columns:1fr 300px;gap:12px;align-items:center}
+#sumCard .dia svg{width:300px;height:auto}
+#sumCard table.t{font-size:14px}
+#sumCard.hoch{width:500px}
+#sumCard.hoch .zwei{grid-template-columns:1fr}
+#sumCard.hoch .dia{text-align:center}
+#sumCard .shot{margin-top:8px;font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:5px}
+body.summary .wrap{max-width:none;padding:8px}
+body.summary h1,body.summary .sub,body.summary .foot{display:none}
 </style>
 </head>
 <body>
@@ -294,16 +305,26 @@ function auswertung(){S.stufe=4;const M=mittel();
   if(ok1&&ok2)document.getElementById('next').classList.remove('hide');};
  bindTipp(4,auswertung);document.getElementById('back').onclick=labor;document.getElementById('next').onclick=ergebnis;}
 function ergebnis(){S.stufe=5;const M=mittel(),stimmt=S.hyp===S.q.w,gl=S.ex.vars.filter(v=>v.id!==S.q.z);
- V.innerHTML=stepsBar()+`<div id="sumCard"><h2 style="font-family:'Patrick Hand',cursive;font-weight:400;font-size:1.9rem">Versuchsprotokoll</h2>
+ // Protokoll als feste Karte, die auf den iPad-Bildschirm skaliert wird → ein einziger Screenshot reicht
+ document.body.classList.add('summary');
+ V.innerHTML=`<div id="fitBox"><div id="sumCard">
+ <div class="top"><h2>Versuchsprotokoll</h2><span class="note">${EXP[S.q.e].titel}</span></div>
  <div class="zeile"><b>① Frage:</b> ${S.q.f}</div><div class="zeile"><b>② Vermutung:</b> ${S.q.hyp[S.hyp]}</div>
  <div class="zeile"><b>③ Plan:</b> Ich verändere <b>${varName(S.q.z)}</b>. Ich messe <b>${S.ex.mess.n} in ${S.ex.mess.u}</b>. Gleich bleiben: ${gl.map(v=>`${v.n} (${vText(v,S.rows[0].s[v.id])})`).join(', ')}.</div>
- <div class="zeile"><b>④ Das habe ich beobachtet (Mittelwerte):</b> ${M.map(m=>`${m.t}: ${f(m.m,S.ex.mess.d)} ${S.ex.mess.u} (${m.n}×)`).join(' · ')}</div>
- <div style="text-align:center">${diagramm(M)}</div>
+ <div class="zwei"><div><div class="zeile"><b>④ Das habe ich beobachtet (Mittelwerte):</b></div>
+  <table class="t">${M.map(m=>`<tr><td>${m.t}</td><td class="n">${f(m.m,S.ex.mess.d)} ${S.ex.mess.u}</td><td class="note">${m.n}×</td></tr>`).join('')}</table></div>
+  <div class="dia">${diagramm(M)}</div></div>
  <div class="zeile"><b>⑤ Das schließe ich daraus:</b> ${S.q.hyp[S.q.w]} Meine Vermutung war <b>${stimmt?'richtig':'falsch'}</b>.</div>
- <div class="zeile"><b>Fehlerquelle beim echten Versuch:</b> ${S.ex.falsch[0]}</div></div>
- <div class="card" style="margin-top:14px"><p>✎ Mach einen <b>Screenshot</b> vom Protokoll und füge ihn in dein OneNote-Heft ein.</p>
- <div class="actions"><button class="btn" id="neu">Andere Frage untersuchen</button></div></div>`;
- document.getElementById('neu').onclick=start;scrollTo(0,0);}
+ <div class="zeile"><b>Fehlerquelle beim echten Versuch:</b> ${S.ex.falsch[0]}</div>
+ <div class="shot">📸 Jetzt Screenshot machen: obere Taste und Lauter-Taste gleichzeitig drücken – dann in OneNote einfügen.</div></div></div>
+ <div class="actions" style="justify-content:center;margin-top:12px"><button class="btn" id="neu">Andere Frage untersuchen</button></div>`;
+ document.getElementById('neu').onclick=()=>{document.body.classList.remove('summary');start();};fit();scrollTo(0,0);}
+function fit(){const card=document.getElementById('sumCard'),box=document.getElementById('fitBox');if(!card)return;
+ card.classList.toggle('hoch',window.innerHeight>window.innerWidth);card.style.transform='none';box.style.height='auto';
+ const sc=Math.min(1.6,(window.innerWidth-16)/card.offsetWidth,(window.innerHeight-16)/card.offsetHeight);
+ card.style.transform=`scale(${sc})`;box.style.height=Math.ceil(card.offsetHeight*sc)+'px';}
+window.addEventListener('resize',()=>{if(document.body.classList.contains('summary'))fit();});
+window.addEventListener('orientationchange',()=>setTimeout(fit,300));
 
 /* ============ Einstieg für den Beamer ============ */
 function beamer(){document.body.classList.add('beamer');document.getElementById('h1').textContent='Welcher Wasserkocher ist sparsamer?';
