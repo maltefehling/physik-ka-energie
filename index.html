@@ -86,6 +86,27 @@ input:focus{outline:3px solid var(--marker);border-color:var(--ink)}
 .tipp b{color:var(--lila)}
 .btn.tippbtn{background:#fff;border-color:var(--lila);color:var(--lila);box-shadow:3px 3px 0 var(--lila)}
 .btn.tippbtn:disabled{box-shadow:none}
+.mcl li.klick{cursor:pointer;user-select:none;-webkit-user-select:none;min-height:44px;align-items:center}
+.mcl li.klick .box{width:22px;height:22px;border:2px solid var(--ink);border-radius:50%;flex:0 0 auto}
+.mcl.multi li.klick .box{border-radius:5px}
+.mcl li.sel{border-color:var(--ink);background:#FFFBEA}.mcl li.sel .box{background:var(--ink);box-shadow:inset 0 0 0 3px #fff}
+.mcl li.right{border-color:var(--green);background:var(--ok-bg)}.mcl li.wrong{border-color:var(--heat);background:var(--bad-bg)}
+.mcl li.fertig{cursor:default}
+.frow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:2px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0;background:#fff}
+.frow .lab{flex:1 1 240px}
+.frow select{font:700 16px "Nunito",sans-serif;color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;min-height:44px;max-width:100%}
+.frow input{width:150px;font:800 19px "Nunito",sans-serif;color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:6px 10px;background:#fff;min-height:44px}
+.frow .u{font-weight:800}
+.frow.right{border-color:var(--green);background:var(--ok-bg)}.frow.wrong{border-color:var(--heat);background:var(--bad-bg)}
+textarea.antw{width:100%;min-height:96px;font:17px/1.45 "Nunito",sans-serif;color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical}
+.krit label{display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer}
+.krit input{width:22px;height:22px;accent-color:var(--green);flex:0 0 auto;margin-top:2px}
+.fb.hinw{background:var(--hilfe);border:2px solid var(--hilfe-rand)}
+.offen-liste{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.offen-liste button{text-align:left;border:2px solid var(--heat);border-radius:10px;background:#fff;padding:8px 12px;font:inherit;color:inherit;cursor:pointer;min-height:44px}
+.offen-liste button.erledigt{border-color:var(--green);background:var(--ok-bg)}
+.fehlliste li{margin:3px 0}
+.fehlliste a{color:var(--dblue);font-weight:700}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
 .btn{border:2px solid var(--ink);background:var(--marker);color:var(--ink);font:800 16px "Nunito",sans-serif;padding:9px 18px;border-radius:10px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);min-height:44px}
 .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
@@ -123,7 +144,7 @@ input:focus{outline:3px solid var(--marker);border-color:var(--ink)}
 <body>
 <div class="wrap">
   <h1>Fit für die Klassenarbeit: Energie</h1>
-  <p class="sub">Physik Klasse 8 · Aufgaben auf Papier lösen, dann mit der Ideallösung vergleichen</p>
+  <p class="sub">Physik Klasse 8 · Antwort eingeben, prüfen, aus Fehlern lernen – Rechenwege im Heft</p>
   <section id="view"></section>
   <p class="foot">Fehling · Fit für die Klassenarbeit: Energie · <a href="versuch.html">Versuchslabor</a> · <a href="https://maltefehling.github.io/energiefluss/">alle Energie-Apps</a></p>
 </div>
@@ -624,32 +645,33 @@ const BER=[
 function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});L.push(iqb(pick(Object.keys(IQB)),n));return L;}
 
 /* ============ Zustand + Ansichten ============ */
-const S={mode:null,ber:null,niv:null,list:[],i:0,res:{},inp:{},tip:{}};
+const S={mode:null,ber:null,niv:null,list:[],i:0,res:{},st:{},tip:{},offen:false};
 const VW=document.getElementById('view');
 const NIV={1:['★','Grundlagen','Größen stehen mit Formelzeichen und Einheit im Text. Einfache Fragen.'],2:['★★','Standard','Ohne Formelzeichen, manche Einheiten musst du erst umrechnen.'],3:['★★★','Profi','Mehrere Rechnungen verknüpfen, überflüssige Angaben aussortieren, Aussagen beurteilen.']};
 const FUENF='<div class="fuenf">✎ <b>Rechne im Heft im Fünf-Schritt:</b><ol><li>① <b>gegeben:</b> Formelzeichen = Wert mit Einheit (umgerechnet)</li><li>② <b>gesucht:</b> Formelzeichen und Einheit</li><li>③ <b>Formel</b> (umgestellt, gesuchte Größe vorne)</li><li>④ <b>Rechnung</b> mit Formelzeichen und Einheiten</li><li>⑤ <b>Antwortsatz</b> mit Formelzeichen, Zahl und Einheit</li></ol></div>';
 const LET='ABCDEFGH';
 
 function startView(){S.mode=null;S.ber=null;S.niv=null;
- VW.innerHTML=`<div class="card"><h2>Was willst du üben?</h2><div class="choice">
+ VW.innerHTML=offenHTML()+`<div class="card"><h2>Was willst du üben?</h2><div class="choice">
   <button class="big" data-m="ka"><b>Ganze Klassenarbeit</b><small>Aus jedem Bereich eine Aufgabe – wie in der echten Klassenarbeit, mit Punkten.</small></button>
   <button class="big" data-m="ber"><b>Einen Bereich</b><small>Alle Aufgaben zu einer Seite aus deinem OneNote-Heft.</small></button></div></div>
   <div class="card"><h2>So funktioniert's</h2><ul>
-  <li>Du löst jede Aufgabe <b>auf Papier</b> bzw. in deinem Heft. Rechenaufgaben immer im <b>Fünf-Schritt</b>. Bei Rechenaufgaben tippst du nur dein <b>Endergebnis</b> ein – die App prüft es und sagt dir, welcher Fehler dahinterstecken könnte.</li>
-  <li>Wenn du nicht weiterkommst, hol dir einen <b>Tipp ▶</b> – bei Rechenaufgaben gibt es mehrere, Schritt für Schritt.</li>
-  <li>Dann tippst du auf <b>Ideallösung anzeigen</b>, vergleichst ehrlich und gibst an, wie es lief: ✓ richtig · ◐ teilweise · ✗ noch nicht.</li>
+  <li>Du gibst deine Antwort ein und tippst auf <b>Prüfen</b>. Ist sie falsch, bekommst du einen Tipp und einen <b>zweiten Versuch</b>.</li>
+  <li>Bei <b>Rechenaufgaben</b> tippst du nur dein <b>Endergebnis</b> ein. Den Rechenweg schreibst du ins Heft – im <b>Fünf-Schritt</b>, mit Formelzeichen und Einheiten. Die App sagt dir, welcher Fehler hinter einem falschen Ergebnis stecken könnte.</li>
+  <li>Bei Fragen, die du in Sätzen beantwortest, vergleichst du deine Antwort mit der Ideallösung und hakst ab, was drinsteht.</li>
+  <li>Wenn du nicht weiterkommst, hol dir einen <b>Tipp ▶</b>. Am Ende siehst du, was noch nicht geklappt hat – das bleibt auf der Startseite stehen, bis du es nachgeübt hast.</li>
   <li>Bei Aufgaben mit <b>Material</b> (Text, Tabelle, Diagramm) liest du zuerst genau das Material.</li>
   <li>Bei jedem Durchgang bekommst du <b>neue Aufgaben</b>: gleiches Muster, anderer Zusammenhang, andere Zahlen – aber gleich schwer.</li></ul></div>`;
- VW.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;S.mode==='ka'?nivView():berView();});scrollTo(0,0);}
+ VW.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;S.mode==='ka'?nivView():berView();});wireOffen(VW);scrollTo(0,0);}
 function berView(){VW.innerHTML=`<div class="card"><h2>Welchen Bereich?</h2><p class="note">Die Bereiche heißen wie die Seiten in deinem OneNote-Heft.</p><div class="choice">${BER.map(b=>`<button class="big" data-b="${b.nr}"><b>${b.name}</b>${b.info?`<small>${b.info}</small>`:''}</button>`).join('')}</div>
  <div class="actions"><button class="btn ghost" id="back">← zurück</button></div></div>`;
  VW.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{S.ber=+b.dataset.b;BER[S.ber].one?(S.niv=1,go()):nivView();});document.getElementById('back').onclick=startView;scrollTo(0,0);}
 function nivView(){VW.innerHTML=`<div class="card"><h2>${S.mode==='ka'?'Ganze Klassenarbeit':BER[S.ber].name}: Welches Niveau?</h2><div class="choice">${[1,2,3].map(n=>`<button class="big" data-n="${n}"><b><span class="stars">${NIV[n][0]}</span> ${NIV[n][1]}</b><small>${NIV[n][2]}</small></button>`).join('')}</div>
  <div class="actions"><button class="btn ghost" id="back">← zurück</button></div></div>`;
  VW.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{S.niv=+b.dataset.n;go();});document.getElementById('back').onclick=()=>S.mode==='ka'?startView():berView();scrollTo(0,0);}
-function go(){S.list=S.mode==='ka'?klassenarbeit(S.niv):BER[S.ber].tasks(S.niv).map(t=>({bereich:S.ber,...t}));S.i=0;S.res={};S.inp={};S.tip={};taskView();}
+function go(){S.list=S.mode==='ka'?klassenarbeit(S.niv):BER[S.ber].tasks(S.niv).map(t=>({bereich:S.ber,...t}));S.i=0;S.res={};S.st={};S.tip={};taskView();}
 
-/* ---------- Aufgabe anzeigen (nur lesen, Lösung auf Papier) ---------- */
+/* ---------- Aufgabe anzeigen: Eingabe → Prüfen → Rückmeldung (2 Versuche, wie in der Mathe-App Kl. 9) ---------- */
 // Tipps einer Teilaufgabe: eigene Tipps, sonst aus der Rechnung abgeleitet (gestuft)
 function tipps(t){
  if(t.typ==='rechnen'){const L=[`Gesucht ist <b>${t.ges}</b>. Schreib zuerst ① gegeben: alle Größen mit Formelzeichen und Einheit.`];
@@ -659,47 +681,67 @@ function tipps(t){
   if(t.hin)L.push(t.hin);return L;}
  const x=t.tipp||TIPP[t.titel]||(t.titel&&t.titel.startsWith('Umwandlungskette')?TIPP_KETTE:null);
  return x?[].concat(x):['Lies die Aufgabe noch einmal genau und unterstreiche die wichtigen Wörter.'];}
-const sameOpts=rows=>rows.every(r=>r.opts.join('|')===rows[0].opts.join('|'));
+const HEFT='✎ Den Rechenweg schreibst du ins Heft – im <b>Fünf-Schritt</b>, in jeder Zeile mit <b>Formelzeichen und Einheiten</b>.';
 function subHTML(t,k,lab){
  let h=`<div class="teil" id="s${k}">${lab?`<div class="tl">${lab}</div>`:''}`;
  if(t.svg)h+=`<div class="svgbox">${t.svg}</div>`;
- if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis: <b>${t.erg.l} =</b></span><input inputmode="decimal" autocomplete="off" aria-label="Endergebnis"><span class="u">${t.erg.u}</span><button class="btn" data-a="check">Prüfen</button></div><div class="fbx"></div>`;
+ if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis: <b>${t.erg.l} =</b></span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Endergebnis"><span class="u">${t.erg.u}</span></div>`;
  else{h+=`<p class="q">${t.frage}</p>`;
-  if(t.typ==='mc')h+=`<ul class="mcl ${t.diag?'diag':''}">${t.opts.map((o,i)=>`<li><b class="L">${LET[i]})</b><span>${o}</span></li>`).join('')}</ul><p class="note">${t.multi?'Mehrere Buchstaben können richtig sein. ':''}Notiere ${t.multi?'die Buchstaben':'den Buchstaben'} auf deinem Papier.</p>`;
-  if(t.typ==='select'){const same=sameOpts(t.rows);
-   if(same)h+=`<div class="auswahl">${t.rows[0].opts.map(o=>`<span>${o}</span>`).join('')}</div>`;
-   h+=`<div class="zr">${t.rows.map((r,i)=>`<span class="nr">${i+1}.</span><span>${r.l}${same?'':` <span class="note">(${r.opts.join(' / ')})</span>`}</span>`).join('')}</div><p class="note">Schreib zu jeder Nummer die passende Antwort auf.</p>`;}
-  if(t.typ==='zahl')h+=`<div class="zr">${t.rows.map((r,i)=>`<span class="nr">${i+1}.</span><span>${r.l} <span class="leer"></span> ${r.u}</span>`).join('')}</div>`;
-  if(t.typ==='offen')h+=`<div class="heft">✎ Schreib deine Antwort in ganzen Sätzen ins Heft.</div>`;}
- h+=`<div class="tipps"></div><div class="actions"><button class="btn tippbtn" data-a="tipp">Tipp ▶</button><button class="btn ${t.typ==='rechnen'?'ghost':''}" data-a="ideal">${t.typ==='rechnen'?'Ich komme nicht weiter – Ideallösung zeigen':'Ideallösung anzeigen'}</button></div><div class="ideal hide">${idealHTML(t)}</div>
-  <div class="rate hide"><span>Wie lief's?</span><button data-r="ok">✓ richtig</button><button data-r="teil">◐ teilweise</button><button data-r="nein">✗ noch nicht</button></div></div>`;
+  if(t.typ==='mc')h+=`<ul class="mcl ${t.diag?'diag':''} ${t.multi?'multi':''}">${t.opts.map((o,i)=>`<li class="klick" data-k="${i}" role="button" tabindex="0">${t.diag?`<b class="L">${LET[i]}</b>`:''}<span class="box"></span><span>${o}</span></li>`).join('')}</ul><p class="note">${t.multi?'Mehrere Antworten können richtig sein. ':''}Tippe an und bestätige mit „Prüfen“.</p>`;
+  if(t.typ==='select')h+=t.rows.map((r,i)=>`<div class="frow"><span class="lab"><b>${i+1}.</b> ${r.l}</span><select aria-label="Antwort ${i+1}"><option value="">– wählen –</option>${r.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('');
+  if(t.typ==='zahl')h+=t.rows.map((r,i)=>`<div class="frow"><span class="lab"><b>${i+1}.</b> ${r.l}</span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Antwort ${i+1}"><span class="u">${r.u}</span></div>`).join('');
+  if(t.typ==='offen')h+=`<textarea class="antw" placeholder="Schreib deine Antwort in ganzen Sätzen – hier oder ins Heft."></textarea>`;}
+ h+=`<div class="tipps"></div><div class="fbx"></div><div class="actions"><button class="btn" data-a="check">${t.typ==='offen'?'Mit der Ideallösung vergleichen':'Prüfen ✓'}</button><button class="btn tippbtn" data-a="tipp">Tipp ▶</button><button class="btn ghost" data-a="ideal">Ich komme nicht weiter – Lösung zeigen</button></div><div class="ideal hide">${idealHTML(t)}</div></div>`;
  return h;}
 function idealHTML(t){
  if(t.typ==='rechnen'){let h=`<h4>Ideallösung im Fünf-Schritt</h4><div class="is"><span class="k">① gegeben:</span><span>${t.geg.join('<br>')}</span><span class="k">② gesucht:</span><span>${t.ges}</span>`;
   const multi=t.schritte.length>1;
   t.schritte.forEach(s=>{if(multi)h+=`<span class="zw">${s.t}</span>`;h+=`<span class="k">③ Formel:</span><span>${s.formel}</span><span class="k">④ Rechnung:</span><span>${s.rechnung.join('<br>')}</span>`;});
   h+=`<span class="k">⑤ Antwort:</span><span>${t.antwort}</span></div>`;if(t.hin)h+=`<p class="hin">Tipp: ${t.hin}</p>`;return h;}
- if(t.typ==='mc'){const r=[].concat(t.richtig);return `<h4>Ideallösung</h4>${t.diag?`<p>Richtig ist <b>${r.map(i=>LET[i]).join(', ')}</b>.</p>`:`<ul>${r.map(i=>`<li><b>${LET[i]}) ${t.opts[i]}</b></li>`).join('')}</ul>`}${t.erkl?`<p>${t.erkl}</p>`:''}`;}
+ if(t.typ==='mc'){const r=[].concat(t.richtig);return `<h4>Ideallösung</h4>${t.diag?`<p>Richtig ist <b>${r.map(i=>LET[i]).join(', ')}</b>.</p>`:`<ul>${r.map(i=>`<li><b>${t.opts[i]}</b></li>`).join('')}</ul>`}${t.erkl?`<p>${t.erkl}</p>`:''}`;}
  if(t.typ==='select')return `<h4>Ideallösung</h4><table class="t">${t.rows.map((r,i)=>`<tr><td><b>${i+1}.</b> ${r.l}</td><td><b>${r.r}</b></td></tr>`).join('')}</table>${t.erkl?`<p>${t.erkl}</p>`:''}`;
  if(t.typ==='zahl')return `<h4>Ideallösung</h4>${t.rows.map((r,i)=>`<p><b>${i+1}.</b> ${r.l} <b>${f(r.w)} ${r.u}</b></p>`).join('')}${t.erkl?`<p>${t.erkl}</p>`:''}`;
- if(t.typ==='offen')return `<h4>Ideallösung</h4><p>${t.ideal}</p>${t.krit?`<p><b>Daran erkennst du eine gute Antwort:</b></p><ul>${t.krit.map(k=>`<li>${k}</li>`).join('')}</ul>`:''}`;}
+ if(t.typ==='offen')return `<h4>Ideallösung</h4><p>${t.ideal}</p>${t.krit?`<p><b>Hake ab, was in deiner Antwort steht:</b></p><div class="krit">${t.krit.map((k,i)=>`<label><input type="checkbox" data-c="${i}"><span>${k}</span></label>`).join('')}</div><div class="actions"><button class="btn" data-a="werten">Fertig abgehakt</button></div>`:''}`;}
+// Bewertung einer Eingabe: true/false, null = noch nichts eingegeben; markiert richtige und falsche Teile
+function pruefe(t,el){
+ if(t.typ==='mc'){const sel=[...el.querySelectorAll('.mcl li.sel')].map(li=>+li.dataset.k);if(!sel.length)return {leer:true};const r=[].concat(t.richtig);
+  el.querySelectorAll('.mcl li').forEach(li=>{const k=+li.dataset.k;li.classList.remove('right','wrong');if(li.classList.contains('sel'))li.classList.add(r.includes(k)?'right':'wrong');});
+  return {ok:sel.length===r.length&&sel.every(k=>r.includes(k)),m:t.multi&&sel.every(k=>r.includes(k))&&sel.length<r.length?'Deine Antworten stimmen – aber es fehlt noch mindestens eine.':''};}
+ if(t.typ==='select'){const S2=[...el.querySelectorAll('.frow select')];if(S2.every(x=>!x.value))return {leer:true};let ok=true,n=0;
+  S2.forEach((x,i)=>{const row=x.closest('.frow');row.classList.remove('right','wrong');const g=x.value.replace(/\u00A0/g,' ')===t.rows[i].r.replace(/\u00A0/g,' ');if(g)n++;row.classList.add(g?'right':'wrong');if(!g)ok=false;});
+  return {ok,m:ok?'':`${n} von ${S2.length} richtig. Die rot markierten Zeilen stimmen noch nicht.`};}
+ if(t.typ==='zahl'){const I=[...el.querySelectorAll('.frow input')];if(I.every(x=>!x.value.trim()))return {leer:true};let ok=true,m='';
+  I.forEach((x,i)=>{const row=x.closest('.frow'),w=t.rows[i].w,v=parseDE(x.value);row.classList.remove('right','wrong');
+   const g=nah(v,w)||(t.rows[i].u==='%'&&nah(v*100,w));row.classList.add(g?'right':'wrong');if(!g){ok=false;if(!m&&isFinite(v)){const d=diagnose({erg:{w,u:t.rows[i].u},F:[]},v);if(!d.ok)m=d.m;}}});
+  return {ok,m:ok?'':(m||'Die rot markierten Zeilen stimmen noch nicht.')};}
+ if(t.typ==='rechnen'){const inp=el.querySelector('.erg input'),box=el.querySelector('.erg'),v=parseDE(inp.value);if(!inp.value.trim())return {leer:true};
+  if(!isFinite(v))return {leer:true,m:'Gib dein Endergebnis als Zahl ein (Komma statt Punkt).'};
+  const d=diagnose(t,v);box.classList.remove('right','wrong');box.classList.add(d.ok?'right':'wrong');return {ok:d.ok,m:d.ok?'':'<b>Möglicher Fehler:</b> '+d.m};}
+ return {leer:true};}
+function sperre(el){el.querySelectorAll('input,select,textarea,[data-a="check"],[data-a="ideal"],[data-a="tipp"]').forEach(x=>x.disabled=true);el.querySelectorAll('.mcl li').forEach(li=>li.classList.add('fertig'));}
 function bindSub(el,key,t){
- const rate=el.querySelector('.rate'),ideal=el.querySelector('.ideal'),btn=el.querySelector('[data-a="ideal"]');
- const setR=r=>{S.res[key]=r;rate.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));progress();};
- rate.querySelectorAll('button').forEach(b=>b.onclick=()=>setR(b.dataset.r));
- btn.onclick=()=>{ideal.classList.toggle('hide');rate.classList.remove('hide');btn.textContent=ideal.classList.contains('hide')?'Ideallösung anzeigen':'Ideallösung ausblenden';};
- const tb=el.querySelector('[data-a="tipp"]'),tbox=el.querySelector('.tipps'),TL=tipps(t);let tn=0;
- const zeig=n=>{tbox.innerHTML=TL.slice(0,n).map((x,i)=>`<div class="tipp"><b>Tipp${TL.length>1?' '+(i+1):''}:</b> ${x}</div>`).join('');tb.textContent=n<TL.length?(n?'Noch ein Tipp ▶':'Tipp ▶'):'Keine weiteren Tipps';tb.disabled=n>=TL.length;};
- tb.onclick=()=>{tn++;S.tip[key]=tn;zeig(tn);};if(S.tip[key]){tn=S.tip[key];zeig(tn);}else zeig(0);
+ const st=S.st[key]=S.st[key]||{tries:0,done:false},ideal=el.querySelector('.ideal'),fbx=el.querySelector('.fbx');
+ const tb=el.querySelector('[data-a="tipp"]'),tbox=el.querySelector('.tipps'),TL=tipps(t);
+ const zeig=n=>{tbox.innerHTML=TL.slice(0,n).map((x,i)=>`<div class="tipp"><b>Tipp${TL.length>1?' '+(i+1):''}:</b> ${x}</div>`).join('');tb.textContent=n<TL.length?(n?'Noch ein Tipp ▶':'Tipp ▶'):'Keine weiteren Tipps';if(!st.done)tb.disabled=n>=TL.length;};
+ tb.onclick=()=>{S.tip[key]=(S.tip[key]||0)+1;zeig(S.tip[key]);};zeig(S.tip[key]||0);
+ const setR=r=>{S.res[key]=r;progress();};
+ const fertig=(r,html)=>{st.done=true;setR(r);st.fb=html;fbx.innerHTML=html;ideal.classList.remove('hide');sperre(el);};
+ // Auswahl antippen markiert nur – gewertet wird erst mit „Prüfen“
+ if(t.typ==='mc')el.querySelectorAll('.mcl li').forEach(li=>{const tog=()=>{if(st.done)return;if(!t.multi)el.querySelectorAll('.mcl li').forEach(x=>x!==li&&x.classList.remove('sel'));li.classList.toggle('sel');el.querySelectorAll('.mcl li').forEach(x=>x.classList.remove('right','wrong'));};li.onclick=tog;li.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();tog();}};});
  const chk=el.querySelector('[data-a="check"]');
- if(chk){const inp=el.querySelector('.erg input'),box=el.querySelector('.erg'),fbx=el.querySelector('.fbx');
-  const run=()=>{const v=parseDE(inp.value);if(!isFinite(v)){fbx.innerHTML='<div class="fb bad">Gib zuerst dein Endergebnis als Zahl ein.</div>';return;}
-   const d=diagnose(t,v);box.classList.remove('right','wrong');box.classList.add(d.ok?'right':'wrong');
-   fbx.innerHTML=d.ok?`<div class="fb ok"><b>✓ Dein Ergebnis stimmt!</b><br>Hast du auch den Fünf-Schritt eingehalten – mit Formelzeichen und Einheiten in jeder Zeile und einem Antwortsatz? Vergleiche mit der Ideallösung unten.</div>`
-    :`<div class="fb bad"><b>✗ Das stimmt noch nicht.</b><br><b>Möglicher Fehler:</b> ${d.m}<br>Hast du den Fünf-Schritt eingehalten und überall Formelzeichen und Einheiten hingeschrieben? Unten siehst du die Aufgabe im perfekten Fünf-Schritt.</div>`;
-   ideal.classList.remove('hide');rate.classList.remove('hide');btn.textContent='Ideallösung ausblenden';if(!S.res[key])setR(d.ok?'ok':'nein');S.inp[key]=inp.value;};
-  chk.onclick=run;inp.onkeydown=e=>{if(e.key==='Enter')run();};if(S.inp[key])inp.value=S.inp[key];}
- if(S.res[key]){setR(S.res[key]);rate.classList.remove('hide');}}
+ if(t.typ==='offen'){chk.onclick=()=>{if(st.done)return;ideal.classList.remove('hide');chk.disabled=true;fbx.innerHTML='<div class="fb hinw">Vergleiche deine Antwort mit der Ideallösung und hake ehrlich ab, was drinsteht.</div>';};
+  el.querySelector('[data-a="werten"]').onclick=()=>{const c=el.querySelectorAll('.krit input'),n=[...c].filter(x=>x.checked).length,r=n===c.length?'ok':n>=c.length/2?'teil':'nein';
+   fertig(r,`<div class="fb ${r==='ok'?'ok':'bad'}">${r==='ok'?'✓ Alles drin – stark!':r==='teil'?`◐ ${n} von ${c.length} Punkten stehen in deiner Antwort. Ergänze den Rest im Heft.`:`✗ Nur ${n} von ${c.length} Punkten. Lies die Ideallösung genau und schreib sie ins Heft.`}</div>`);el.querySelector('[data-a="werten"]').disabled=true;};}
+ else{const run=()=>{if(st.done)return;const g=pruefe(t,el);
+   if(g.leer){fbx.innerHTML=`<div class="fb bad">${g.m||'Gib zuerst eine Antwort ein.'}</div>`;return;}
+   const heft=t.typ==='rechnen'?`<br>${HEFT} Vergleiche ihn jetzt mit der Ideallösung unten.`:'';
+   if(g.ok)return fertig(st.tries?'teil':'ok',`<div class="fb ok"><b>✓ Richtig${st.tries?' – im zweiten Versuch':''}!</b>${heft}</div>`);
+   if(!st.tries){st.tries=1;if(!S.tip[key]){S.tip[key]=1;zeig(1);}
+    fbx.innerHTML=`<div class="fb bad"><b>✗ Noch nicht.</b> ${g.m||''}<br>Schau dir den Tipp an und versuch es noch einmal.${t.typ==='rechnen'?`<br>Hast du den Fünf-Schritt eingehalten und überall Formelzeichen und Einheiten hingeschrieben?`:''}</div>`;return;}
+   fertig('nein',`<div class="fb bad"><b>✗ Leider wieder nicht richtig.</b> ${g.m||''} Unten steht die Lösung.${heft}</div>`);};
+  chk.onclick=run;el.querySelectorAll('input:not([type=checkbox])').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')run();});}
+ el.querySelector('[data-a="ideal"]').onclick=()=>{if(st.done)return;fertig('nein',`<div class="fb bad">Hier ist die Lösung. Diese Aufgabe zählt als „noch nicht“ – schau sie dir genau an und versuch es in der nächsten Runde wieder.${t.typ==='rechnen'?'<br>'+HEFT:''}</div>`);};
+ if(st.done){fbx.innerHTML=st.fb||'';ideal.classList.remove('hide');sperre(el);}}
 const subs=t=>t.typ==='einheit'?t.teile:[t];
 function taskView(){const t=S.list[S.i],b=BER[t.bereich];
  let h=`<div id="prog"></div><div class="card"><div class="kopf"><span>Aufgabe ${S.i+1} von ${S.list.length} · ${b.name}</span><span class="stars">${NIV[S.niv][0]}</span></div><h2>${t.typ==='einheit'?'Aufgabe mit Material: ':''}${t.titel}</h2>`;
@@ -713,17 +755,42 @@ const pkt=x=>x.punkte||(x.typ==='select'||x.typ==='zahl'?Math.max(1,x.rows.lengt
 function stat(i){const ss=subs(S.list[i]);let p=0,max=0,done=0;
  ss.forEach((x,j)=>{const pk=pkt(x);max+=pk;const r=S.res[i+'_'+j];if(r)done++;p+=r==='ok'?pk:r==='teil'?pk/2:0;});return {p,max,done,all:ss.length};}
 function progress(){const el=document.getElementById('prog');if(!el)return;let tp=0,tm=0;
- el.innerHTML=S.list.map((t,i)=>{const s=stat(i);tp+=s.p;tm+=s.max;const c=s.done<s.all?'':s.p>=s.max?'ok':s.p>0?'teil':'nein';return `<button class="${i===S.i?'cur ':''}${c}" data-i="${i}" aria-label="Aufgabe ${i+1}">${i+1}</button>`;}).join('')+(S.mode==='ka'?`<span class="info">${f(tp,1)} / ${f(tm,1)} P.</span>`:'');
+ el.innerHTML=S.list.map((t,i)=>{const s=stat(i);tp+=s.p;tm+=s.max;const c=s.done<s.all?'':s.p>=s.max?'ok':s.p>0?'teil':'nein';return `<button class="${i===S.i?'cur ':''}${c}" data-i="${i}" aria-label="Aufgabe ${i+1}">${i+1}</button>`;}).join('')+`<span class="info">${S.mode==='ka'?`${f(tp,1)} / ${f(tm,1)} P.`:`✓ ${Object.values(S.res).filter(r=>r==='ok').length} beim 1. Versuch`}</span>`;
  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.i=+b.dataset.i;taskView();});}
-function sumView(){let tp=0,tm=0;const per={};
- S.list.forEach((t,i)=>{const s=stat(i);tp+=s.p;tm+=s.max;const k=t.bereich;per[k]=per[k]||{p:0,max:0,done:0,all:0};per[k].p+=s.p;per[k].max+=s.max;per[k].done+=s.done;per[k].all+=s.all;});
+
+/* ---------- Was nicht geklappt hat: bleibt auf der Startseite, bis es nachgeübt ist ---------- */
+const OKEY='physikka.offen';
+const store={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const heute=()=>new Date().toISOString().slice(0,10);
+function offenHTML(){const o=store.get(OKEY);if(!o||!o.ber)return '';
+ const was=o.mode==='ka'?'Klassenarbeits-Durchgang':'Durchgang',wann=o.date===heute()?'heute':`am ${o.date.slice(8,10)}.${o.date.slice(5,7)}.`;
+ if(!o.ber.length)return `<div class="card"><h2>🎉 In deinem letzten ${was} ${wann} hat alles geklappt!</h2></div>`;
+ const left=o.ber.filter(b=>!o.done.includes(b));
+ return `<div class="card"><h2>${left.length?`Das hat in deinem letzten ${was} ${wann} nicht geklappt`:`✅ Alles aus deinem letzten ${was} nachgeübt!`}</h2>
+ ${left.length?`<p class="note">Tippe einen Bereich an – du übst ihn auf Niveau <span class="stars">${NIV[o.niv][0]}</span>. Danach wird er abgehakt. (${o.done.length} von ${o.ber.length} geübt)</p>`:'<p>Stark! Jetzt am besten noch einmal eine ganze Klassenarbeit üben.</p>'}
+ <div class="offen-liste">${o.ber.map(b=>`<button data-ob="${b}" class="${o.done.includes(b)?'erledigt':''}"><b>${o.done.includes(b)?'✓ ':''}${BER[b].name}</b><br><small class="note">${(o.titel[b]||[]).join(' · ')}</small></button>`).join('')}</div></div>`;}
+function wireOffen(root){const o=store.get(OKEY);root.querySelectorAll('[data-ob]').forEach(b=>b.onclick=()=>{S.mode='ber';S.ber=+b.dataset.ob;S.niv=BER[S.ber].one?1:o.niv;S.offen=true;go();});}
+function merkeOffen(){const ber=[],titel={};
+ S.list.forEach((t,i)=>{subs(t).forEach((x,j)=>{if(S.res[i+'_'+j]!=='ok'){if(!ber.includes(t.bereich))ber.push(t.bereich);(titel[t.bereich]=titel[t.bereich]||[]);const n=x.titel||t.titel;if(!titel[t.bereich].includes(n))titel[t.bereich].push(n);}});});
+ store.set(OKEY,{ber:ber.sort((a,b)=>a-b),titel,done:[],niv:S.niv,mode:S.mode,date:heute()});}
+function sumView(){let tp=0,tm=0;const per={},fehl=[];
+ S.list.forEach((t,i)=>{const s=stat(i);tp+=s.p;tm+=s.max;const k=t.bereich;per[k]=per[k]||{p:0,max:0,done:0,all:0};per[k].p+=s.p;per[k].max+=s.max;per[k].done+=s.done;per[k].all+=s.all;
+  subs(t).forEach((x,j)=>{const r=S.res[i+'_'+j];if(r!=='ok')fehl.push({i,b:k,n:(t.typ==='einheit'?t.titel+' '+'abcdef'[j]+')':t.titel),r});});});
  const pc=tm?tp/tm*100:0;
+ // Klassenarbeit oder ganzer Bereich: neue Liste; Nachüben eines offenen Bereichs: dort abhaken
+ const o=store.get(OKEY);
+ if(S.offen&&o&&o.ber.includes(S.ber)){if(!o.done.includes(S.ber))o.done.push(S.ber);store.set(OKEY,o);}else merkeOffen();
+ S.offen=false;
  VW.innerHTML=`<div class="card"><h2>Auswertung: ${S.mode==='ka'?'Klassenarbeit':BER[S.ber].name} <span class="stars">${NIV[S.niv][0]}</span></h2>
- <p><b>${f(tp,1)} von ${f(tm,1)} Punkten</b> (${f(pc,0)} %) – nach deiner eigenen Einschätzung.</p><div class="bar"><i style="width:${pc}%"></i></div>
- ${Object.keys(per).sort((a,b)=>a-b).map(k=>{const q=per[k],r=q.max?q.p/q.max:0,cls=q.done<q.all?'o':r>=.8?'g':r>=.5?'y':'r',txt=q.done<q.all?'nicht bewertet':r>=.8?'sicher':r>=.5?'fast':'noch üben';
-  return `<div class="sumrow"><span><b>${BER[k].name}</b>${cls==='r'||cls==='y'?`<br><span class="note">Schlag im OneNote-Heft die Seite „${BER[k].name}“ auf${k==0?' (Merkkästen zum Fünf-Schritt und zu den Einheiten)':''}.</span>`:''}</span><span class="ampel ${cls}">${txt}</span></div>`;}).join('')}
- <p class="note">Übertrage dein Ergebnis in dein Kompetenzraster: sicher · fast · noch üben.</p>
- <div class="actions"><button class="btn" id="again">Nochmal mit neuen Aufgaben</button><button class="btn ghost" id="other">Anderes Niveau</button><button class="btn ghost" id="home">Zum Start</button></div></div>`;
+ <p><b>${f(tp,1)} von ${f(tm,1)} Punkten</b> (${f(pc,0)} %)</p><div class="bar"><i style="width:${pc}%"></i></div>
+ <p class="note">Gewertet wird: richtig im 1. Versuch = volle Punkte, im 2. Versuch = halbe Punkte.</p>
+ ${fehl.length?`<h2 style="margin-top:14px">Das hat noch nicht geklappt</h2><ul class="fehlliste">${fehl.map(x=>`<li><a href="#" data-g="${x.i}">Aufgabe ${x.i+1}: ${x.n}</a> <span class="note">(${BER[x.b].name}${x.r==='teil'?' · im 2. Versuch':x.r?'':' · nicht bearbeitet'})</span></li>`).join('')}</ul><p class="note">Tippe eine Aufgabe an, um dir die Lösung noch einmal anzusehen.</p>`:'<p><b>Alles beim ersten Versuch richtig – stark! 🎉</b></p>'}
+ <h2 style="margin-top:14px">Dein Stand im Kompetenzraster</h2>
+ ${Object.keys(per).sort((a,b)=>a-b).map(k=>{const q=per[k],r=q.max?q.p/q.max:0,cls=r>=.8?'g':r>=.5?'y':'r',txt=r>=.8?'sicher':r>=.5?'fast':'noch üben';
+  return `<div class="sumrow"><span><b>${BER[k].name}</b>${cls!=='g'?`<br><span class="note">Schlag im OneNote-Heft die Seite „${BER[k].name}“ auf${k==0?' (Merkkästen zum Fünf-Schritt und zu den Einheiten)':''}.</span>`:''}</span><span class="ampel ${cls}">${txt}</span></div>`;}).join('')}
+ <p class="note">Übertrage dein Ergebnis in dein Kompetenzraster: sicher · fast · noch üben. Was nicht geklappt hat, steht ab jetzt auf der Startseite.</p>
+ <div class="actions"><button class="btn" id="again">Nochmal mit neuen Aufgaben</button><button class="btn ghost" id="other">Anderes Niveau</button><button class="btn ghost" id="home">Zur Startseite</button></div></div>`;
+ VW.querySelectorAll('[data-g]').forEach(a=>a.onclick=e=>{e.preventDefault();S.i=+a.dataset.g;taskView();});
  document.getElementById('again').onclick=go;document.getElementById('other').onclick=nivView;document.getElementById('home').onclick=startView;scrollTo(0,0);}
 startView();
 </script>
