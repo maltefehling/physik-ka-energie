@@ -707,13 +707,14 @@ function pruefe(t,el){
  if(t.typ==='mc'){const sel=[...el.querySelectorAll('.mcl li.sel')].map(li=>+li.dataset.k);if(!sel.length)return {leer:true};const r=[].concat(t.richtig);
   el.querySelectorAll('.mcl li').forEach(li=>{const k=+li.dataset.k;li.classList.remove('right','wrong');if(li.classList.contains('sel'))li.classList.add(r.includes(k)?'right':'wrong');});
   return {ok:sel.length===r.length&&sel.every(k=>r.includes(k)),m:t.multi&&sel.every(k=>r.includes(k))&&sel.length<r.length?'Deine Antworten stimmen – aber es fehlt noch mindestens eine.':''};}
- if(t.typ==='select'){const S2=[...el.querySelectorAll('.frow select')];if(S2.every(x=>!x.value))return {leer:true};let ok=true,n=0;
-  S2.forEach((x,i)=>{const row=x.closest('.frow');row.classList.remove('right','wrong');const g=x.value.replace(/\u00A0/g,' ')===t.rows[i].r.replace(/\u00A0/g,' ');if(g)n++;row.classList.add(g?'right':'wrong');if(!g)ok=false;});
-  return {ok,m:ok?'':`${n} von ${S2.length} richtig. Die rot markierten Zeilen stimmen noch nicht.`};}
- if(t.typ==='zahl'){const I=[...el.querySelectorAll('.frow input')];if(I.every(x=>!x.value.trim()))return {leer:true};let ok=true,m='';
-  I.forEach((x,i)=>{const row=x.closest('.frow'),w=t.rows[i].w,v=parseDE(x.value);row.classList.remove('right','wrong');
-   const g=nah(v,w)||(t.rows[i].u==='%'&&nah(v*100,w));row.classList.add(g?'right':'wrong');if(!g){ok=false;if(!m&&isFinite(v)){const d=diagnose({erg:{w,u:t.rows[i].u},F:[]},v);if(!d.ok)m=d.m;}}});
-  return {ok,m:ok?'':(m||'Die rot markierten Zeilen stimmen noch nicht.')};}
+ // Mehrere Felder: nur ausgefüllte werden gewertet, richtige werden festgehalten, leere bleiben offen
+ if(t.typ==='select'){const S2=[...el.querySelectorAll('.frow select')];if(S2.every(x=>!x.value))return {leer:true};let ok=true,n=0,leer=0;
+  S2.forEach((x,i)=>{const row=x.closest('.frow');row.classList.remove('right','wrong');if(!x.value){leer++;ok=false;return;}const g=x.value.replace(/\u00A0/g,' ')===t.rows[i].r.replace(/\u00A0/g,' ');if(g){n++;x.disabled=true;}row.classList.add(g?'right':'wrong');if(!g)ok=false;});
+  return {ok,leer,m:ok?'':`${n} von ${S2.length} richtig.${n<S2.length-leer?' Die rot markierten Zeilen stimmen noch nicht.':''}`};}
+ if(t.typ==='zahl'){const I=[...el.querySelectorAll('.frow input')];if(I.every(x=>!x.value.trim()))return {leer:true};let ok=true,m='',leer=0,falsch=0;
+  I.forEach((x,i)=>{const row=x.closest('.frow'),w=t.rows[i].w,v=parseDE(x.value);row.classList.remove('right','wrong');if(!x.value.trim()){leer++;ok=false;return;}
+   const g=nah(v,w)||(t.rows[i].u==='%'&&nah(v*100,w));row.classList.add(g?'right':'wrong');if(g)x.disabled=true;else{ok=false;falsch++;if(!m&&isFinite(v)){const d=diagnose({erg:{w,u:t.rows[i].u},F:[]},v);if(!d.ok)m=d.m;}}});
+  return {ok,leer,m:ok?'':falsch?(m||'Die rot markierten Zeilen stimmen noch nicht.'):''};}
  if(t.typ==='rechnen'){const inp=el.querySelector('.erg input'),box=el.querySelector('.erg'),v=parseDE(inp.value);if(!inp.value.trim())return {leer:true};
   if(!isFinite(v))return {leer:true,m:'Gib dein Endergebnis als Zahl ein (Komma statt Punkt).'};
   const d=diagnose(t,v);box.classList.remove('right','wrong');box.classList.add(d.ok?'right':'wrong');return {ok:d.ok,m:d.ok?'':'<b>Möglicher Fehler:</b> '+d.m};}
@@ -733,7 +734,9 @@ function bindSub(el,key,t){
   el.querySelector('[data-a="werten"]').onclick=()=>{const c=el.querySelectorAll('.krit input'),n=[...c].filter(x=>x.checked).length,r=n===c.length?'ok':n>=c.length/2?'teil':'nein';
    fertig(r,`<div class="fb ${r==='ok'?'ok':'bad'}">${r==='ok'?'✓ Alles drin – stark!':r==='teil'?`◐ ${n} von ${c.length} Punkten stehen in deiner Antwort. Ergänze den Rest im Heft.`:`✗ Nur ${n} von ${c.length} Punkten. Lies die Ideallösung genau und schreib sie ins Heft.`}</div>`);el.querySelector('[data-a="werten"]').disabled=true;};}
  else{const run=()=>{if(st.done)return;const g=pruefe(t,el);
-   if(g.leer){fbx.innerHTML=`<div class="fb bad">${g.m||'Gib zuerst eine Antwort ein.'}</div>`;return;}
+   if(g.leer===true){fbx.innerHTML=`<div class="fb bad">${g.m||'Gib zuerst eine Antwort ein.'}</div>`;return;}
+   // Noch leere Felder: kein Versuch verbraucht, die Felder bleiben offen
+   if(g.leer>0){fbx.innerHTML=`<div class="fb ${g.m&&g.m.includes('rot')||/zu (groß|klein)|umgerechnet/.test(g.m||'')?'bad':'hinw'}">${g.m?g.m+' ':''}Füll noch die ${g.leer===1?'leere Zeile':g.leer+' leeren Zeilen'} aus und tippe dann wieder auf „Prüfen“.</div>`;return;}
    const heft=t.typ==='rechnen'?`<br>${HEFT} Vergleiche ihn jetzt mit der Ideallösung unten.`:'';
    if(g.ok)return fertig(st.tries?'teil':'ok',`<div class="fb ok"><b>✓ Richtig${st.tries?' – im zweiten Versuch':''}!</b>${heft}</div>`);
    if(!st.tries){st.tries=1;if(!S.tip[key]){S.tip[key]=1;zeig(1);}
