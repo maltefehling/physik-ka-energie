@@ -643,6 +643,119 @@ const BER=[
  {nr:8,name:'8 Leistung',info:'',tasks:n=>n===1?[T.leistungIst(),T.leistungZeichen(),l8a(),l8b(),l8c(),iqb('test3',1)]:n===2?[T.leistungZeichen(),l8d(),l8e(),l8f(),T.vergleich(),iqb('test3',2)]:[l8g(),l8h(),l8i(),iqb('test3',3)],ka:n=>[n===1?pick([l8a,l8b,l8c])():n===2?pick([l8d,l8e,l8f])():pick([l8g,l8h,l8i])()]},
 ];
 function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});L.push(iqb(pick(Object.keys(IQB)),n));return L;}
+/* ============ Probeklassenarbeit (mittleres / erhöhtes Niveau) ============
+ Aufbau wie eine echte Klassenarbeit (ca. 45 min): jeder Bereich des Kompetenzrasters kommt vor, dazu eine Aufgabe mit Material.
+ Mittleres Niveau: Rechenaufgaben nennen Größe, Formelzeichen und Einheit (Pool ★).
+ Erhöhtes Niveau: ohne Formelzeichen, mit Umrechnen (Pool ★★), mehr Begründen/Beurteilen (Anforderungsbereich III).
+ Keine versteckten Zweischritt-Rechnungen (★★★-Pool bleibt draußen) – die Höhe kommt über die Aufgaben mit Material.
+ Zielanteile der Punkte: mittel ≈ AFB I 40 % · II 45 % · III 15 %, erhöht ≈ I 30 % · II 45 % · III 25 %. */
+const tag=(t,afb,punkte)=>({...t,afb:t.afb||afb,...(punkte?{punkte}:{})});
+function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b});
+ if(M){
+  add(1,tag(T.def(),'I'));add(1,tag(T.zeichen(),'I'));
+  add(0,tag(T.conv(1),'I'));
+  add(2,tag(pick([T.formBeschr,T.fachbegriff])(),'I'));
+  add(3,tag(T.geraete(),'I'));
+  add(4,tag(pick([T.pendel,T.satz])(),'I'));
+  add(5,tag(pick([T.led,e5a])(),'II'));
+  add(6,tag(pick([w6a,w6b])(),'II'));
+  add(7,tag(pick([p7a,p7b,p7c])(),'II'));
+  add(8,tag(pick([l8a,l8b,l8c])(),'II'));
+  add(pick([4,5]),tag(pick([T.erfinder,T.hoeher])(),'III'));
+  // Material mit Beurteilen (AFB III) auf mittlerem Niveau, dazu eine zweite, kürzere Aufgabe mit Material
+  const k1=pick(['vergleich3','wunder','antrieb']),k2=pick(Object.keys(IQB).filter(k=>k!==k1&&IQB[k].bereich!==IQB[k1].bereich));
+  L.push(iqb(k1,2),iqb(k2,1));
+ }else{
+  add(1,tag(T.def(),'I'));add(1,tag(T.zeichen(),'I'));
+  add(0,tag(T.conv(2),'I'));
+  add(2,tag(T.formBsp(),'I'));
+  add(3,tag(pick([T.kaTabelle,T.kette])(),'II'));
+  add(4,tag(T.pendel(),'I'));
+  add(5,tag(pick([e5b,T.richtigesDiagramm])(),'II'));
+  add(6,tag(pick([w6c,w6d])(),'II'));
+  add(7,tag(pick([p7d,p7e,p7f])(),'II'));
+  add(8,tag(pick([l8d,l8e,l8f])(),'II'));
+  add(pick([4,6]),tag(pick([T.reibung,T.getriebe])(),'III'));
+  const k1=pick(Object.keys(IQB)),k2=pick(Object.keys(IQB).filter(k=>k!==k1&&IQB[k].bereich!==IQB[k1].bereich));
+  L.push(iqb(k1,3),iqb(k2,2));
+ }
+ return L;}
+// Notenschlüssel: mittel streng proportional (Hälfte = 3,5); erhöht mit Sockel (Hälfte = 3,8 → unter ≈ 11 % bleibt 6,0)
+const SOCKEL_E=(5*0.5-(6-3.8))/(5-(6-3.8));   // s so, dass 6 − 5·(0,5 − s)/(1 − s) = 3,8
+function note(x,lvl){x=Math.max(0,Math.min(1,x));const n=lvl==='M'?6-5*x:(x<=SOCKEL_E?6:6-5*(x-SOCKEL_E)/(1-SOCKEL_E));return Math.round(n*10)/10;}
+
+/* Antworten festhalten (ohne Prüfen) und später bewerten */
+function liesAntwort(t,el){
+ if(t.typ==='mc')return {sel:[...el.querySelectorAll('.mcl li.sel')].map(li=>+li.dataset.k)};
+ if(t.typ==='select')return {v:[...el.querySelectorAll('.frow select')].map(x=>x.value)};
+ if(t.typ==='zahl')return {v:[...el.querySelectorAll('.frow input')].map(x=>x.value)};
+ if(t.typ==='rechnen')return {v:[el.querySelector('.erg input').value]};
+ if(t.typ==='offen')return {txt:el.querySelector('textarea.antw').value};}
+function setzeAntwort(t,el,a){if(!a)return;
+ if(t.typ==='mc')el.querySelectorAll('.mcl li').forEach(li=>li.classList.toggle('sel',a.sel.includes(+li.dataset.k)));
+ if(t.typ==='select')el.querySelectorAll('.frow select').forEach((x,i)=>x.value=a.v[i]||'');
+ if(t.typ==='zahl')el.querySelectorAll('.frow input').forEach((x,i)=>x.value=a.v[i]||'');
+ if(t.typ==='rechnen')el.querySelector('.erg input').value=a.v[0]||'';
+ if(t.typ==='offen')el.querySelector('textarea.antw').value=a.txt||'';}
+const beantwortet=(t,a)=>!!a&&(t.typ==='mc'?a.sel.length>0:t.typ==='offen'?a.txt.trim().length>0:a.v.some(x=>String(x).trim()));
+const norm=s=>String(s).replace(/ /g,' ');
+// Anteil richtig (0…1); null = muss selbst bewertet werden
+function bewerte(t,a){
+ if(t.typ==='offen')return null;
+ if(!a)return 0;
+ if(t.typ==='mc'){const r=[].concat(t.richtig);return a.sel.length===r.length&&a.sel.every(k=>r.includes(k))?1:0;}
+ if(t.typ==='select')return t.rows.filter((r,i)=>norm(a.v[i])===norm(r.r)).length/t.rows.length;
+ if(t.typ==='zahl')return t.rows.filter((r,i)=>{const v=parseDE(a.v[i]);return nah(v,r.w)||(r.u==='%'&&nah(v*100,r.w));}).length/t.rows.length;
+ if(t.typ==='rechnen'){const v=parseDE(a.v[0]);return isFinite(v)&&diagnose(t,v).ok?1:null;}}   // falsches Ergebnis: Rechenweg selbst bewerten
+
+function probeNivView(){
+ VW.innerHTML=`<div class="card"><h2>Probeklassenarbeit: Welches Niveau?</h2><div class="choice">
+  <button class="big" data-l="M"><b>Mittleres Niveau</b><small>In den Rechenaufgaben stehen Größe, Formelzeichen und Einheit. Notenschlüssel: Die Hälfte der Punkte ergibt die Note 3,5.</small></button>
+  <button class="big" data-l="E"><b>Erhöhtes Niveau</b><small>Ohne Formelzeichen, Einheiten musst du umrechnen, mehr Begründen und Beurteilen. Notenschlüssel: Die Hälfte der Punkte ergibt die Note 3,8.</small></button></div>
+  <ul class="note" style="margin-top:12px"><li>Plane etwa <b>45 Minuten</b> ein – wie in der echten Klassenarbeit.</li><li>Es gibt <b>keine Tipps</b> und keine Rückmeldung zwischendurch. Du kannst zwischen den Aufgaben hin- und herspringen.</li><li>Rechenwege schreibst du ins Heft im <b>Fünf-Schritt</b>. In die App kommt nur das Endergebnis.</li><li>Am Ende gibst du ab, bewertest deine Sätze und Rechenwege selbst und siehst deine <b>Note</b>.</li></ul>
+  <div class="actions"><button class="btn ghost" id="back">← zurück</button></div></div>`;
+ VW.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{S.mode='probe';S.lvl=b.dataset.l;S.niv=S.lvl==='M'?1:2;probeStart();});
+ document.getElementById('back').onclick=startView;scrollTo(0,0);}
+function probeStart(){S.list=probeKA(S.lvl);S.i=0;S.res={};S.st={};S.tip={};S.ans={};S.anteil={};S.abgabe=false;S.t0=Date.now();
+ clearInterval(S.uhr);S.uhr=setInterval(()=>{if(S.mode==='probe'&&!S.abgabe)progress();},30000);taskView();}
+const LVL={M:'mittleres Niveau',E:'erhöhtes Niveau'};
+function probeAbgeben(){const offen=[];S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{if(!beantwortet(x,S.ans[i+'_'+j]))offen.push(i+1);}));
+ const n=[...new Set(offen)];
+ if(n.length&&!confirm(`Bei Aufgabe ${n.join(', ')} fehlt noch eine Antwort. Trotzdem abgeben?`))return;
+ S.abgabe=true;clearInterval(S.uhr);S.dauer=Math.round((Date.now()-S.t0)/60000);
+ S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{const k=i+'_'+j;S.anteil[k]=bewerte(x,S.ans[k]);}));
+ selbstView();}
+// Sätze und falsche Rechenergebnisse: selbst mit der Ideallösung vergleichen
+function selbstView(){const L=[];S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{const k=i+'_'+j;if(S.anteil[k]===null)L.push({t,x,i,j,k});}));
+ if(!L.length)return probeErgebnis();
+ VW.innerHTML=`<div class="card"><h2>Abgegeben! Jetzt bewertest du selbst</h2><p>Diese Antworten kann die App nicht allein prüfen. Vergleiche ehrlich mit der Ideallösung und hake ab.</p></div>`+
+ L.map(o=>{const x=o.x,a=S.ans[o.k];
+  if(x.typ==='offen')return `<div class="card" data-k="${o.k}"><div class="kopf"><span>Aufgabe ${o.i+1}${o.t.typ==='einheit'?' '+'abcdef'[o.j]+')':''} · ${BER[o.t.bereich].name}</span></div><p class="q">${x.frage}</p>
+   <p><b>Deine Antwort:</b> ${a&&a.txt.trim()?a.txt.replace(/</g,'&lt;'):'<i>keine Antwort</i>'}</p><div class="ideal"><h4>Ideallösung</h4><p>${x.ideal}</p><p><b>Hake ab, was in deiner Antwort steht:</b></p><div class="krit">${(x.krit||[]).map((c,n)=>`<label><input type="checkbox" data-c="${n}"><span>${c}</span></label>`).join('')}</div></div></div>`;
+  return `<div class="card" data-k="${o.k}"><div class="kopf"><span>Aufgabe ${o.i+1}${o.t.typ==='einheit'?' '+'abcdef'[o.j]+')':''} · ${BER[o.t.bereich].name}</span></div><p class="q">${x.frage}</p>
+   <p><b>Dein Ergebnis:</b> ${a&&a.v[0]?a.v[0]+' '+x.erg.u:'<i>keins</i>'} – das stimmt nicht.${a&&isFinite(parseDE(a.v[0]))?' <span class="note">Möglicher Fehler: '+diagnose(x,parseDE(a.v[0])).m+'</span>':''}</p>
+   <div class="ideal">${idealHTML(x)}<div class="krit"><label><input type="checkbox" data-c="weg"><span>In meinem Heft stimmen <b>gegeben, gesucht und Formel</b> (mit Formelzeichen und Einheiten) – nur das Ergebnis ist falsch. <span class="note">(gibt die halbe Punktzahl)</span></span></label></div></div></div>`;}).join('')+
+ `<div class="actions" style="justify-content:center"><button class="btn" id="fertig">Note anzeigen</button></div>`;
+ document.getElementById('fertig').onclick=()=>{VW.querySelectorAll('[data-k]').forEach(c=>{const k=c.dataset.k,cb=[...c.querySelectorAll('.krit input')];
+   S.anteil[k]=cb[0]&&cb[0].dataset.c==='weg'?(cb[0].checked?.5:0):(cb.length?cb.filter(x=>x.checked).length/cb.length:0);});probeErgebnis();};
+ progress();scrollTo(0,0);}
+function probeErgebnis(){let p=0,m=0;const per={},fehl=[];
+ S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{const k=i+'_'+j,pk=pkt(x),a=S.anteil[k]||0,b=t.bereich;p+=pk*a;m+=pk;
+  per[b]=per[b]||{p:0,m:0};per[b].p+=pk*a;per[b].m+=pk;S.res[k]=a>=.999?'ok':a>0?'teil':'nein';
+  if(a<.999)fehl.push({i,n:t.typ==='einheit'?t.titel+' '+'abcdef'[j]+')':t.titel,b,pk,erreicht:pk*a});}));
+ const x=m?p/m:0,n=note(x,S.lvl);merkeOffen();
+ VW.innerHTML=`<div class="card"><h2>Deine Probeklassenarbeit · ${LVL[S.lvl]}</h2>
+ <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin:6px 0 10px"><div style="font:800 3rem 'Nunito',sans-serif;color:var(--dblue)">Note ${n.toFixed(1).replace('.',',')}</div>
+ <div><b>${f(p,1)} von ${f(m,1)} Punkten</b> (${f(x*100,0)} %)<br><span class="note">Bearbeitungszeit: ${S.dauer} min</span></div></div>
+ <div class="bar"><i style="width:${x*100}%"></i></div>
+ <p class="note">${S.lvl==='M'?'Notenschlüssel mittleres Niveau: streng proportional – die Hälfte der Punkte ergibt 3,5.':`Notenschlüssel erhöhtes Niveau: unter ${f(SOCKEL_E*100,0)} % der Punkte bleibt es bei 6,0, die Hälfte der Punkte ergibt 3,8.`} Sätze und Rechenwege hast du selbst bewertet – sei ehrlich zu dir!</p>
+ ${fehl.length?`<h2 style="margin-top:14px">Das war noch nicht richtig</h2><ul class="fehlliste">${fehl.map(o=>`<li><a href="#" data-g="${o.i}">Aufgabe ${o.i+1}: ${o.n}</a> <span class="note">(${BER[o.b].name} · ${f(o.erreicht,1)} von ${f(o.pk,1)} P.)</span></li>`).join('')}</ul><p class="note">Tippe eine Aufgabe an: Du siehst deine Antwort und die Lösung.</p>`:'<p><b>Alles richtig – stark! 🎉</b></p>'}
+ <h2 style="margin-top:14px">Das solltest du noch üben</h2>
+ ${Object.keys(per).sort((a,b)=>a-b).map(k=>{const q=per[k],r=q.m?q.p/q.m:0,cls=r>=.8?'g':r>=.5?'y':'r',txt=r>=.8?'sicher':r>=.5?'fast':'noch üben';
+  return `<div class="sumrow"><span><b>${BER[k].name}</b>${cls!=='g'?`<br><span class="note">Übe diesen Bereich auf der Startseite oder schlag im OneNote-Heft die Seite „${BER[k].name}“ auf.</span>`:''}</span><span class="ampel ${cls}">${txt}</span></div>`;}).join('')}
+ <div class="actions"><button class="btn" id="neu">Neue Probeklassenarbeit</button><button class="btn ghost" id="home">Zur Startseite (Bereiche üben)</button></div></div>`;
+ VW.querySelectorAll('[data-g]').forEach(a=>a.onclick=e=>{e.preventDefault();S.i=+a.dataset.g;taskView();});
+ document.getElementById('neu').onclick=probeStart;document.getElementById('home').onclick=()=>{S.mode=null;startView();};scrollTo(0,0);}
 
 /* ============ Zustand + Ansichten ============ */
 const S={mode:null,ber:null,niv:null,list:[],i:0,res:{},st:{},tip:{},offen:false};
@@ -654,7 +767,8 @@ const LET='ABCDEFGH';
 function startView(){S.mode=null;S.ber=null;S.niv=null;
  VW.innerHTML=offenHTML()+`<div class="card"><h2>Was willst du üben?</h2><div class="choice">
   <button class="big" data-m="ka"><b>Ganze Klassenarbeit</b><small>Aus jedem Bereich eine Aufgabe – wie in der echten Klassenarbeit, mit Punkten.</small></button>
-  <button class="big" data-m="ber"><b>Einen Bereich</b><small>Alle Aufgaben zu einer Seite aus deinem OneNote-Heft.</small></button></div></div>
+  <button class="big" data-m="ber"><b>Einen Bereich</b><small>Alle Aufgaben zu einer Seite aus deinem OneNote-Heft.</small></button>
+  <button class="big" data-m="probe"><b>📝 Probeklassenarbeit schreiben</b><small>Wie die echte Klassenarbeit: ca. 45 Minuten, keine Tipps, am Ende deine Note. Jedes Mal eine neue.</small></button></div></div>
   <div class="card"><h2>So funktioniert's</h2><ul>
   <li>Du gibst deine Antwort ein und tippst auf <b>Prüfen</b>. Ist sie falsch, bekommst du einen Tipp und einen <b>zweiten Versuch</b>.</li>
   <li>Bei <b>Rechenaufgaben</b> tippst du nur dein <b>Endergebnis</b> ein. Den Rechenweg schreibst du ins Heft – im <b>Fünf-Schritt</b>, mit Formelzeichen und Einheiten. Die App sagt dir, welcher Fehler hinter einem falschen Ergebnis stecken könnte.</li>
@@ -662,7 +776,7 @@ function startView(){S.mode=null;S.ber=null;S.niv=null;
   <li>Wenn du nicht weiterkommst, hol dir einen <b>Tipp ▶</b>. Am Ende siehst du, was noch nicht geklappt hat – das bleibt auf der Startseite stehen, bis du es nachgeübt hast.</li>
   <li>Bei Aufgaben mit <b>Material</b> (Text, Tabelle, Diagramm) liest du zuerst genau das Material.</li>
   <li>Bei jedem Durchgang bekommst du <b>neue Aufgaben</b>: gleiches Muster, anderer Zusammenhang, andere Zahlen – aber gleich schwer.</li></ul></div>`;
- VW.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;S.mode==='ka'?nivView():berView();});wireOffen(VW);scrollTo(0,0);}
+ VW.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{if(b.dataset.m==='probe')return probeNivView();S.mode=b.dataset.m;S.mode==='ka'?nivView():berView();});wireOffen(VW);scrollTo(0,0);}
 function berView(){VW.innerHTML=`<div class="card"><h2>Welchen Bereich?</h2><p class="note">Die Bereiche heißen wie die Seiten in deinem OneNote-Heft.</p><div class="choice">${BER.map(b=>`<button class="big" data-b="${b.nr}"><b>${b.name}</b>${b.info?`<small>${b.info}</small>`:''}</button>`).join('')}</div>
  <div class="actions"><button class="btn ghost" id="back">← zurück</button></div></div>`;
  VW.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{S.ber=+b.dataset.b;BER[S.ber].one?(S.niv=1,go()):nivView();});document.getElementById('back').onclick=startView;scrollTo(0,0);}
@@ -685,12 +799,13 @@ const HEFT='✎ Den Rechenweg schreibst du ins Heft – im <b>Fünf-Schritt</b>,
 function subHTML(t,k,lab){
  let h=`<div class="teil" id="s${k}">${lab?`<div class="tl">${lab}</div>`:''}`;
  if(t.svg)h+=`<div class="svgbox">${t.svg}</div>`;
- if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis: <b>${t.erg.l} =</b></span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Endergebnis"><span class="u">${t.erg.u}</span></div>`;
+ if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis:${S.mode==='probe'&&S.lvl==='E'?'':` <b>${t.erg.l} =</b>`}</span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Endergebnis"><span class="u">${t.erg.u}</span></div>`;
  else{h+=`<p class="q">${t.frage}</p>`;
   if(t.typ==='mc')h+=`<ul class="mcl ${t.diag?'diag':''} ${t.multi?'multi':''}">${t.opts.map((o,i)=>`<li class="klick" data-k="${i}" role="button" tabindex="0">${t.diag?`<b class="L">${LET[i]}</b>`:''}<span class="box"></span><span>${o}</span></li>`).join('')}</ul><p class="note">${t.multi?'Mehrere Antworten können richtig sein. ':''}Tippe an und bestätige mit „Prüfen“.</p>`;
   if(t.typ==='select')h+=t.rows.map((r,i)=>`<div class="frow"><span class="lab"><b>${i+1}.</b> ${r.l}</span><select aria-label="Antwort ${i+1}"><option value="">– wählen –</option>${r.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('');
   if(t.typ==='zahl')h+=t.rows.map((r,i)=>`<div class="frow"><span class="lab"><b>${i+1}.</b> ${r.l}</span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Antwort ${i+1}"><span class="u">${r.u}</span></div>`).join('');
   if(t.typ==='offen')h+=`<textarea class="antw" placeholder="Schreib deine Antwort in ganzen Sätzen – hier oder ins Heft."></textarea>`;}
+ if(S.mode==='probe'){h+=`<div class="fbx"></div><div class="ideal ${S.abgabe?'':'hide'}">${idealHTML(t)}</div></div>`;return h;}
  h+=`<div class="tipps"></div><div class="fbx"></div><div class="actions"><button class="btn" data-a="check">${t.typ==='offen'?'Mit der Ideallösung vergleichen':'Prüfen ✓'}</button><button class="btn tippbtn" data-a="tipp">Tipp ▶</button><button class="btn ghost" data-a="ideal">Ich komme nicht weiter – Lösung zeigen</button></div><div class="ideal hide">${idealHTML(t)}</div></div>`;
  return h;}
 function idealHTML(t){
@@ -720,7 +835,17 @@ function pruefe(t,el){
   const d=diagnose(t,v);box.classList.remove('right','wrong');box.classList.add(d.ok?'right':'wrong');return {ok:d.ok,m:d.ok?'':'<b>Möglicher Fehler:</b> '+d.m};}
  return {leer:true};}
 function sperre(el){el.querySelectorAll('input,select,textarea,[data-a="check"],[data-a="ideal"],[data-a="tipp"]').forEach(x=>x.disabled=true);el.querySelectorAll('.mcl li').forEach(li=>li.classList.add('fertig'));}
-function bindSub(el,key,t){
+function bindProbe(el,key,t){const sv=()=>{S.ans[key]=liesAntwort(t,el);progress();};
+ setzeAntwort(t,el,S.ans[key]);
+ if(!S.abgabe){if(t.typ==='mc')el.querySelectorAll('.mcl li').forEach(li=>{const tog=()=>{if(!t.multi)el.querySelectorAll('.mcl li').forEach(x=>x!==li&&x.classList.remove('sel'));li.classList.toggle('sel');sv();};li.onclick=tog;li.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();tog();}};});
+  el.querySelectorAll('input,select,textarea').forEach(x=>{x.oninput=x.onchange=sv;});return;}
+ // nach der Abgabe: markieren, Punkte, Lösung
+ if(t.typ==='mc'){const r=[].concat(t.richtig);el.querySelectorAll('.mcl li').forEach(li=>{const k=+li.dataset.k;if(li.classList.contains('sel'))li.classList.add(r.includes(k)?'right':'wrong');});}
+ else if(t.typ!=='offen')pruefe(t,el);
+ const pk=pkt(t),a=S.anteil[key]||0;
+ el.querySelector('.fbx').innerHTML=`<div class="fb ${a>=.999?'ok':'bad'}"><b>${f(pk*a,1)} von ${f(pk,1)} Punkten.</b>${t.typ==='rechnen'?' '+HEFT:''}</div>`;
+ sperre(el);}
+function bindSub(el,key,t){if(S.mode==='probe')return bindProbe(el,key,t);
  const st=S.st[key]=S.st[key]||{tries:0,done:false},ideal=el.querySelector('.ideal'),fbx=el.querySelector('.fbx');
  const tb=el.querySelector('[data-a="tipp"]'),tbox=el.querySelector('.tipps'),TL=tipps(t);
  const zeig=n=>{tbox.innerHTML=TL.slice(0,n).map((x,i)=>`<div class="tipp"><b>Tipp${TL.length>1?' '+(i+1):''}:</b> ${x}</div>`).join('');tb.textContent=n<TL.length?(n?'Noch ein Tipp ▶':'Tipp ▶'):'Keine weiteren Tipps';if(!st.done)tb.disabled=n>=TL.length;};
@@ -747,17 +872,19 @@ function bindSub(el,key,t){
  if(st.done){fbx.innerHTML=st.fb||'';ideal.classList.remove('hide');sperre(el);}}
 const subs=t=>t.typ==='einheit'?t.teile:[t];
 function taskView(){const t=S.list[S.i],b=BER[t.bereich];
- let h=`<div id="prog"></div><div class="card"><div class="kopf"><span>Aufgabe ${S.i+1} von ${S.list.length} · ${b.name}</span><span class="stars">${NIV[S.niv][0]}</span></div><h2>${t.typ==='einheit'?'Aufgabe mit Material: ':''}${t.titel}</h2>`;
+ let h=`<div id="prog"></div><div class="card"><div class="kopf"><span>Aufgabe ${S.i+1} von ${S.list.length} · ${b.name}</span><span class="stars">${S.mode==='probe'?LVL[S.lvl]:NIV[S.niv][0]}</span></div><h2>${t.typ==='einheit'?'Aufgabe mit Material: ':''}${t.titel}</h2>`;
  if(t.typ==='einheit')h+=`<div class="material">${t.material}</div>`+t.teile.map((x,j)=>subHTML(x,S.i+'_'+j,'abcdef'[j]+')')).join('');
  else h+=subHTML(t,S.i+'_0');
- h+=`<div class="nav"><button class="btn ghost" id="prev" ${S.i?'':'disabled'}>← zurück</button><button class="btn" id="next">${S.i<S.list.length-1?'weiter →':'zur Auswertung'}</button></div></div>`;
+ h+=`<div class="nav"><button class="btn ghost" id="prev" ${S.i?'':'disabled'}>← zurück</button><button class="btn" id="next">${S.i<S.list.length-1?'weiter →':S.mode==='probe'?(S.abgabe?'zurück zur Note':'Klassenarbeit abgeben ✓'):'zur Auswertung'}</button></div>${S.mode==='probe'&&!S.abgabe?'<p class="note" style="text-align:center;margin-top:8px">Deine Antworten werden gespeichert. Du kannst jederzeit zu anderen Aufgaben springen und erst am Ende abgeben.</p>':''}</div>`;
  VW.innerHTML=h.replace(/(\d) (J|kJ|W|kW|kg|g|m|cm|s|min|t|h|%)(?![\wäöüß])/g,'$1&nbsp;$2');subs(t).forEach((x,j)=>bindSub(document.getElementById('s'+S.i+'_'+j),S.i+'_'+j,x));
- document.getElementById('prev').onclick=()=>{S.i--;taskView();};document.getElementById('next').onclick=()=>{if(S.i<S.list.length-1){S.i++;taskView();}else sumView();};
+ document.getElementById('prev').onclick=()=>{S.i--;taskView();};document.getElementById('next').onclick=()=>{if(S.i<S.list.length-1){S.i++;taskView();}else if(S.mode==='probe')S.abgabe?probeErgebnis():probeAbgeben();else sumView();};
  progress();scrollTo(0,0);}
 const pkt=x=>x.punkte||(x.typ==='select'||x.typ==='zahl'?Math.max(1,x.rows.length*.5):x.typ==='offen'?2:x.typ==='rechnen'?3:1);
 function stat(i){const ss=subs(S.list[i]);let p=0,max=0,done=0;
  ss.forEach((x,j)=>{const pk=pkt(x);max+=pk;const r=S.res[i+'_'+j];if(r)done++;p+=r==='ok'?pk:r==='teil'?pk/2:0;});return {p,max,done,all:ss.length};}
 function progress(){const el=document.getElementById('prog');if(!el)return;let tp=0,tm=0;
+ if(S.mode==='probe'&&!S.abgabe){let fertig=0;el.innerHTML=S.list.map((t,i)=>{const ok=subs(t).every((x,j)=>beantwortet(x,S.ans[i+'_'+j]));if(ok)fertig++;return `<button class="${i===S.i?'cur ':''}${ok?'ok':''}" data-i="${i}" aria-label="Aufgabe ${i+1}">${i+1}</button>`;}).join('')+`<span class="info">⏱ ${Math.round((Date.now()-S.t0)/60000)} min · ${fertig} von ${S.list.length} beantwortet</span>`;
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.i=+b.dataset.i;taskView();});return;}
  el.innerHTML=S.list.map((t,i)=>{const s=stat(i);tp+=s.p;tm+=s.max;const c=s.done<s.all?'':s.p>=s.max?'ok':s.p>0?'teil':'nein';return `<button class="${i===S.i?'cur ':''}${c}" data-i="${i}" aria-label="Aufgabe ${i+1}">${i+1}</button>`;}).join('')+`<span class="info">${S.mode==='ka'?`${f(tp,1)} / ${f(tm,1)} P.`:`✓ ${Object.values(S.res).filter(r=>r==='ok').length} beim 1. Versuch`}</span>`;
  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.i=+b.dataset.i;taskView();});}
 
@@ -766,7 +893,7 @@ const OKEY='physikka.offen';
 const store={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const heute=()=>new Date().toISOString().slice(0,10);
 function offenHTML(){const o=store.get(OKEY);if(!o||!o.ber)return '';
- const was=o.mode==='ka'?'Klassenarbeits-Durchgang':'Durchgang',wann=o.date===heute()?'heute':`am ${o.date.slice(8,10)}.${o.date.slice(5,7)}.`;
+ const was=o.mode==='probe'?'Durchgang (Probeklassenarbeit)':o.mode==='ka'?'Klassenarbeits-Durchgang':'Durchgang',wann=o.date===heute()?'heute':`am ${o.date.slice(8,10)}.${o.date.slice(5,7)}.`;
  if(!o.ber.length)return `<div class="card"><h2>🎉 In deinem letzten ${was} ${wann} hat alles geklappt!</h2></div>`;
  const left=o.ber.filter(b=>!o.done.includes(b));
  return `<div class="card"><h2>${left.length?`Das hat in deinem letzten ${was} ${wann} nicht geklappt`:`✅ Alles aus deinem letzten ${was} nachgeübt!`}</h2>
