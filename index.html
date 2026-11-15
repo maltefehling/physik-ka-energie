@@ -185,7 +185,7 @@ function sankey(o){
   <rect x="${xJ-bw2}" y="${y0-14}" width="${2*bw2}" height="${H+28}" rx="8" fill="#fff" stroke="#1F2A44" stroke-width="2"/>
   <text x="${xJ}" y="${y0+H/2+5}" text-anchor="middle" font-size="13" font-weight="800" fill="#1F2A44">${o.dev||''}</text>
   <text x="18" y="${y0+H+32}" font-size="13" font-weight="800" fill="#3B6FB6">${o.lz}</text>
-  <text x="${xJ+44}" y="${y0-8}" font-size="14" font-weight="800" fill="#2E9E5B">${o.ln}</text>
+  <text x="${xJ+bw2+8}" y="${y0-8}" font-size="14" font-weight="800" fill="#2E9E5B">${o.ln}</text>
   <text x="${xd+hw/2+14}" y="${yEnd+4}" font-size="14" font-weight="800" fill="#E4572E">${o.lw}</text>
   </svg>`;}
 function halfpipe(cap){
@@ -513,7 +513,7 @@ const T={
  led:()=>{const v=pick([{d:'LED',n:'eine LED-Lampe',zu:'elektrische Energie',nu:'Licht',a:30,b:45},{d:'Motor',n:'ein Elektromotor',zu:'elektrische Energie',nu:'Bewegung',a:70,b:90},{d:'Lampe',n:'eine Glühlampe',zu:'elektrische Energie',nu:'Licht',a:3,b:8},{d:'Solar',n:'eine Solarzelle',zu:'Licht',nu:'Strom',a:15,b:25}]),Z=pick([100,200]),N=Z*R(v.a,v.b)/100,W=Z-N;
    return {typ:'zahl',titel:'Ein Diagramm lesen',svg:sankey({bz:100,bn:N/Z*100,bw:W/Z*100,lz:`${Z} J ${v.zu}`,ln:`${f(N)} J ${v.nu}`,lw:'? J Wärme',dev:v.d}),frage:`Das Diagramm zeigt, was ${v.n} mit ${Z} J macht. Wie viel Energie wird zu Wärme?`,rows:[{l:'Wärme:',w:W,u:'J'}],erkl:`${Z} J − ${f(N)} J = ${f(W)} J. Es geht keine Energie verloren.`};},
  richtigesDiagramm:()=>{const v=pick([{d:'Dynamo',t:'Ein Fahrraddynamo bekommt 100 J kinetische Energie und gibt {N} J elektrische Energie ab.'},{d:'Motor',t:'Ein Elektromotor bekommt 100 J elektrische Energie und gibt {N} J Bewegungsenergie ab.'},{d:'LED',t:'Eine LED-Lampe bekommt 100 J elektrische Energie und gibt {N} J Licht ab.'}]);
-   const p=R(55,75,5),q=100-p,D=shuffle([{k:1,bz:100,bn:p,bw:q,ln:`${p} J`,lw:`${q} J`},{k:2,bz:100,bn:p,bw:p,ln:`${p} J`,lw:`${p} J`},{k:3,bz:100,bn:q,bw:p,ln:`${p} J`,lw:`${q} J`}]);
+   const p=R(65,75,5),q=100-p,D=shuffle([{k:1,bz:100,bn:p,bw:q,ln:`${p} J`,lw:`${q} J`},{k:2,bz:100,bn:p,bw:p,ln:`${p} J`,lw:`${p} J`},{k:3,bz:100,bn:q,bw:p,ln:`${p} J`,lw:`${q} J`}]);
    return {typ:'mc',diag:true,titel:'Welches Diagramm stimmt?',frage:v.t.replace('{N}',p)+' Welches Energieflussdiagramm ist richtig gezeichnet?',opts:D.map(d=>sankey({...d,lz:'100 J',s:.8,w:380,dev:v.d})),richtig:D.findIndex(d=>d.k===1),
    erkl:D.map((d,i)=>`<b>${LET[i]}</b>: `+(d.k===1?`richtig – 100 J = ${p} J + ${q} J, und die Pfeilbreiten passen.`:d.k===2?`falsch – es käme mehr heraus (${2*p} J), als hineingeht.`:`falsch – der ${p}-J-Pfeil ist schmaler gezeichnet als der ${q}-J-Pfeil.`)).join('<br>')};},
  erfinder:()=>{const v=pick([['neuer Motor','elektrischer Energie','Bewegungsenergie'],['neue Glühlampe','elektrischer Energie','Licht'],['neuer Dynamo','Bewegungsenergie','elektrische Energie']]),Z=pick([100,200,500]),X=Z*pick([1.1,1.2,1.5]);
