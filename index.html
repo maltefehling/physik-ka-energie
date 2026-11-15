@@ -699,7 +699,8 @@ function setzeAntwort(t,el,a){if(!a)return;
  if(t.typ==='zahl')el.querySelectorAll('.frow input').forEach((x,i)=>x.value=a.v[i]||'');
  if(t.typ==='rechnen')el.querySelector('.erg input').value=a.v[0]||'';
  if(t.typ==='offen')el.querySelector('textarea.antw').value=a.txt||'';}
-const beantwortet=(t,a)=>!!a&&(t.typ==='mc'?a.sel.length>0:t.typ==='offen'?a.txt.trim().length>0:a.v.some(x=>String(x).trim()));
+const beantwortet0=(t,a)=>!!a&&(t.typ==='mc'?a.sel.length>0:t.typ==='offen'?a.txt.trim().length>0:a.v.some(x=>String(x).trim()));
+const beantwortet=(t,a,k)=>beantwortet0(t,a);
 const norm=s=>String(s).replace(/ /g,' ');
 // Anteil richtig (0…1); null = muss selbst bewertet werden
 function bewerte(t,a){
@@ -714,18 +715,18 @@ function probeNivView(){
  VW.innerHTML=`<div class="card"><h2>Probeklassenarbeit: Welches Niveau?</h2><div class="choice">
   <button class="big" data-l="M"><b>Mittleres Niveau</b><small>In den Rechenaufgaben stehen Größe, Formelzeichen und Einheit. Notenschlüssel: Die Hälfte der Punkte ergibt die Note 3,5.</small></button>
   <button class="big" data-l="E"><b>Erhöhtes Niveau</b><small>Ohne Formelzeichen, Einheiten musst du umrechnen, mehr Begründen und Beurteilen. Notenschlüssel: Die Hälfte der Punkte ergibt die Note 3,8.</small></button></div>
-  <ul class="note" style="margin-top:12px"><li>Plane etwa <b>45 Minuten</b> ein – wie in der echten Klassenarbeit.</li><li>Es gibt <b>keine Tipps</b> und keine Rückmeldung zwischendurch. Du kannst zwischen den Aufgaben hin- und herspringen.</li><li>Rechenwege schreibst du ins Heft im <b>Fünf-Schritt</b>. In die App kommt nur das Endergebnis.</li><li>Am Ende gibst du ab, bewertest deine Sätze und Rechenwege selbst und siehst deine <b>Note</b>.</li></ul>
+  <ul class="note" style="margin-top:12px"><li>Plane etwa <b>45 Minuten</b> ein – wie in der echten Klassenarbeit.</li><li>Es ist eine <b>Probe</b>: Du kannst dir <b>Tipps ▶</b> anzeigen lassen. Auch die <b>Lösung</b> darfst du ansehen – diese Teilaufgabe zählt dann aber <b>0 Punkte</b>. Ob deine Antwort stimmt, siehst du erst nach der Abgabe.</li><li>Du kannst zwischen den Aufgaben hin- und herspringen.</li><li>Rechenwege schreibst du ins Heft im <b>Fünf-Schritt</b>. In die App kommt nur das Endergebnis.</li><li>Am Ende gibst du ab, bewertest deine Sätze und Rechenwege selbst und siehst deine <b>Note</b>.</li></ul>
   <div class="actions"><button class="btn ghost" id="back">← zurück</button></div></div>`;
  VW.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{S.mode='probe';S.lvl=b.dataset.l;S.niv=S.lvl==='M'?1:2;probeStart();});
  document.getElementById('back').onclick=startView;scrollTo(0,0);}
-function probeStart(){S.list=probeKA(S.lvl);S.i=0;S.res={};S.st={};S.tip={};S.ans={};S.anteil={};S.abgabe=false;S.t0=Date.now();
+function probeStart(){S.list=probeKA(S.lvl);S.i=0;S.res={};S.st={};S.tip={};S.ans={};S.anteil={};S.gesehen={};S.abgabe=false;S.t0=Date.now();
  clearInterval(S.uhr);S.uhr=setInterval(()=>{if(S.mode==='probe'&&!S.abgabe)progress();},30000);taskView();}
 const LVL={M:'mittleres Niveau',E:'erhöhtes Niveau'};
-function probeAbgeben(){const offen=[];S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{if(!beantwortet(x,S.ans[i+'_'+j]))offen.push(i+1);}));
+function probeAbgeben(){const offen=[];S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{if(!S.gesehen[i+'_'+j]&&!beantwortet(x,S.ans[i+'_'+j]))offen.push(i+1);}));
  const n=[...new Set(offen)];
  if(n.length&&!confirm(`Bei Aufgabe ${n.join(', ')} fehlt noch eine Antwort. Trotzdem abgeben?`))return;
  S.abgabe=true;clearInterval(S.uhr);S.dauer=Math.round((Date.now()-S.t0)/60000);
- S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{const k=i+'_'+j;S.anteil[k]=bewerte(x,S.ans[k]);}));
+ S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{const k=i+'_'+j;S.anteil[k]=S.gesehen[k]?0:bewerte(x,S.ans[k]);}));
  selbstView();}
 // Sätze und falsche Rechenergebnisse: selbst mit der Ideallösung vergleichen
 function selbstView(){const L=[];S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{const k=i+'_'+j;if(S.anteil[k]===null)L.push({t,x,i,j,k});}));
@@ -748,7 +749,7 @@ function probeErgebnis(){let p=0,m=0;const per={},fehl=[];
  const x=m?p/m:0,n=note(x,S.lvl);merkeOffen();
  VW.innerHTML=`<div class="card"><h2>Deine Probeklassenarbeit · ${LVL[S.lvl]}</h2>
  <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin:6px 0 10px"><div style="font:800 3rem 'Nunito',sans-serif;color:var(--dblue)">Note ${n.toFixed(1).replace('.',',')}</div>
- <div><b>${f(p,1)} von ${f(m,1)} Punkten</b> (${f(x*100,0)} %)<br><span class="note">Bearbeitungszeit: ${S.dauer} min</span></div></div>
+ <div><b>${f(p,1)} von ${f(m,1)} Punkten</b> (${f(x*100,0)} %)<br><span class="note">Bearbeitungszeit: ${S.dauer} min · Tipps genutzt: ${Object.values(S.tip).reduce((a,b)=>a+b,0)} · Lösungen angesehen: ${Object.keys(S.gesehen).length}</span></div></div>
  <div class="bar"><i style="width:${x*100}%"></i></div>
  <p class="note">${S.lvl==='M'?'Notenschlüssel mittleres Niveau: streng proportional – die Hälfte der Punkte ergibt 3,5.':`Notenschlüssel erhöhtes Niveau: unter ${f(SOCKEL_E*100,0)} % der Punkte bleibt es bei 6,0, die Hälfte der Punkte ergibt 3,8.`} Sätze und Rechenwege hast du selbst bewertet – sei ehrlich zu dir!</p>
  ${fehl.length?`<h2 style="margin-top:14px">Das war noch nicht richtig</h2><ul class="fehlliste">${fehl.map(o=>`<li><a href="#" data-g="${o.i}">Aufgabe ${o.i+1}: ${o.n}</a> <span class="note">(${BER[o.b].name} · ${f(o.erreicht,1)} von ${f(o.pk,1)} P.)</span></li>`).join('')}</ul><p class="note">Tippe eine Aufgabe an: Du siehst deine Antwort und die Lösung.</p>`:'<p><b>Alles richtig – stark! 🎉</b></p>'}
@@ -807,7 +808,7 @@ function subHTML(t,k,lab){
   if(t.typ==='select')h+=t.rows.map((r,i)=>`<div class="frow"><span class="lab"><b>${i+1}.</b> ${r.l}</span><select aria-label="Antwort ${i+1}"><option value="">– wählen –</option>${r.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('');
   if(t.typ==='zahl')h+=t.rows.map((r,i)=>`<div class="frow"><span class="lab"><b>${i+1}.</b> ${r.l}</span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Antwort ${i+1}"><span class="u">${r.u}</span></div>`).join('');
   if(t.typ==='offen')h+=`<textarea class="antw" placeholder="Schreib deine Antwort in ganzen Sätzen – hier oder ins Heft."></textarea>`;}
- if(S.mode==='probe'){h+=`<div class="fbx"></div><div class="ideal ${S.abgabe?'':'hide'}">${idealHTML(t)}</div></div>`;return h;}
+ if(S.mode==='probe'){h+=`<div class="tipps"></div><div class="fbx"></div>${S.abgabe?'':`<div class="actions"><button class="btn tippbtn" data-a="tipp">Tipp ▶</button><button class="btn ghost" data-a="ideal">Lösung zeigen (0 Punkte)</button></div>`}<div class="ideal ${S.abgabe||S.gesehen[k]?'':'hide'}">${idealHTML(t)}</div></div>`;return h;}
  h+=`<div class="tipps"></div><div class="fbx"></div><div class="actions"><button class="btn" data-a="check">${t.typ==='offen'?'Mit der Ideallösung vergleichen':'Prüfen ✓'}</button><button class="btn tippbtn" data-a="tipp">Tipp ▶</button><button class="btn ghost" data-a="ideal">Ich komme nicht weiter – Lösung zeigen</button></div><div class="ideal hide">${idealHTML(t)}</div></div>`;
  return h;}
 function idealHTML(t){
@@ -839,13 +840,19 @@ function pruefe(t,el){
 function sperre(el){el.querySelectorAll('input,select,textarea,[data-a="check"],[data-a="ideal"],[data-a="tipp"]').forEach(x=>x.disabled=true);el.querySelectorAll('.mcl li').forEach(li=>li.classList.add('fertig'));}
 function bindProbe(el,key,t){const sv=()=>{S.ans[key]=liesAntwort(t,el);progress();};
  setzeAntwort(t,el,S.ans[key]);
- if(!S.abgabe){if(t.typ==='mc')el.querySelectorAll('.mcl li').forEach(li=>{const tog=()=>{if(!t.multi)el.querySelectorAll('.mcl li').forEach(x=>x!==li&&x.classList.remove('sel'));li.classList.toggle('sel');sv();};li.onclick=tog;li.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();tog();}};});
+ const tbox=el.querySelector('.tipps'),tb=el.querySelector('[data-a="tipp"]'),TL=tipps(t);
+ const zeig=n=>{tbox.innerHTML=TL.slice(0,n).map((x,i)=>`<div class="tipp"><b>Tipp${TL.length>1?' '+(i+1):''}:</b> ${x}</div>`).join('');if(tb){tb.textContent=n<TL.length?(n?'Noch ein Tipp ▶':'Tipp ▶'):'Keine weiteren Tipps';tb.disabled=n>=TL.length;}};
+ zeig(S.tip[key]||0);
+ if(!S.abgabe&&S.gesehen[key]){el.querySelector('.fbx').innerHTML='<div class="fb bad">Lösung angesehen – diese Teilaufgabe zählt 0 Punkte.</div>';sperre(el);return;}
+ if(!S.abgabe){if(tb)tb.onclick=()=>{S.tip[key]=(S.tip[key]||0)+1;zeig(S.tip[key]);};
+  const lb=el.querySelector('[data-a="ideal"]');if(lb)lb.onclick=()=>{if(!confirm('Wenn du dir die Lösung ansiehst, bekommst du für diese Teilaufgabe 0 Punkte. Trotzdem ansehen?'))return;S.gesehen[key]=true;S.ans[key]=liesAntwort(t,el);el.querySelector('.ideal').classList.remove('hide');el.querySelector('.fbx').innerHTML='<div class="fb bad">Lösung angesehen – diese Teilaufgabe zählt 0 Punkte.</div>';sperre(el);progress();};
+if(t.typ==='mc')el.querySelectorAll('.mcl li').forEach(li=>{const tog=()=>{if(!t.multi)el.querySelectorAll('.mcl li').forEach(x=>x!==li&&x.classList.remove('sel'));li.classList.toggle('sel');sv();};li.onclick=tog;li.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();tog();}};});
   el.querySelectorAll('input,select,textarea').forEach(x=>{x.oninput=x.onchange=sv;});return;}
  // nach der Abgabe: markieren, Punkte, Lösung
  if(t.typ==='mc'){const r=[].concat(t.richtig);el.querySelectorAll('.mcl li').forEach(li=>{const k=+li.dataset.k;if(li.classList.contains('sel'))li.classList.add(r.includes(k)?'right':'wrong');});}
  else if(t.typ!=='offen')pruefe(t,el);
  const pk=pkt(t),a=S.anteil[key]||0;
- el.querySelector('.fbx').innerHTML=`<div class="fb ${a>=.999?'ok':'bad'}"><b>${f(pk*a,1)} von ${f(pk,1)} Punkten.</b>${t.typ==='rechnen'?' '+HEFT:''}</div>`;
+ el.querySelector('.fbx').innerHTML=`<div class="fb ${a>=.999?'ok':'bad'}"><b>${f(pk*a,1)} von ${f(pk,1)} Punkten.</b>${S.gesehen[key]?' (Lösung angesehen)':''}${t.typ==='rechnen'?' '+HEFT:''}</div>`;
  sperre(el);}
 function bindSub(el,key,t){if(S.mode==='probe')return bindProbe(el,key,t);
  const st=S.st[key]=S.st[key]||{tries:0,done:false},ideal=el.querySelector('.ideal'),fbx=el.querySelector('.fbx');
@@ -885,7 +892,7 @@ const pkt=x=>x.punkte||(x.typ==='select'||x.typ==='zahl'?Math.max(1,x.rows.lengt
 function stat(i){const ss=subs(S.list[i]);let p=0,max=0,done=0;
  ss.forEach((x,j)=>{const pk=pkt(x);max+=pk;const r=S.res[i+'_'+j];if(r)done++;p+=r==='ok'?pk:r==='teil'?pk/2:0;});return {p,max,done,all:ss.length};}
 function progress(){const el=document.getElementById('prog');if(!el)return;let tp=0,tm=0;
- if(S.mode==='probe'&&!S.abgabe){let fertig=0;el.innerHTML=S.list.map((t,i)=>{const ok=subs(t).every((x,j)=>beantwortet(x,S.ans[i+'_'+j]));if(ok)fertig++;return `<button class="${i===S.i?'cur ':''}${ok?'ok':''}" data-i="${i}" aria-label="Aufgabe ${i+1}">${i+1}</button>`;}).join('')+`<span class="info">⏱ ${Math.round((Date.now()-S.t0)/60000)} min · ${fertig} von ${S.list.length} beantwortet</span>`;
+ if(S.mode==='probe'&&!S.abgabe){let fertig=0;el.innerHTML=S.list.map((t,i)=>{const ok=subs(t).every((x,j)=>S.gesehen[i+'_'+j]||beantwortet(x,S.ans[i+'_'+j]));if(ok)fertig++;return `<button class="${i===S.i?'cur ':''}${ok?'ok':''}" data-i="${i}" aria-label="Aufgabe ${i+1}">${i+1}</button>`;}).join('')+`<span class="info">⏱ ${Math.round((Date.now()-S.t0)/60000)} min · ${fertig} von ${S.list.length} beantwortet</span>`;
   el.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.i=+b.dataset.i;taskView();});return;}
  el.innerHTML=S.list.map((t,i)=>{const s=stat(i);tp+=s.p;tm+=s.max;const c=s.done<s.all?'':s.p>=s.max?'ok':s.p>0?'teil':'nein';return `<button class="${i===S.i?'cur ':''}${c}" data-i="${i}" aria-label="Aufgabe ${i+1}">${i+1}</button>`;}).join('')+`<span class="info">${S.mode==='ka'?`${f(tp,1)} / ${f(tm,1)} P.`:`✓ ${Object.values(S.res).filter(r=>r==='ok').length} beim 1. Versuch`}</span>`;
  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.i=+b.dataset.i;taskView();});}
