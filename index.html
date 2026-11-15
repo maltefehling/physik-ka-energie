@@ -445,7 +445,7 @@ const TIPP={
 };
 const T={
  def:()=>({typ:'offen',titel:'Was ist Energie?',punkte:2,frage:'Beschreibe, was man in der Physik unter Energie versteht.',
-   ideal:'<b>Energie ist die Fähigkeit, Arbeit zu verrichten, Licht auszustrahlen und Wärme abzugeben.</b>',krit:['„Fähigkeit“','Arbeit verrichten','Licht ausstrahlen','Wärme abgeben']}),
+   ideal:'<b>Energie ist die Fähigkeit, Arbeit zu verrichten, Licht auszustrahlen oder Wärme abzugeben.</b>',krit:['„Fähigkeit“','Arbeit verrichten','Licht ausstrahlen','Wärme abgeben']}),
  zeichen:()=>({typ:'select',titel:'Formelzeichen und Einheit',frage:'Ergänze.',rows:shuffle([{l:'Formelzeichen der Energie',opts:['E','P','W','J'],r:'E'},{l:'Einheit der Energie',opts:['Watt (W)','Joule (J)','Newton (N)','Kilogramm (kg)'],r:'Joule (J)'},{l:'1 kJ = …',opts:['10 J','100 J','1 000 J','1 000 000 J'],r:'1 000 J'}])}),
  conv:n=>{const L={1:[()=>{const a=R(2,9)/2;return{l:`${f(a)} kJ =`,w:a*1000,u:'J'};},()=>{const a=R(2,10);return{l:`${a} min =`,w:a*60,u:'s'};},()=>{const a=R(2,6)/2;return{l:`${f(a)} kW =`,w:a*1000,u:'W'};}],
    2:[()=>{const a=R(250,950,50);return{l:`${a} g =`,w:a/1000,u:'kg'};},()=>{const a=R(30,180,5);return{l:`${a} cm =`,w:a/100,u:'m'};},()=>{const a=R(12,45)/10;return{l:`${f(a)} t =`,w:a*1000,u:'kg'};},()=>{const a=R(15,95,5)/100;return{l:`${f(a)} kJ =`,w:a*1000,u:'J'};}],
@@ -642,7 +642,9 @@ const BER=[
  {nr:7,name:'7 Potenzielle Energie',info:'',tasks:n=>n===1?[T.epotAbh(),p7a(),p7b(),p7c(),iqb('speicher',1)]:n===2?[p7d(),p7e(),p7f(),iqb('speicher',2)]:[p7g(),p7h(),p7i(),iqb('speicher',3)],ka:n=>[n===1?pick([p7a,p7b,p7c])():n===2?pick([p7d,p7e,p7f])():pick([p7g,p7h,p7i])()]},
  {nr:8,name:'8 Leistung',info:'',tasks:n=>n===1?[T.leistungIst(),T.leistungZeichen(),l8a(),l8b(),l8c(),iqb('test3',1)]:n===2?[T.leistungZeichen(),l8d(),l8e(),l8f(),T.vergleich(),iqb('test3',2)]:[l8g(),l8h(),l8i(),iqb('test3',3)],ka:n=>[n===1?pick([l8a,l8b,l8c])():n===2?pick([l8d,l8e,l8f])():pick([l8g,l8h,l8i])()]},
 ];
-function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});L.push(iqb(pick(Object.keys(IQB)),n));return L;}
+function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});
+ // Einstieg in jeder Arbeit: die Definition der Energie (Bereich 1) zuerst
+ L.sort((a,b)=>(b.bereich===1)-(a.bereich===1));L.push(iqb(pick(Object.keys(IQB)),n));return L;}
 /* ============ Probeklassenarbeit (mittleres / erhöhtes Niveau) ============
  Aufbau wie eine echte Klassenarbeit (ca. 45 min): jeder Bereich des Kompetenzrasters kommt vor, dazu eine Aufgabe mit Material.
  Mittleres Niveau: Rechenaufgaben nennen Größe, Formelzeichen und Einheit (Pool ★).
