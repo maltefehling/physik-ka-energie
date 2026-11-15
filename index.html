@@ -495,7 +495,18 @@ const T={
    {typ:'offen',titel:'Vom Wind bis zum Föhn',punkte:3,frage:'Ein Windrad liefert Strom für deinen Föhn. Beschreibe die Energieumwandlungen vom Wind bis zur warmen Luft aus dem Föhn als Pfeildiagramm und in Worten.',
     ideal:'kinetische Energie (Wind) → kinetische Energie (Rotor dreht sich) → elektrische Energie (Generator, Leitung) → thermische Energie (Heizdraht im Föhn) + kinetische Energie (Gebläse).',krit:['kinetische Energie von Wind/Rotor','elektrische Energie','thermische Energie im Föhn']}]),
  satz:()=>({typ:'mc',titel:'Energieerhaltungssatz',frage:'Welche Aussage gibt den Energieerhaltungssatz richtig wieder?',...mcOk('Energie kann weder erzeugt noch vernichtet werden. Sie wird nur von einer Form in eine andere umgewandelt.',['Bei jeder Umwandlung wird die Energie weniger.','Maschinen erzeugen Energie.','Energie bleibt immer in derselben Form.'])}),
- verlust:()=>({typ:'mc',titel:'„Energieverlust“',frage:`Im Alltag sagt man: „Bei ${pick(['der Glühlampe','dem Automotor','dem Ladegerät','der Bohrmaschine'])} geht Energie verloren.“ Was bedeutet das physikalisch?`,...mcOk('Ein Teil wird in Wärme umgewandelt und ist für uns nicht mehr nutzbar – er ist entwertet.',['Die Energie verschwindet.','Das Gerät erzeugt weniger Energie, als es bekommt.','Die Energie wird im Gehäuse gespeichert.']),erkl:'Energie geht nie verloren. Sie wird <b>entwertet</b>: meist als Wärme an die Umgebung abgegeben.'}),
+ fair:n=>{const SZ=shuffle([
+  {t:'Tim lässt eine Stahlkugel aus 1 m und eine Holzkugel aus 2 m Höhe in Sand fallen. Er will wissen, ob schwere Kugeln tiefere Krater machen.',z:'die Fallhöhe'},
+  {t:'Mia lässt denselben Flummi aus 1 m Höhe einmal auf Holz und einmal auf Teppich fallen und misst, wie hoch er springt.',z:null},
+  {t:'Ben will wissen, ob ein Deckel beim Wasserkochen Energie spart. Mit Deckel kocht er 1 L Wasser, ohne Deckel 0,5 L.',z:'die Wassermenge'},
+  {t:'Lea misst mit dem Energiemessgerät jeweils 1 Stunde lang, wie viel Energie ein Fernseher im Standby und eingeschaltet braucht.',z:null},
+  {t:'Ali will wissen, welche von zwei gleichen Solarzellen besser ist. Die eine steht 20 cm, die andere 60 cm von der Lampe entfernt.',z:'der Abstand zur Lampe'},
+  {t:'Emma zieht ein Aufziehauto einmal 3-mal und einmal 6-mal auf und lässt es jedes Mal auf denselben Fliesen fahren.',z:null},
+  {t:'Noah will wissen, ob man für mehr Wasser mehr Energie braucht. Er erhitzt 0,5 L Leitungswasser und 1 L Wasser aus dem Kühlschrank.',z:'die Starttemperatur'}]);
+   const wahl=[SZ.find(x=>x.z),SZ.find(x=>!x.z),...SZ.filter(x=>x!==SZ.find(y=>y.z)&&x!==SZ.find(y=>!y.z)).slice(0,1)];const opts=['die Fallhöhe','die Wassermenge','der Abstand zur Lampe','die Starttemperatur','die Masse'];
+   const rows=[];shuffle(wahl).forEach(x=>{rows.push({l:x.t,opts:['fair','unfair'],r:x.z?'unfair':'fair'});if(n>1&&x.z)rows.push({l:'→ Was wurde in diesem Versuch zusätzlich verändert?',opts,r:x.z});});
+   return {typ:'select',k:'E',titel:'Fair oder unfair?',frage:'Ein Versuch ist nur fair, wenn sich genau <b>eine</b> Größe ändert. Entscheide bei jedem Versuch.'+(n>1?' Gib bei einem unfairen Versuch an, was zusätzlich verändert wurde.':''),rows,tipp:'Welche Größe soll laut Frage untersucht werden? Ändert sich daneben noch etwas anderes, ist der Versuch unfair.'};},
+ verlust:()=>({typ:'mc',k:'K',titel:'„Energieverlust“',frage:`Im Alltag sagt man: „Bei ${pick(['der Glühlampe','dem Automotor','dem Ladegerät','der Bohrmaschine'])} geht Energie verloren.“ Was bedeutet das physikalisch?`,...mcOk('Ein Teil wird in Wärme umgewandelt und ist für uns nicht mehr nutzbar – er ist entwertet.',['Die Energie verschwindet.','Das Gerät erzeugt weniger Energie, als es bekommt.','Die Energie wird im Gehäuse gespeichert.']),erkl:'Energie geht nie verloren. Sie wird <b>entwertet</b>: meist als Wärme an die Umgebung abgegeben.'}),
  pendel:()=>{const v=pick([['Ein Pendel schwingt hin und her','am höchsten Punkt','am tiefsten Punkt'],['Ein Kind schaukelt','am höchsten Punkt','am tiefsten Punkt'],['Eine Kugel rollt in einer Schüssel hin und her','am Rand (Umkehrpunkt)','in der Mitte (tiefster Punkt)']]),o=['null','klein','groß','maximal'];
    return {typ:'select',titel:'Hin und her',frage:v[0]+' (ohne Reibung). Wie groß sind die Energien?',rows:[{l:`${v[1]}: ${EP}`,opts:o,r:'maximal'},{l:`${v[1]}: ${E('kin')}`,opts:o,r:'null'},{l:`${v[2]}: ${EP}`,opts:o,r:'null'},{l:`${v[2]}: ${E('kin')}`,opts:o,r:'maximal'}]};},
  skater:()=>{const b=BAHN(),Pz=[['maximal','null'],['groß','klein'],['null','maximal'],['groß','klein'],['maximal','null']],o=['null','klein','groß','maximal'];
@@ -504,20 +515,20 @@ const T={
  summe:()=>{const b=BAHN();return {typ:'mc',titel:'Summe der Energien',svg:halfpipe(),frage:`Das Bild zeigt ${b.n}. ${b.c} Reibung kannst du vernachlässigen. Vergleiche die Summe aus potenzieller und kinetischer Energie an den Punkten 1 bis 5.`,
    ...mcOk('Sie ist an allen Punkten gleich groß – Energieerhaltungssatz.',['Sie ist an Punkt 3 am größten.','Sie ist an Punkt 1 und 5 am größten.','Sie nimmt von Punkt 1 bis 5 ab.']),erkl:'Ohne Reibung gilt der Energieerhaltungssatz: Energie wird nur umgewandelt. Die Summe bleibt gleich.'};},
  reibung:()=>{const v=pick([['„Durch die Reibung der Rollen geht bei jeder Fahrt in der Halfpipe ein wenig Energie verloren.“','an Rollen, Rampe und Luft','Deshalb kommt der Skater jedes Mal etwas weniger hoch.'],['„Beim Schaukeln geht durch die Luftreibung Energie verloren.“','an die Luft und die Aufhängung','Deshalb schwingt die Schaukel immer weniger hoch.'],['„Beim Bremsen wird die Bewegungsenergie des Fahrrads vernichtet.“','an Bremsen, Felgen und Luft','Deshalb wird das Fahrrad langsamer.']]);
-   return {typ:'offen',titel:'Stellung nehmen',punkte:3,frage:'Nimm Stellung zur Aussage: '+v[0],
+   return {typ:'offen',k:'K',titel:'Stellung nehmen',punkte:3,frage:'Nimm Stellung zur Aussage: '+v[0],
    ideal:`Die Aussage ist <b>physikalisch nicht korrekt</b>. Nach dem Energieerhaltungssatz geht keine Energie verloren und wird auch nicht vernichtet. Durch Reibung wird ein Teil der Energie in <b>thermische Energie (Wärme)</b> umgewandelt und ${v[1]} abgegeben. Diese Energie ist <b>entwertet</b> – sie kann nicht mehr für die Bewegung genutzt werden. ${v[2]}`,
    krit:['Aussage beurteilt (so nicht korrekt)','Energieerhaltungssatz genannt','Umwandlung in Wärme durch Reibung','Fachbegriff „entwertet“']};},
  hoeher:()=>{const v=pick([['Ein Skater startet aus dem Stand an Punkt 1 einer Halfpipe und tritt nicht an.','Kann er auf der anderen Seite höher kommen als seine Starthöhe?','er'],['Ein Achterbahnwagen rollt ohne Antrieb vom ersten Hügel herunter.','Kann er einen zweiten Hügel schaffen, der höher ist als der erste?','er'],['Ein Pendel wird aus 30 cm Höhe losgelassen.','Kann es auf der anderen Seite höher als 30 cm schwingen?','es']]);
    return {typ:'offen',titel:'Höher als der Start?',punkte:2,frage:`${v[0]} ${v[1]} Begründe.`,
    ideal:`<b>Nein.</b> Die gesamte Energie stammt aus der potenziellen Energie am Start. Mehr Energie kann nicht entstehen (Energieerhaltungssatz). Höher zu kommen hieße, mehr potenzielle Energie zu haben als am Anfang. Wegen der Reibung kommt ${v[2]} sogar etwas weniger hoch.`,krit:['Nein','nur die Start-Energie steht zur Verfügung','Energieerhaltungssatz']};},
  led:()=>{const v=pick([{d:'LED',n:'eine LED-Lampe',zu:'elektrische Energie',nu:'Licht',a:30,b:45},{d:'Motor',n:'ein Elektromotor',zu:'elektrische Energie',nu:'Bewegung',a:70,b:90},{d:'Lampe',n:'eine Glühlampe',zu:'elektrische Energie',nu:'Licht',a:3,b:8},{d:'Solar',n:'eine Solarzelle',zu:'Licht',nu:'Strom',a:15,b:25}]),Z=pick([100,200]),N=Z*R(v.a,v.b)/100,W=Z-N;
-   return {typ:'zahl',titel:'Ein Diagramm lesen',svg:sankey({bz:100,bn:N/Z*100,bw:W/Z*100,lz:`${Z} J ${v.zu}`,ln:`${f(N)} J ${v.nu}`,lw:'? J Wärme',dev:v.d}),frage:`Das Diagramm zeigt, was ${v.n} mit ${Z} J macht. Wie viel Energie wird zu Wärme?`,rows:[{l:'Wärme:',w:W,u:'J'}],erkl:`${Z} J − ${f(N)} J = ${f(W)} J. Es geht keine Energie verloren.`};},
+   return {typ:'zahl',k:'K',titel:'Ein Diagramm lesen',svg:sankey({bz:100,bn:N/Z*100,bw:W/Z*100,lz:`${Z} J ${v.zu}`,ln:`${f(N)} J ${v.nu}`,lw:'? J Wärme',dev:v.d}),frage:`Das Diagramm zeigt, was ${v.n} mit ${Z} J macht. Wie viel Energie wird zu Wärme?`,rows:[{l:'Wärme:',w:W,u:'J'}],erkl:`${Z} J − ${f(N)} J = ${f(W)} J. Es geht keine Energie verloren.`};},
  richtigesDiagramm:()=>{const v=pick([{d:'Dynamo',t:'Ein Fahrraddynamo bekommt 100 J kinetische Energie und gibt {N} J elektrische Energie ab.'},{d:'Motor',t:'Ein Elektromotor bekommt 100 J elektrische Energie und gibt {N} J Bewegungsenergie ab.'},{d:'LED',t:'Eine LED-Lampe bekommt 100 J elektrische Energie und gibt {N} J Licht ab.'}]);
    const p=R(65,75,5),q=100-p,D=shuffle([{k:1,bz:100,bn:p,bw:q,ln:`${p} J`,lw:`${q} J`},{k:2,bz:100,bn:p,bw:p,ln:`${p} J`,lw:`${p} J`},{k:3,bz:100,bn:q,bw:p,ln:`${p} J`,lw:`${q} J`}]);
-   return {typ:'mc',diag:true,titel:'Welches Diagramm stimmt?',frage:v.t.replace('{N}',p)+' Welches Energieflussdiagramm ist richtig gezeichnet?',opts:D.map(d=>sankey({...d,lz:'100 J',s:.8,w:380,dev:v.d})),richtig:D.findIndex(d=>d.k===1),
+   return {typ:'mc',k:'K',diag:true,titel:'Welches Diagramm stimmt?',frage:v.t.replace('{N}',p)+' Welches Energieflussdiagramm ist richtig gezeichnet?',opts:D.map(d=>sankey({...d,lz:'100 J',s:.8,w:380,dev:v.d})),richtig:D.findIndex(d=>d.k===1),
    erkl:D.map((d,i)=>`<b>${LET[i]}</b>: `+(d.k===1?`richtig – 100 J = ${p} J + ${q} J, und die Pfeilbreiten passen.`:d.k===2?`falsch – es käme mehr heraus (${2*p} J), als hineingeht.`:`falsch – der ${p}-J-Pfeil ist schmaler gezeichnet als der ${q}-J-Pfeil.`)).join('<br>')};},
  erfinder:()=>{const v=pick([['neuer Motor','elektrischer Energie','Bewegungsenergie'],['neue Glühlampe','elektrischer Energie','Licht'],['neuer Dynamo','Bewegungsenergie','elektrische Energie']]),Z=pick([100,200,500]),X=Z*pick([1.1,1.2,1.5]);
-   return {typ:'offen',titel:'Stimmt das?',punkte:2,frage:`Ein Erfinder behauptet: „Mein ${v[0]} macht aus ${Z} J ${v[1]} ${f(X)} J ${v[2]}.“ Nimm Stellung und begründe mit dem Energieerhaltungssatz.`,
+   return {typ:'offen',k:'B',titel:'Stimmt das?',punkte:2,frage:`Ein Erfinder behauptet: „Mein ${v[0]} macht aus ${Z} J ${v[1]} ${f(X)} J ${v[2]}.“ Nimm Stellung und begründe mit dem Energieerhaltungssatz.`,
    ideal:`Das <b>kann nicht stimmen</b>. Nach dem Energieerhaltungssatz kann keine Energie erzeugt werden – es kann höchstens so viel herauskommen, wie hineingeht. Da immer ein Teil entwertet wird (Wärme), kommen sogar <b>weniger als ${Z} J</b> Nutzenergie heraus. Eine solche Maschine wäre ein Perpetuum mobile.`,krit:['kann nicht stimmen','Energie kann nicht erzeugt werden',`immer Entwertung → weniger als ${Z} J`]};},
  jeGroesser:()=>({typ:'mc',multi:true,titel:'Was bedeutet ein großer Wirkungsgrad?',frage:'Je größer der Wirkungsgrad ist, desto … Notiere <b>alle</b> richtigen Buchstaben.',...mcMulti([[1,'… weniger Energie braucht man, um das gewünschte Ziel zu erreichen.'],[0,'… mehr Energie wird entwertet.'],[1,'… effizienter ist die Energieumwandlung.'],[0,'… wärmer wird bei der Energieumwandlung die Umgebung.']])}),
  typischEta:()=>({typ:'select',titel:'Typische Wirkungsgrade',frage:'Ordne ungefähr zu.',rows:shuffle([{l:'Glühlampe',opts:['etwa 5 %','etwa 30 %','etwa 90 %'],r:'etwa 5 %'},{l:'Verbrennungsmotor (Auto)',opts:['etwa 5 %','etwa 30 %','etwa 90 %'],r:'etwa 30 %'},{l:'Elektromotor',opts:['etwa 5 %','etwa 30 %','etwa 90 %'],r:'etwa 90 %'}])}),
@@ -643,6 +654,7 @@ const BER=[
  {nr:6,name:'6 Wirkungsgrad',info:'',tasks:n=>n===1?[T.jeGroesser(),w6a(),w6b(),iqb('vergleich3',1)]:n===2?[T.typischEta(),w6c(),w6d(),T.unter100(),iqb('vergleich3',2),iqb('antrieb',2)]:[w6e(),w6f(),T.getriebe(),iqb('vergleich3',3),iqb('antrieb',3)],ka:n=>[n===1?pick([w6a,w6b])():n===2?pick([w6c,w6d])():pick([w6e,w6f])()]},
  {nr:7,name:'7 Potenzielle Energie',info:'',tasks:n=>n===1?[T.epotAbh(),p7a(),p7b(),p7c(),iqb('speicher',1)]:n===2?[p7d(),p7e(),p7f(),iqb('speicher',2)]:[p7g(),p7h(),p7i(),iqb('speicher',3)],ka:n=>[n===1?pick([p7a,p7b,p7c])():n===2?pick([p7d,p7e,p7f])():pick([p7g,p7h,p7i])()]},
  {nr:8,name:'8 Leistung',info:'',tasks:n=>n===1?[T.leistungIst(),T.leistungZeichen(),l8a(),l8b(),l8c(),iqb('test3',1)]:n===2?[T.leistungZeichen(),l8d(),l8e(),l8f(),T.vergleich(),iqb('test3',2)]:[l8g(),l8h(),l8i(),iqb('test3',3)],ka:n=>[n===1?pick([l8a,l8b,l8c])():n===2?pick([l8d,l8e,l8f])():pick([l8g,l8h,l8i])()]},
+ {nr:9,name:'Versuch planen',info:'fair oder unfair?',tasks:n=>[T.fair(n),T.fair(n)],ka:n=>[]},
 ];
 function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});
  // Einstieg in jeder Arbeit: die Definition der Energie (Bereich 1) zuerst
@@ -665,20 +677,22 @@ function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b})
   add(6,tag(pick([w6a,w6b])(),'II'));
   add(7,tag(pick([p7a,p7b,p7c])(),'II'));
   add(8,tag(pick([l8a,l8b,l8c])(),'II'));
+  add(9,tag(T.fair(1),'II'));
   add(pick([4,5]),tag(pick([T.erfinder,T.hoeher])(),'III'));
   // Material mit Beurteilen (AFB III) auf mittlerem Niveau, dazu eine zweite, kürzere Aufgabe mit Material
   const k1=pick(['vergleich3','wunder','antrieb']),k2=pick(Object.keys(IQB).filter(k=>k!==k1&&IQB[k].bereich!==IQB[k1].bereich));
   L.push(iqb(k1,2),iqb(k2,1));
  }else{
-  add(1,tag(T.def(),'I'));add(1,tag(T.zeichen(),'I'));
-  add(0,tag(T.conv(2),'I'));
+  add(1,tag(T.def(),'I'));
+  // Umrechnen (Übergreifend) steckt auf erhöhtem Niveau in jeder Rechenaufgabe (kJ, kW, min, g, t, cm) – keine eigene Aufgabe
   add(2,tag(T.formBsp(),'I'));
-  add(3,tag(pick([T.kaTabelle,T.kette])(),'II'));
+  add(3,tag(T.kette(),'II'));
   add(4,tag(T.pendel(),'I'));
   add(5,tag(pick([e5b,T.richtigesDiagramm])(),'II'));
   add(6,tag(pick([w6c,w6d])(),'II'));
   add(7,tag(pick([p7d,p7e,p7f])(),'II'));
   add(8,tag(pick([l8d,l8e,l8f])(),'II'));
+  add(9,tag(T.fair(2),'II'));
   add(pick([4,6]),tag(pick([T.reibung,T.getriebe])(),'III'));
   const k1=pick(Object.keys(IQB)),k2=pick(Object.keys(IQB).filter(k=>k!==k1&&IQB[k].bereich!==IQB[k1].bereich));
   L.push(iqb(k1,3),iqb(k2,2));
