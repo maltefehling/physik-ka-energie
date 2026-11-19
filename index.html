@@ -663,7 +663,8 @@ function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L
  Aufbau wie eine echte Klassenarbeit (ca. 45 min): jeder Bereich des Kompetenzrasters kommt vor, dazu eine Aufgabe mit Material.
  Mittleres Niveau: Rechenaufgaben nennen Größe, Formelzeichen und Einheit (Pool ★).
  Erhöhtes Niveau: ohne Formelzeichen, mit Umrechnen (Pool ★★), mehr Begründen/Beurteilen (Anforderungsbereich III).
- Keine versteckten Zweischritt-Rechnungen (★★★-Pool bleibt draußen) – die Höhe kommt über die Aufgaben mit Material.
+ Keine versteckten Zweischritt-Rechnungen – Ausnahme seit 19.11.2026: auf erhöhtem Niveau zum Schluss eine Transferaufgabe (p7i, 5 P).
+ Rechenaufgaben im Fünf-Schritt zählen 4 P (wie in der Papierarbeit).
  Zielanteile der Punkte: mittel ≈ AFB I 40 % · II 45 % · III 15 %, erhöht ≈ I 30 % · II 45 % · III 25 %. */
 const tag=(t,afb,punkte)=>({...t,afb:t.afb||afb,...(punkte?{punkte}:{})});
 function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b});
@@ -673,10 +674,10 @@ function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b})
   add(2,tag(pick([T.formBeschr,T.fachbegriff])(),'I'));
   add(3,tag(T.geraete(),'I'));
   add(4,tag(pick([T.pendel,T.satz])(),'I'));
-  add(5,tag(pick([T.led,e5a])(),'II'));
-  add(6,tag(pick([w6a,w6b])(),'II'));
-  add(7,tag(pick([p7a,p7b,p7c])(),'II'));
-  add(8,tag(pick([l8a,l8b,l8c])(),'II'));
+  {const t=pick([T.led,e5a])();add(5,tag(t,'II',t.typ==='rechnen'?4:0));}
+  add(6,tag(pick([w6a,w6b])(),'II',4));
+  add(7,tag(pick([p7a,p7b,p7c])(),'II',4));
+  add(8,tag(pick([l8a,l8b,l8c])(),'II',4));
   add(9,tag(T.fair(1),'II'));
   add(pick([4,5]),tag(pick([T.erfinder,T.hoeher])(),'III'));
   // Material mit Beurteilen (AFB III) auf mittlerem Niveau, dazu eine zweite, kürzere Aufgabe mit Material
@@ -688,14 +689,16 @@ function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b})
   add(2,tag(T.formBsp(),'I'));
   add(3,tag(T.kette(),'II'));
   add(4,tag(T.pendel(),'I'));
-  add(5,tag(pick([e5b,T.richtigesDiagramm])(),'II'));
-  add(6,tag(pick([w6c,w6d])(),'II'));
-  add(7,tag(pick([p7d,p7e,p7f])(),'II'));
-  add(8,tag(pick([l8d,l8e,l8f])(),'II'));
+  {const t=pick([e5b,T.richtigesDiagramm])();add(5,tag(t,'II',t.typ==='rechnen'?4:0));}
+  add(6,tag(pick([w6c,w6d])(),'II',4));
+  add(7,tag(pick([p7d,p7e,p7f])(),'II',4));
+  add(8,tag(pick([l8d,l8e,l8f])(),'II',4));
   add(9,tag(T.fair(2),'II'));
   add(pick([4,6]),tag(pick([T.reibung,T.getriebe])(),'III'));
   const k1=pick(Object.keys(IQB)),k2=pick(Object.keys(IQB).filter(k=>k!==k1&&IQB[k].bereich!==IQB[k1].bereich));
   L.push(iqb(k1,3),iqb(k2,2));
+  // Transferaufgabe zum Schluss (wie in der Papierarbeit, 19.11.2026): Nahrung → Wirkungsgrad → potenzielle Energie
+  add(7,tag(p7i(),'III',5));
  }
  return L;}
 // Notenschlüssel: mittel streng proportional (Hälfte = 3,5); erhöht mit Sockel (Hälfte = 3,8 → unter ≈ 11 % bleibt 6,0)

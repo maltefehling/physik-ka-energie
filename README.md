@@ -21,3 +21,5 @@ Startseite → „Probeklassenarbeit schreiben“ → mittleres oder erhöhtes N
 - Ablauf (Probe, echte KA auf Papier): Tipps erlaubt (zählen nur in der Statistik), Lösung ansehen erlaubt (Teilaufgabe = 0 Punkte, dann gesperrt), keine Richtig/Falsch-Rückmeldung vor der Abgabe; Antworten werden gespeichert, Abgabe am Ende; danach Selbstbewertung der Satzantworten (Kriterien abhaken) und falscher Rechenergebnisse (Fünf-Schritt bis zur Formel richtig = halbe Punkte).
 - Note: mittel streng proportional (Note = 6 − 5·Anteil, Hälfte = 3,5); erhöht mit Sockel 10,7 % (darunter 6,0, Hälfte = 3,8, linear bis 1,0).
 - Ergebnis: Note, Fehlerliste mit Nachschau (Antwort + Lösung), Ampel je Bereich; offene Bereiche erscheinen auf der Startseite zum Nachüben.
+
+**Stand 19.11.2026:** In der Probeklassenarbeit zählen Rechenaufgaben im Fünf-Schritt 4 P (wie in der Papierarbeit). Auf dem erhöhten Niveau kommt zum Schluss eine Transferaufgabe dazu: „Nahrung: Wie hoch komme ich?“ (Wirkungsgrad + potenzielle Energie, 5 P).
