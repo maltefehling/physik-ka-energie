@@ -675,9 +675,10 @@ function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b})
   add(3,tag(T.geraete(),'I'));
   add(4,tag(pick([T.pendel,T.satz])(),'I'));
   {const t=pick([T.led,e5a])();add(5,tag(t,'II',t.typ==='rechnen'?4:0));}
-  add(6,tag(pick([w6a,w6b])(),'II',4));
-  add(7,tag(pick([p7a,p7b,p7c])(),'II',4));
-  add(8,tag(pick([l8a,l8b,l8c])(),'II',4));
+  // genau eine Formelumstellung wie in der Papierarbeit (20.11.2026): Wirkungsgrad und E_pot direkt, Leistung umgestellt (E = P · t oder t = E : P)
+  add(6,tag(w6a(),'II',4));
+  add(7,tag(p7a(),'II',4));
+  add(8,tag(pick([l8b,l8c])(),'II',4));
   add(9,tag(T.fair(1),'II'));
   add(pick([4,5]),tag(pick([T.erfinder,T.hoeher])(),'III'));
   // Material mit Beurteilen (AFB III) auf mittlerem Niveau, dazu eine zweite, kürzere Aufgabe mit Material
