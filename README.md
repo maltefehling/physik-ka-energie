@@ -23,3 +23,9 @@ Startseite → „Probeklassenarbeit schreiben“ → mittleres oder erhöhtes N
 - Ergebnis: Note, Fehlerliste mit Nachschau (Antwort + Lösung), Ampel je Bereich; offene Bereiche erscheinen auf der Startseite zum Nachüben.
 
 **Stand 19.11.2026:** In der Probeklassenarbeit zählen Rechenaufgaben im Fünf-Schritt 4 P (wie in der Papierarbeit). Auf dem erhöhten Niveau kommt zum Schluss eine Transferaufgabe dazu: „Nahrung: Wie hoch komme ich?“ (Wirkungsgrad + potenzielle Energie, 5 P).
+
+**Stand 20.11.2026:**
+- Mittleres Niveau: genau eine Formelumstellung (bei der Leistung).
+- Erhöhtes Niveau: Aufbau wie die Gym-Papierarbeit.
+  - Aufgaben: Definition, Energieformen (4), Kette, Pendel, Wirkungsgrad, Masse aus E_pot, Energie aus Leistung, fair/unfair, dann die Material-Aufgaben „Antriebe“ (b–d) und „Höhe nimmt ab“ (a, c, d), zum Schluss die Transferaufgabe.
+  - Keine Einheit vorgegeben: Die Schüler wählen sie selbst. Umrechnen ist erlaubt, z. B. 0,6 t statt 600 kg.

@@ -255,7 +255,7 @@ function w6d(){const Zk=R(2,9)*1000,eta=pick([80,90,95]),Nk=Zk*eta/100,v=pick([
   {t:`Eine Überlandleitung hat einen Wirkungsgrad von ${eta} %. Bei den Häusern kommen ${f(Nk)} kJ elektrische Energie an.`,q:'Wie viel elektrische Energie muss das Kraftwerk in die Leitung einspeisen?',a:'Das Kraftwerk muss'},
   {t:`Ein Ladegerät hat einen Wirkungsgrad von ${eta} %. Im Akku eines E-Bikes kommen ${f(Nk)} kJ an.`,q:'Wie viel elektrische Energie nimmt das Ladegerät aus der Steckdose?',a:'Das Ladegerät muss'},
   {t:`Ein Elektromotor hat einen Wirkungsgrad von ${eta} %. Er gibt ${f(Nk)} kJ Bewegungsenergie ab.`,q:'Wie viel elektrische Energie bekommt der Motor?',a:'Der Motor muss'}]);
- return RE({titel:'Formel umstellen: zugeführte Energie',text:v.t,frage:v.q+' Gib das Ergebnis in J an.',geg:[`η = ${eta} % = ${f(eta/100)}`,`${NU} = ${f(Nk)} kJ = ${f(Nk*1000)} J`],ges:`${ZU} in J`,
+ return RE({titel:'Formel umstellen: zugeführte Energie',text:v.t,frage:v.q+'',geg:[`η = ${eta} % = ${f(eta/100)}`,`${NU} = ${f(Nk)} kJ = ${f(Nk*1000)} J`],ges:`${ZU} in J`,
  schritte:[{formel:`${ZU} = ${NU} : η`,rechnung:[`${ZU} = ${f(Nk*1000)} J : ${f(eta/100)}`,`${ZU} = ${f(Zk*1000)} J`]}],
  erg:{w:Zk*1000,u:'J',l:ZU},F:[[Nk*1000*eta/100,UM]],antwort:`${v.a} ${ZU} = ${f(Zk*1000)} J bekommen.`,hin:'Gesucht ist die zugeführte Energie – umgestellt: '+ZU+' = '+NU+' : η.'});}
 function w6e(){const B=R(5,9)*10000,A=R(1,4)*10000,eta=pick([30,35,40,45]),N=(A+B)*eta/100,v=pick([
@@ -288,7 +288,7 @@ function e5b(){const v=pick([{n:'Eine Solarzelle',nutz:'elektrische Energie',min
   {n:'Ein Automotor',nutz:'Bewegungsenergie',min:20,max:35,frage:'Wie viel chemische Energie aus dem Benzin wird umgewandelt?'}]);
  const Z=R(10,40)*100,N=Z*R(v.min,v.max,5)/100,W=Z-N;
  return RE({titel:'Zugeführte Energie aus dem Energiefluss',text:`${v.n} gibt ${f(N/1000,3)} kJ ${v.nutz} ab. ${f(W)} J werden an die Umgebung abgegeben und sind entwertet.`,
- frage:v.frage+' Gib das Ergebnis in J an.',geg:[`${NU} = ${f(N/1000,3)} kJ = ${f(N)} J`,`${EN} = ${f(W)} J`],ges:`${ZU} in J`,
+ frage:v.frage+'',geg:[`${NU} = ${f(N/1000,3)} kJ = ${f(N)} J`,`${EN} = ${f(W)} J`],ges:`${ZU} in J`,
  schritte:[{formel:`${ZU} = ${NU} + ${EN}`,rechnung:[`${ZU} = ${f(N)} J + ${f(W)} J`,`${ZU} = ${f(Z)} J`]}],
  erg:{w:Z,u:'J',l:ZU},F:[[Math.abs(N-W),`Subtrahiert statt addiert? ${ZU} = ${NU} + ${EN}.`]],antwort:`Es werden ${ZU} = ${f(Z)} J zugeführt.`,hin:'Erst kJ in J umrechnen. Es geht keine Energie verloren.'});}
 function e5c(){const Zk=R(3,8)*1000,el=Zk*R(30,40,5)/100,wa=Zk*R(40,50,5)/100,W=(Zk-el-wa)*1000,v=pick([
@@ -296,7 +296,7 @@ function e5c(){const Zk=R(3,8)*1000,el=Zk*R(30,40,5)/100,wa=Zk*R(40,50,5)/100,W=
   {t:'Das Blockheizkraftwerk eines Schwimmbads verbrennt in 15 Minuten Erdgas mit',a:'Strom für die Pumpen',b:'Wärme für das Badewasser',n:'Im Blockheizkraftwerk'},
   {t:'Ein Biogas-Kraftwerk auf einem Bauernhof verbrennt in 20 Minuten Biogas mit',a:'Strom ins Netz',b:'Wärme für den Stall',n:'Im Biogas-Kraftwerk'}]);
  return RE({titel:'Energiefluss mit zwei Nutzenergien',punkte:5,text:`${v.t} ${f(Zk)} kJ chemischer Energie. Es liefert ${f(el)} kJ elektrische Energie (${v.a}) und ${f(wa)} kJ ${v.b}.`,
- frage:'Wie viel Energie wird entwertet? Gib das Ergebnis in J an.',geg:[`${ZU} = ${f(Zk)} kJ = ${f(Zk*1000)} J`,`${E('el')} = ${f(el)} kJ = ${f(el*1000)} J`,`${E('Wärme')} = ${f(wa)} kJ = ${f(wa*1000)} J`],ges:`${EN} in J`,
+ frage:'Wie viel Energie wird entwertet?',geg:[`${ZU} = ${f(Zk)} kJ = ${f(Zk*1000)} J`,`${E('el')} = ${f(el)} kJ = ${f(el*1000)} J`,`${E('Wärme')} = ${f(wa)} kJ = ${f(wa*1000)} J`],ges:`${EN} in J`,
  schritte:[{t:'Zwischenschritt: gesamte Nutzenergie',formel:`${NU} = ${E('el')} + ${E('Wärme')}`,rechnung:[`${NU} = ${f(el*1000)} J + ${f(wa*1000)} J = ${f((el+wa)*1000)} J`]},
   {t:'entwertete Energie',formel:`${EN} = ${ZU} − ${NU}`,rechnung:[`${EN} = ${f(Zk*1000)} J − ${f((el+wa)*1000)} J`,`${EN} = ${f(W)} J`]}],
  erg:{w:W,u:'J',l:EN},F:[[(Zk-el)*1000,'Die Wärme zum Heizen ist auch Nutzenergie.'],[(Zk-wa)*1000,'Der Strom ist auch Nutzenergie.'],[(el+wa)*1000,ZW('Nutzenergie')]],antwort:`${v.n} werden ${EN} = ${f(W)} J entwertet.`,hin:'Strom und Wärme werden beide genutzt. Die Zeit brauchst du nicht.'});}
@@ -333,7 +333,7 @@ function p7d(){const v=V(()=>{const t=R(10,40)/10,h=R(5,30);return{txt:`Ein Kran
  schritte:[{formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(v.m)} kg · 9,81 N/kg · ${f(v.h)} m`,`${EP} ${eq(Ep)} ${f(Ep)} J`]}],erg:{w:Ep,u:'J',l:EP},F:[[v.m*v.h,'Ortsfaktor g vergessen?'],[v.m*10*v.h,'g = 9,81 N/kg, nicht 10.']],antwort:`${v.w} gewinnt ${EP} = ${f(Ep)} J potenzielle Energie.`,hin:'Erst in kg und m umrechnen, dann einsetzen.'});}
 function p7e(){const m=R(6,30)*50,h=R(5,25),Ek=m*g*h/1000,v=pick([{t:'Ein Kran gibt einer Last',w:'die Last',pr:'sie'},{t:'Ein Hubschrauber gibt einem Wassertank',w:'der Wassertank',pr:'er'},{t:'Eine Seilbahn gibt einer Gondel',w:'die Gondel',pr:'sie'}]);
  return RE({titel:'Masse aus Energie in kJ',text:`${v.t} ${f(Ek,4)} kJ potenzielle Energie, als ${v.pr} ${h} m angehoben wird.`,
- frage:`Wie schwer ist ${v.w}? Gib die Masse in kg an.`,geg:[`${EP} = ${f(Ek,4)} kJ = ${f(Ek*1000)} J`,`h = ${h} m`,'g = 9,81 N/kg'],ges:'m in kg',
+ frage:`Wie schwer ist ${v.w}?`,geg:[`${EP} = ${f(Ek,4)} kJ = ${f(Ek*1000)} J`,`h = ${h} m`,'g = 9,81 N/kg'],ges:'m in kg',
  schritte:[{formel:`m = ${EP} : (g · h)`,rechnung:[`m = ${f(Ek*1000)} J : (9,81 N/kg · ${h} m)`,`m = ${f(m)} kg`]}],erg:{w:m,u:'kg',l:'m'},F:umst(Ek*1000,g,h,'g','h'),antwort:`${cap(v.w)} hat die Masse m = ${f(m)} kg.`,hin:'kJ in J umrechnen, dann umstellen.'});}
 function p7f(){const gm=R(20,50)*1000,Ek=R(5,20),h=Ek*1000/(gm/1000*g),v=pick([{t:'Ein Motor hebt einen Sack Zement',w:'der Sack',a:'Der Sack'},{t:'Eine Seilwinde zieht einen Eimer Mörtel',w:'der Eimer',a:'Der Eimer'},{t:'Ein Lastenaufzug hebt eine Kiste Getränke',w:'die Kiste',a:'Die Kiste'}]);
  return RE({titel:'Höhe mit Umrechnen',text:`${v.t} (${f(gm)} g) nach oben. ${v.a} gewinnt dabei ${Ek} kJ potenzielle Energie.`,frage:`Wie hoch wird ${v.w} gehoben?`,
@@ -357,7 +357,7 @@ function p7h(){const m1=R(45,70),m2=R(4,10),tal=R(900,1300,10),dh=R(400,900,10),
  erg:{w:Ep,u:'J',l:EP},F:[[(m1+m2)*g*gip,'Du hast die Höhe oben statt des Höhenunterschieds genommen.'],[(m1+m2)*g*tal,'Du hast die Höhe unten statt des Höhenunterschieds genommen.'],[m1*g*dh,`Masse ${v.dn==='Ski'?'der Skiausrüstung':v.dn==='Fahrrad'?'des Fahrrads':'des Rucksacks'} vergessen?`],[(m1+m2)*g*w*1000,'Weglänge statt Höhenunterschied genommen?'],[(m1+m2)*g*w,'Weglänge statt Höhenunterschied genommen?']],antwort:`${v.p} und ${v.d} gewinnen zusammen ${EP} = ${f(Ep)} J potenzielle Energie.`,hin:'Es zählt nur der Höhenunterschied, nicht die Weglänge. Weglänge und Zeit brauchst du nicht.'});}
 function p7i(){const food=pick([['Ein Schokoriegel',R(800,1200,50)],['Eine Portion Nudeln',R(1600,2400,100)],['Eine Banane',R(350,450,10)],['Ein Müsliriegel',R(400,600,20)]]),Ek=food[1],m=pick([50,55,60]),eta=pick([20,25]),N=eta/100*Ek*1000,h=N/(m*g),p=pick(['Ein Bergsteiger','Eine Wanderin','Ein Treppenläufer']);
  return RE({titel:'Nahrung: Wie hoch komme ich?',punkte:5,text:`${food[0]} liefert dem Körper ${f(Ek)} kJ Energie. Die Muskeln können davon nur ${eta} % nutzen, um den Körper anzuheben – der Rest wird zu Wärme. ${p} hat eine Masse von ${m} kg.`,
- frage:'Wie viele Meter könnte die Person mit dieser Energie höchstens hochsteigen?',geg:[`${ZU} = ${f(Ek)} kJ = ${f(Ek*1000)} J`,`η = ${eta} % = ${f(eta/100)}`,`m = ${m} kg`,'g = 9,81 N/kg'],ges:'h in m',
+ frage:'Wie hoch könnte die Person mit dieser Energie höchstens steigen?',geg:[`${ZU} = ${f(Ek)} kJ = ${f(Ek*1000)} J`,`η = ${eta} % = ${f(eta/100)}`,`m = ${m} kg`,'g = 9,81 N/kg'],ges:'h in m',
  schritte:[{t:'Zwischenschritt: Nutzenergie',formel:`${NU} = η · ${ZU}`,rechnung:[`${NU} = ${f(eta/100)} · ${f(Ek*1000)} J = ${f(N)} J`]},
   {t:'Höhe (die Nutzenergie wird zu potenzieller Energie)',formel:`h = ${EP} : (m · g)`,rechnung:[`h = ${f(N)} J : (${m} kg · 9,81 N/kg)`,`h ${eq(h)} ${f(h)} m`]}],
  erg:{w:h,u:'m',l:'h'},F:[[Ek*1000/(m*g),'Wirkungsgrad vergessen? Nur '+eta+' % der Energie werden genutzt.'],[N,ZW(NU)]],antwort:`Die Person könnte etwa h = ${f(h)} m hochsteigen.`,hin:'Nur die Nutzenergie wird zu potenzieller Energie.'});}
@@ -373,13 +373,13 @@ function l8c(){const v=pick([{n:'Ein Radfahrer fährt',P:pick([70,80,100,120]),a
  return RE({titel:'Formel umstellen: Zeit',text:`${v.n} mit der Leistung <b>P = ${v.P} W</b>. Dabei wird die Energie <b>E = ${f(Ej)} J</b> umgewandelt.`,frage:'Berechne die Zeit <b>t</b>.',geg:[`P = ${v.P} W`,`E = ${f(Ej)} J`],ges:'t in s',
  schritte:[{formel:'t = E : P',rechnung:[`t = ${f(Ej)} J : ${v.P} W`,`t = ${f(t)} s`]}],erg:{w:t,u:'s',l:'t'},F:[[Ej*v.P,UM],[v.P/Ej,UM]],antwort:`${v.a} t = ${f(t)} s (= ${f(t/60)} min)${v.z}.`});}
 function l8d(){const v=pick([{n:'Ein Föhn',P:pick([1.2,1.8,2,2.2])},{n:'Ein Staubsauger',P:pick([0.8,1,1.2])},{n:'Ein Heizlüfter',P:pick([1.5,2,2.5])},{n:'Eine Mikrowelle',P:pick([0.6,0.8,1])}]),mi=R(3,10),Ej=v.P*1000*mi*60;
- return RE({titel:'Energie mit Umrechnen',text:`${v.n} mit einer Leistung von ${f(v.P)} kW läuft ${mi} Minuten lang.`,frage:'Wie viel Energie wird umgewandelt? Gib das Ergebnis in J an.',geg:[`P = ${f(v.P)} kW = ${f(v.P*1000)} W`,`t = ${mi} min = ${mi*60} s`],ges:'E in J',
+ return RE({titel:'Energie mit Umrechnen',text:`${v.n} mit einer Leistung von ${f(v.P)} kW läuft ${mi} Minuten lang.`,frage:'Wie viel Energie wird umgewandelt?',geg:[`P = ${f(v.P)} kW = ${f(v.P*1000)} W`,`t = ${mi} min = ${mi*60} s`],ges:'E in J',
  schritte:[{formel:'E = P · t',rechnung:[`E = ${f(v.P*1000)} W · ${mi*60} s`,`E = ${f(Ej)} J`]}],erg:{w:Ej,u:'J',l:'E'},F:[[v.P*1000/(mi*60),UM]],antwort:`Es werden E = ${f(Ej)} J umgewandelt.`,hin:'kW in W und min in s umrechnen.'});}
 function l8e(){const v=pick([{n:'Ein Toaster',P:pick([0.8,1,1.2])},{n:'Ein Wasserkocher',P:pick([1.8,2,2.4])},{n:'Ein Bügeleisen',P:pick([1.2,1.5,2])},{n:'Eine Kaffeemaschine',P:pick([0.8,1,1.2])}]),t=R(60,240,12),Ek=v.P*t;
  return RE({titel:'Zeit mit Umrechnen',text:`${v.n} hat eine Leistung von ${f(v.P)} kW und wandelt ${f(Ek)} kJ elektrische Energie um.`,frage:'Wie lange ist das Gerät eingeschaltet?',geg:[`P = ${f(v.P)} kW = ${f(v.P*1000)} W`,`E = ${f(Ek)} kJ = ${f(Ek*1000)} J`],ges:'t in s',
  schritte:[{formel:'t = E : P',rechnung:[`t = ${f(Ek*1000)} J : ${f(v.P*1000)} W`,`t = ${f(t)} s`]}],erg:{w:t,u:'s',l:'t'},F:[[Ek*1000*v.P*1000,UM],[v.P/Ek,UM]],antwort:`Das Gerät ist t = ${f(t)} s eingeschaltet.`});}
 function l8f(){const Ek=R(600,2400,60),mi=R(1,4),P=Ek*1000/(mi*60),n=pick(['Ein Aufzugmotor','Der Motor einer Rolltreppe','Eine Wasserpumpe','Der Motor eines Förderbands']);
- return RE({titel:'Leistung mit Umrechnen',text:`${n} wandelt in ${mi} Minuten ${f(Ek)} kJ elektrische Energie um.`,frage:'Welche Leistung hat das Gerät? Gib das Ergebnis in W an.',geg:[`E = ${f(Ek)} kJ = ${f(Ek*1000)} J`,`t = ${mi} min = ${mi*60} s`],ges:'P in W',
+ return RE({titel:'Leistung mit Umrechnen',text:`${n} wandelt in ${mi} Minuten ${f(Ek)} kJ elektrische Energie um.`,frage:'Welche Leistung hat das Gerät?',geg:[`E = ${f(Ek)} kJ = ${f(Ek*1000)} J`,`t = ${mi} min = ${mi*60} s`],ges:'P in W',
  schritte:[{formel:'P = E : t',rechnung:[`P = ${f(Ek*1000)} J : ${mi*60} s`,`P ${eq(P)} ${f(P)} W`]}],erg:{w:P,u:'W',l:'P'},F:[[Ek*1000*mi*60,UM]],antwort:`Das Gerät hat eine Leistung von P = ${f(P)} W.`});}
 function l8g(){const t=R(10,40)/10,h=R(10,30),s=R(20,60,5),Ep=t*1000*g*h,P=Ep/s,v=pick([
   {t:`Ein 45 m hoher Baukran hebt eine ${f(t)} t schwere Last in ${s} s um ${h} m nach oben.`,x:'Die Höhe des Krans (45 m) ist nicht die Hubhöhe – du brauchst sie nicht.',n:'Der Kran',d:45},
@@ -397,7 +397,7 @@ function l8i(){const v=pick([{n:'Ein Wasserkocher mit 1 Liter Wasser',P:pick([1.
   {n:'Der Motor eines E-Scooters (Fahrer 70 kg)',P:pick([0.4,0.5,0.6]),eta:pick([75,80,85]),q:'Wie viel Bewegungsenergie gibt der Motor ab?',a:'Der Motor gibt',e:' ab',xh:'Die Masse des Fahrers brauchst du nicht.'},
   {n:'Eine Waschmaschine mit 6 kg Wäsche',P:pick([2,2.2,2.4]),eta:pick([80,85,90]),q:'Wie viel Energie bekommt das Waschwasser?',a:'Das Waschwasser bekommt',e:'',xh:'Die Wäschemenge brauchst du nicht.'}]);
  const mi=pick([2,3,4]),Z=v.P*1000*mi*60,N=Z*v.eta/100;
- return RE({titel:'Leistung und Wirkungsgrad',punkte:5,text:`${v.n} hat eine Leistung von ${f(v.P)} kW und ist ${mi} Minuten lang eingeschaltet. Der Wirkungsgrad beträgt ${v.eta} %.`,frage:v.q+' Gib das Ergebnis in J an.',
+ return RE({titel:'Leistung und Wirkungsgrad',punkte:5,text:`${v.n} hat eine Leistung von ${f(v.P)} kW und ist ${mi} Minuten lang eingeschaltet. Der Wirkungsgrad beträgt ${v.eta} %.`,frage:v.q+'',
  geg:[`P = ${f(v.P)} kW = ${f(v.P*1000)} W`,`t = ${mi} min = ${mi*60} s`,`η = ${v.eta} % = ${f(v.eta/100)}`],ges:`${NU} in J`,
  schritte:[{t:'Zwischenschritt: zugeführte elektrische Energie',formel:`${ZU} = P · t`,rechnung:[`${ZU} = ${f(v.P*1000)} W · ${mi*60} s = ${f(Z)} J`]},{t:'Nutzenergie',formel:`${NU} = η · ${ZU}`,rechnung:[`${NU} = ${f(v.eta/100)} · ${f(Z)} J`,`${NU} = ${f(N)} J`]}],
  erg:{w:N,u:'J',l:NU},F:[[Z,ZW(ZU)+' Der Wirkungsgrad fehlt noch.'],[Z/(v.eta/100),'Durch η geteilt statt mal η?'],[Z*v.eta,'Prozent als Dezimalzahl einsetzen: '+v.eta+' % = '+f(v.eta/100)+'.']],antwort:`${v.a} ${NU} = ${f(N)} J${v.e}.`,hin:v.xh});}
@@ -465,8 +465,8 @@ const T={
  formBeschr:()=>{const D=[['Steckt in einem Körper, weil er sich bewegt. Je schneller und schwerer, desto mehr.',0],['Steckt in einem Körper, weil er sich in einer bestimmten Höhe befindet.',1],['Steckt in einem elastisch verformten Körper, z. B. in einer gespannten Feder.',2],['Steckt in der ungeordneten Bewegung der Teilchen eines Stoffes – je heißer, desto mehr.',3],['Wird durch elektrischen Strom übertragen.',4],['Hält die Atome in Molekülen zusammen und wird bei chemischen Reaktionen (z. B. Verbrennung) frei.',5],['Wird von Licht und anderen elektromagnetischen Wellen transportiert.',6],['Hält Atomkerne zusammen und wird bei der Kernspaltung frei.',7]];
    return {typ:'select',titel:'Energieformen erkennen',frage:'Welche Energieform wird beschrieben?',rows:sample(D,4).map(d=>({l:d[0],opts:opt8,r:opt8[d[1]]}))};},
  fachbegriff:()=>({typ:'select',titel:'Fachausdrücke',frage:'Wie heißen die Energieformen in der Fachsprache?',rows:shuffle([['Lageenergie','potenzielle Energie'],['Bewegungsenergie','kinetische Energie'],['Wärmeenergie','thermische Energie']]).map(r=>({l:r[0],opts:['potenzielle Energie','kinetische Energie','thermische Energie','chemische Energie'],r:r[1]}))}),
- formBsp:()=>{const B=[['ein gespannter Bogen',2],['eine Tafel Schokolade',5],['ein rollender Ball',0],['heißer Tee',3],['Sonnenlicht',6],['Wasser oben im Stausee',1],['Strom aus der Steckdose',4],['Uran im Kernkraftwerk',7],['Benzin im Tank',5],['ein aufgezogenes Uhrwerk (Feder)',2],['ein fahrender Zug',0],['ein Apfel oben am Baum (gegenüber dem Boden)',1],['eine heiße Herdplatte',3],['das Licht einer Taschenlampe',6]];
-   return {typ:'select',titel:'Energieformen im Alltag',frage:'Welche Energieform steckt hauptsächlich darin?',rows:sample(B,6).map(b=>({l:b[0],opts:opt8,r:opt8[b[1]]}))};},
+ formBsp:(n=6)=>{const B=[['ein gespannter Bogen',2],['eine Tafel Schokolade',5],['ein rollender Ball',0],['heißer Tee',3],['Sonnenlicht',6],['Wasser oben im Stausee',1],['Strom aus der Steckdose',4],['Uran im Kernkraftwerk',7],['Benzin im Tank',5],['ein aufgezogenes Uhrwerk (Feder)',2],['ein fahrender Zug',0],['ein Apfel oben am Baum (gegenüber dem Boden)',1],['eine heiße Herdplatte',3],['das Licht einer Taschenlampe',6]];
+   return {typ:'select',titel:'Energieformen im Alltag',frage:'Welche Energieform steckt hauptsächlich darin?',rows:sample(B,n).map(b=>({l:b[0],opts:opt8,r:opt8[b[1]]}))};},
  flugzeug:()=>{const v=pick([{n:'Ein Flugzeug fliegt in 10 km Höhe.',o:['potenzielle Energie (es ist hoch oben)','kinetische Energie (es fliegt schnell)','chemische Energie (Kerosin im Tank)','thermische Energie (heiße Triebwerke)'],f:['Kernenergie (es hat einen Reaktor)','Spannenergie (eine Feder treibt es an)']},
    {n:'Eine Rakete steigt kurz nach dem Start nach oben.',o:['potenzielle Energie (sie gewinnt an Höhe)','kinetische Energie (sie wird schneller)','chemische Energie (Treibstoff im Tank)','Strahlungsenergie (die Flamme leuchtet)'],f:['Spannenergie (eine Feder schießt sie ab)','Kernenergie (sie hat einen Reaktor)']},
    {n:'Ein Radfahrer fährt nachts mit Licht einen Berg hinunter.',o:['potenzielle Energie (er ist noch oben am Hang)','kinetische Energie (er fährt)','elektrische Energie (Strom für die Lampe)','Strahlungsenergie (die Lampe leuchtet)'],f:['Kernenergie (in den Reifen)','Spannenergie (eine Feder treibt das Rad an)']}]);
@@ -604,7 +604,7 @@ const IQB={
    const kette=d.ek*d.eb/100;
    return {mat,T:[
     MZ('K','I',{tipp:'Die entwertete Energie ist der Pfeil, der nach unten abzweigt.',niv:[1,2],typ:'zahl',frage:`Lies ab: Wie viel Energie wird ${d.dem} entwertet?`,rows:[{l:'entwertet:',w:100-d.ea,u:'J'}]}),
-    MZ('S','II',{tipp:'η = Bewegungsenergie : zugeführte Energie (100 J), dann mal 100.',niv:[1,2,3],typ:'zahl',frage:'Berechne die Wirkungsgrade der beiden Antriebe.',rows:[{l:`η ${d.a} =`,w:d.ea,u:'%'},{l:`η ${d.b} =`,w:d.eb,u:'%'}],erkl:`${d.a}: η = ${d.ea} J : 100 J = ${d.ea} % · ${d.b}: η = ${d.eb} J : 100 J = ${d.eb} %`}),
+    MZ('S','II',{tipp:'η = Bewegungsenergie : zugeführte Energie (100 J), dann mal 100.',niv:[1,2,3],typ:'zahl',punkte:2,frage:'Berechne die Wirkungsgrade der beiden Antriebe.',rows:[{l:`η ${d.a} =`,w:d.ea,u:'%'},{l:`η ${d.b} =`,w:d.eb,u:'%'}],erkl:`${d.a}: η = ${d.ea} J : 100 J = ${d.ea} % · ${d.b}: η = ${d.eb} J : 100 J = ${d.eb} %`}),
     MZ('S','III',{tipp:'Rechne in zwei Schritten: Wie viel Strom macht das Kraftwerk aus 100 J? Wie viel Bewegung macht das Fahrzeug aus diesem Strom?',niv:[3],typ:'zahl',punkte:2,frage:`Der Strom für die/das ${d.b} kommt aus einem ${d.kw} mit dem Wirkungsgrad ${d.ek} %. Von 100 J chemischer Energie im Brennstoff: Wie viel kommt am Ende als Bewegungsenergie an?`.replace('die/das E-Auto','das E-Auto').replace('die/das E-Lok','die E-Lok'),rows:[{l:'Bewegungsenergie:',w:kette,u:'J'}],
      erkl:`${d.kw}: ${f(d.ek/100)} · 100 J = ${d.ek} J elektrische Energie · ${d.b}: ${f(d.eb/100)} · ${d.ek} J = ${f(kette)} J Bewegungsenergie`}),
     MZ('B','III',{tipp:'Vergleiche die Wirkungsgrade der Antriebe. Überlege dann: Woher kommt der Strom? Schreib am Ende dein Urteil zum Wort „immer“.',niv:[2,3],typ:'offen',punkte:3,frage:`In einer Zeitung steht: „Elektrisch angetriebene ${d.fahr} nutzen die Energie immer viel besser.“ Beurteile die Aussage.`,
@@ -687,18 +687,17 @@ function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b})
  }else{
   add(1,tag(T.def(),'I'));
   // Umrechnen (Übergreifend) steckt auf erhöhtem Niveau in jeder Rechenaufgabe (kJ, kW, min, g, t, cm) – keine eigene Aufgabe
-  add(2,tag(T.formBsp(),'I'));
+  // Aufbau wie die Gym-Papierarbeit (20.11.2026): gleiche Typen, gleiche Reihenfolge, gleiche Punkte
+  add(2,tag(T.formBsp(4),'I'));
   add(3,tag(T.kette(),'II'));
   add(4,tag(T.pendel(),'I'));
-  {const t=pick([e5b,T.richtigesDiagramm])();add(5,tag(t,'II',t.typ==='rechnen'?4:0));}
-  add(6,tag(pick([w6c,w6d])(),'II',4));
-  add(7,tag(pick([p7d,p7e,p7f])(),'II',4));
-  add(8,tag(pick([l8d,l8e,l8f])(),'II',4));
+  add(6,tag(w6c(),'II',4));
+  add(7,tag(p7e(),'II',4));
+  add(8,tag(l8d(),'II',4));
   add(9,tag(T.fair(2),'II'));
-  add(pick([4,6]),tag(pick([T.reibung,T.getriebe])(),'III'));
-  const k1=pick(Object.keys(IQB)),k2=pick(Object.keys(IQB).filter(k=>k!==k1&&IQB[k].bereich!==IQB[k1].bereich));
-  L.push(iqb(k1,3),iqb(k2,2));
-  // Transferaufgabe zum Schluss (wie in der Papierarbeit, 19.11.2026): Nahrung → Wirkungsgrad → potenzielle Energie
+  // Material wie in der Papierarbeit: Antriebe (Niveau ★★★: b, c, d) und „Höhe nimmt ab“ (Niveau ★★: a, c, d)
+  L.push(iqb('antrieb',3),iqb('abnahme',2));
+  // Transferaufgabe zum Schluss: Nahrung → Wirkungsgrad → potenzielle Energie
   add(7,tag(p7i(),'III',5));
  }
  return L;}
@@ -707,17 +706,24 @@ const SOCKEL_E=(5*0.5-(6-3.8))/(5-(6-3.8));   // s so, dass 6 − 5·(0,5 − s)
 function note(x,lvl){x=Math.max(0,Math.min(1,x));const n=lvl==='M'?6-5*x:(x<=SOCKEL_E?6:6-5*(x-SOCKEL_E)/(1-SOCKEL_E));return Math.round(n*10)/10;}
 
 /* Antworten festhalten (ohne Prüfen) und später bewerten */
+
+/* Einheit selbst wählen (Probe erhöhtes Niveau, 20.11.2026: Gymnasiasten sollen die Einheit selbst finden) */
+const EINH={J:['J',1],kJ:['J',1000],W:['W',1],kW:['W',1000],kg:['kg',1],g:['kg',.001],t:['kg',1000],m:['m',1],cm:['m',.01],s:['s',1],min:['s',60],'%':['%',1]};
+const einhWahl=t=>S.mode==='probe'&&S.lvl==='E'&&t.typ==='rechnen';
+// Wert in der Grundeinheit der Lösung; {fehlt} ohne Einheit, {falsch} wenn die Einheit nicht zur Größe passt
+function inGrund(t,a){const v=parseDE(a&&a.v?a.v[0]:'');if(!einhWahl(t))return {v};const u=a&&a.u;if(!u)return {v,fehlt:true};const e=EINH[u];
+ if(!e||e[0]!==t.erg.u)return {v,falsch:true};return {v:v*e[1]};}
 function liesAntwort(t,el){
  if(t.typ==='mc')return {sel:[...el.querySelectorAll('.mcl li.sel')].map(li=>+li.dataset.k)};
  if(t.typ==='select')return {v:[...el.querySelectorAll('.frow select')].map(x=>x.value)};
  if(t.typ==='zahl')return {v:[...el.querySelectorAll('.frow input')].map(x=>x.value)};
- if(t.typ==='rechnen')return {v:[el.querySelector('.erg input').value]};
+ if(t.typ==='rechnen'){const se=el.querySelector('.erg select.ue');return {v:[el.querySelector('.erg input').value],u:se?se.value:undefined};}
  if(t.typ==='offen')return {txt:el.querySelector('textarea.antw').value};}
 function setzeAntwort(t,el,a){if(!a)return;
  if(t.typ==='mc')el.querySelectorAll('.mcl li').forEach(li=>li.classList.toggle('sel',a.sel.includes(+li.dataset.k)));
  if(t.typ==='select')el.querySelectorAll('.frow select').forEach((x,i)=>x.value=a.v[i]||'');
  if(t.typ==='zahl')el.querySelectorAll('.frow input').forEach((x,i)=>x.value=a.v[i]||'');
- if(t.typ==='rechnen')el.querySelector('.erg input').value=a.v[0]||'';
+ if(t.typ==='rechnen'){el.querySelector('.erg input').value=a.v[0]||'';const se=el.querySelector('.erg select.ue');if(se)se.value=a.u||'';}
  if(t.typ==='offen')el.querySelector('textarea.antw').value=a.txt||'';}
 const beantwortet0=(t,a)=>!!a&&(t.typ==='mc'?a.sel.length>0:t.typ==='offen'?a.txt.trim().length>0:a.v.some(x=>String(x).trim()));
 const beantwortet=(t,a,k)=>beantwortet0(t,a);
@@ -729,7 +735,7 @@ function bewerte(t,a){
  if(t.typ==='mc'){const r=[].concat(t.richtig);return a.sel.length===r.length&&a.sel.every(k=>r.includes(k))?1:0;}
  if(t.typ==='select')return t.rows.filter((r,i)=>norm(a.v[i])===norm(r.r)).length/t.rows.length;
  if(t.typ==='zahl')return t.rows.filter((r,i)=>{const v=parseDE(a.v[i]);return nah(v,r.w)||(r.u==='%'&&nah(v*100,r.w));}).length/t.rows.length;
- if(t.typ==='rechnen'){const v=parseDE(a.v[0]);return isFinite(v)&&diagnose(t,v).ok?1:null;}}   // falsches Ergebnis: Rechenweg selbst bewerten
+ if(t.typ==='rechnen'){const g=inGrund(t,a);if(g.fehlt||g.falsch)return null;return isFinite(g.v)&&diagnose(t,g.v).ok?1:null;}}   // falsches Ergebnis: Rechenweg selbst bewerten
 
 function probeNivView(){
  VW.innerHTML=`<div class="card"><h2>Probeklassenarbeit: Welches Niveau?</h2><div class="choice">
@@ -756,7 +762,7 @@ function selbstView(){const L=[];S.list.forEach((t,i)=>subs(t).forEach((x,j)=>{c
   if(x.typ==='offen')return `<div class="card" data-k="${o.k}"><div class="kopf"><span>Aufgabe ${o.i+1}${o.t.typ==='einheit'?' '+'abcdef'[o.j]+')':''} · ${BER[o.t.bereich].name}</span></div><p class="q">${x.frage}</p>
    <p><b>Deine Antwort:</b> ${a&&a.txt.trim()?a.txt.replace(/</g,'&lt;'):'<i>keine Antwort</i>'}</p><div class="ideal"><h4>Ideallösung</h4><p>${x.ideal}</p><p><b>Hake ab, was in deiner Antwort steht:</b></p><div class="krit">${(x.krit||[]).map((c,n)=>`<label><input type="checkbox" data-c="${n}"><span>${c}</span></label>`).join('')}</div></div></div>`;
   return `<div class="card" data-k="${o.k}"><div class="kopf"><span>Aufgabe ${o.i+1}${o.t.typ==='einheit'?' '+'abcdef'[o.j]+')':''} · ${BER[o.t.bereich].name}</span></div><p class="q">${x.frage}</p>
-   <p><b>Dein Ergebnis:</b> ${a&&a.v[0]?a.v[0]+' '+x.erg.u:'<i>keins</i>'} – das stimmt nicht.${a&&isFinite(parseDE(a.v[0]))?' <span class="note">Möglicher Fehler: '+diagnose(x,parseDE(a.v[0])).m+'</span>':''}</p>
+   <p><b>Dein Ergebnis:</b> ${a&&a.v[0]?a.v[0]+' '+(a.u||x.erg.u):'<i>keins</i>'} – das stimmt nicht.${(()=>{const g=inGrund(x,a);return g.falsch?' <span class="note">Möglicher Fehler: Die Einheit passt nicht zur gesuchten Größe.</span>':g.fehlt?' <span class="note">Die Einheit fehlt.</span>':isFinite(g.v)?' <span class="note">Möglicher Fehler: '+diagnose(x,g.v).m+'</span>':'';})()}</p>
    <div class="ideal">${idealHTML(x)}<div class="krit"><label><input type="checkbox" data-c="weg"><span>In meinem Heft stimmen <b>gegeben, gesucht und Formel</b> (mit Formelzeichen und Einheiten) – nur das Ergebnis ist falsch. <span class="note">(gibt die halbe Punktzahl)</span></span></label></div></div></div>`;}).join('')+
  `<div class="actions" style="justify-content:center"><button class="btn" id="fertig">Note anzeigen</button></div>`;
  document.getElementById('fertig').onclick=()=>{VW.querySelectorAll('[data-k]').forEach(c=>{const k=c.dataset.k,cb=[...c.querySelectorAll('.krit input')];
@@ -822,7 +828,7 @@ const HEFT='✎ Den Rechenweg schreibst du ins Heft – im <b>Fünf-Schritt</b>,
 function subHTML(t,k,lab){
  let h=`<div class="teil" id="s${k}">${lab?`<div class="tl">${lab}</div>`:''}`;
  if(t.svg)h+=`<div class="svgbox">${t.svg}</div>`;
- if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis:${S.mode==='probe'&&S.lvl==='E'?'':` <b>${t.erg.l} =</b>`}</span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Endergebnis"><span class="u">${t.erg.u}</span></div>`;
+ if(t.typ==='rechnen')h+=`<p>${t.text}</p><p class="q">${t.frage}</p>${FUENF}<div class="erg"><span>Dein Endergebnis:${S.mode==='probe'&&S.lvl==='E'?'':` <b>${t.erg.l} =</b>`}</span><input inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Endergebnis">${einhWahl(t)?`<select class="ue" aria-label="Einheit"><option value="">Einheit?</option>${Object.keys(EINH).map(u=>`<option>${u}</option>`).join('')}</select>`:`<span class="u">${t.erg.u}</span>`}</div>`;
  else{h+=`<p class="q">${t.frage}</p>`;
   if(t.typ==='mc')h+=`<ul class="mcl ${t.diag?'diag':''} ${t.multi?'multi':''}">${t.opts.map((o,i)=>`<li class="klick" data-k="${i}" role="button" tabindex="0">${t.diag?`<b class="L">${LET[i]}</b>`:''}<span class="box"></span><span>${o}</span></li>`).join('')}</ul><p class="note">${t.multi?'Mehrere Antworten können richtig sein. ':''}Tippe an und bestätige mit „Prüfen“.</p>`;
   if(t.typ==='select')h+=t.rows.map((r,i)=>`<div class="frow"><span class="lab"><b>${i+1}.</b> ${r.l}</span><select aria-label="Antwort ${i+1}"><option value="">– wählen –</option>${r.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('');
@@ -853,7 +859,10 @@ function pruefe(t,el){
   I.forEach((x,i)=>{const row=x.closest('.frow'),w=t.rows[i].w,v=parseDE(x.value);row.classList.remove('right','wrong');if(!x.value.trim()){leer++;ok=false;return;}
    const g=nah(v,w)||(t.rows[i].u==='%'&&nah(v*100,w));row.classList.add(g?'right':'wrong');if(g)x.disabled=true;else{ok=false;falsch++;if(!m&&isFinite(v)){const d=diagnose({erg:{w,u:t.rows[i].u},F:[]},v);if(!d.ok)m=d.m;}}});
   return {ok,leer,m:ok?'':falsch?(m||'Die rot markierten Zeilen stimmen noch nicht.'):''};}
- if(t.typ==='rechnen'){const inp=el.querySelector('.erg input'),box=el.querySelector('.erg'),v=parseDE(inp.value);if(!inp.value.trim())return {leer:true};
+ if(t.typ==='rechnen'){const inp=el.querySelector('.erg input'),box=el.querySelector('.erg'),se=el.querySelector('.erg select.ue');if(!inp.value.trim())return {leer:true};
+  if(se&&!se.value)return {leer:true,m:'Wähle die passende Einheit aus.'};
+  const g=inGrund(t,{v:[inp.value],u:se?se.value:undefined});let v=g.v;
+  if(g.falsch){box.classList.remove('right');box.classList.add('wrong');return {ok:false,m:'<b>Möglicher Fehler:</b> Die Einheit passt nicht zur gesuchten Größe. Was ist gesucht – Energie, Leistung, Masse, Höhe, Zeit oder Wirkungsgrad?'};}
   if(!isFinite(v))return {leer:true,m:'Gib dein Endergebnis als Zahl ein (Komma statt Punkt).'};
   const d=diagnose(t,v);box.classList.remove('right','wrong');box.classList.add(d.ok?'right':'wrong');return {ok:d.ok,m:d.ok?'':'<b>Möglicher Fehler:</b> '+d.m};}
  return {leer:true};}
