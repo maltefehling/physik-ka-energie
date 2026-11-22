@@ -816,10 +816,15 @@ function bewerte(t,a){
  if(t.typ==='rechnen'){const g=inGrund(t,a);if(g.fehlt||g.falsch)return null;return isFinite(g.v)&&diagnose(t,g.v).ok?1:null;}}   // falsches Ergebnis: Rechenweg selbst bewerten
 
 function probeNivView(){
- VW.innerHTML=`<div class="card"><h2>Probeklassenarbeit: Welches Niveau?</h2><div class="choice">
+ VW.innerHTML=`<div class="card"><h2>Probeklassenarbeit: Welches Niveau?</h2>
+  <div style="background:#FFF3CD;border:2px solid #E0A800;border-radius:12px;padding:14px 16px;margin:8px 0 14px;font-size:1.08em;line-height:1.45">
+   <b style="font-size:1.15em">⚠️ Wichtig: Deine Antworten werden nicht gespeichert.</b><br>
+   Wenn du das Fenster schließt oder die Seite neu lädst, ist deine Probearbeit weg und du musst <b>von vorne anfangen</b> – mit neuen Aufgaben.
+   Nimm dir deshalb die <b>ganze Zeit am Stück</b> und schreib die Arbeit bis zur Abgabe durch.</div>
+  <div class="choice">
   <button class="big" data-l="M"><b>Mittleres Niveau</b><small>In den Rechenaufgaben stehen Größe, Formelzeichen und Einheit. Notenschlüssel: Die Hälfte der Punkte ergibt die Note 3,5.</small></button>
   <button class="big" data-l="E"><b>Erhöhtes Niveau</b><small>Ohne Formelzeichen, Einheiten musst du umrechnen, mehr Begründen und Beurteilen. Notenschlüssel: Die Hälfte der Punkte ergibt die Note 3,8.</small></button></div>
-  <ul class="note" style="margin-top:12px"><li>Plane etwa <b>45 Minuten</b> ein – wie in der echten Klassenarbeit.</li><li>Es ist eine <b>Probe</b>: Du kannst dir <b>Tipps ▶</b> anzeigen lassen. Auch die <b>Lösung</b> darfst du ansehen – diese Teilaufgabe zählt dann aber <b>0 Punkte</b>. Ob deine Antwort stimmt, siehst du erst nach der Abgabe.</li><li>Du kannst zwischen den Aufgaben hin- und herspringen.</li><li>Rechenwege schreibst du ins Heft im <b>Fünf-Schritt</b>. In die App kommt nur das Endergebnis.</li><li>Am Ende gibst du ab, bewertest deine Sätze und Rechenwege selbst und siehst deine <b>Note</b>.</li></ul>
+  <ul class="note" style="margin-top:12px"><li>Plane die Zeit der echten Klassenarbeit ein: <b>mittleres Niveau etwa 45 Minuten</b>, <b>erhöhtes Niveau etwa 60 Minuten</b>.</li><li>Es ist eine <b>Probe</b>: Du kannst dir <b>Tipps ▶</b> anzeigen lassen. Auch die <b>Lösung</b> darfst du ansehen – diese Teilaufgabe zählt dann aber <b>0 Punkte</b>. Ob deine Antwort stimmt, siehst du erst nach der Abgabe.</li><li>Du kannst zwischen den Aufgaben hin- und herspringen.</li><li>Rechenwege schreibst du ins Heft im <b>Fünf-Schritt</b>. In die App kommt nur das Endergebnis.</li><li>Am Ende gibst du ab, bewertest deine Sätze und Rechenwege selbst und siehst deine <b>Note</b>.</li></ul>
   <div class="actions"><button class="btn ghost" id="back">← zurück</button></div></div>`;
  VW.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{S.mode='probe';S.lvl=b.dataset.l;S.niv=S.lvl==='M'?1:2;probeStart();});
  document.getElementById('back').onclick=startView;scrollTo(0,0);}
@@ -873,9 +878,8 @@ const LET='ABCDEFGH';
 
 function startView(){S.mode=null;S.ber=null;S.niv=null;
  VW.innerHTML=offenHTML()+`<div class="card"><h2>Was willst du üben?</h2><div class="choice">
-  <button class="big" data-m="ka"><b>Ganze Klassenarbeit</b><small>Aus jedem Bereich eine Aufgabe – wie in der echten Klassenarbeit, mit Punkten.</small></button>
   <button class="big" data-m="ber"><b>Einen Bereich</b><small>Alle Aufgaben zu einer Seite aus deinem OneNote-Heft.</small></button>
-  <button class="big" data-m="probe"><b>📝 Probeklassenarbeit schreiben</b><small>Wie die echte Klassenarbeit: ca. 45 Minuten, keine Tipps, am Ende deine Note. Jedes Mal eine neue.</small></button></div></div>
+  <button class="big" data-m="probe"><b>📝 Probeklassenarbeit schreiben</b><small>Wie die echte Klassenarbeit, am Ende siehst du deine Note. Jedes Mal eine neue.</small></button></div></div>
   <div class="card"><h2>So funktioniert's</h2><ul>
   <li>Du gibst deine Antwort ein und tippst auf <b>Prüfen</b>. Ist sie falsch, bekommst du einen Tipp und einen <b>zweiten Versuch</b>.</li>
   <li>Bei <b>Rechenaufgaben</b> tippst du nur dein <b>Endergebnis</b> ein. Den Rechenweg schreibst du ins Heft – im <b>Fünf-Schritt</b>, mit Formelzeichen und Einheiten. Die App sagt dir, welcher Fehler hinter einem falschen Ergebnis stecken könnte.</li>
@@ -1006,6 +1010,7 @@ function progress(){const el=document.getElementById('prog');if(!el)return;let t
 
 /* ---------- Was nicht geklappt hat: bleibt auf der Startseite, bis es nachgeübt ist ---------- */
 const OKEY='physikka.offen';
+window.addEventListener('beforeunload',e=>{if(S&&S.mode==='probe'&&S.list&&S.list.length&&!S.abgabe){e.preventDefault();e.returnValue='';}});   // 22.11.2026: Probe wird nicht gespeichert
 const store={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 const heute=()=>new Date().toISOString().slice(0,10);
 function offenHTML(){const o=store.get(OKEY);if(!o||!o.ber)return '';
