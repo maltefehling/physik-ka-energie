@@ -29,3 +29,10 @@ Startseite → „Probeklassenarbeit schreiben“ → mittleres oder erhöhtes N
 - Erhöhtes Niveau: Aufbau wie die Gym-Papierarbeit.
   - Aufgaben: Definition, Energieformen (4), Kette, Pendel, Wirkungsgrad, Masse aus E_pot, Energie aus Leistung, fair/unfair, dann die Material-Aufgaben „Antriebe“ (b–d) und „Höhe nimmt ab“ (a, c, d), zum Schluss die Transferaufgabe.
   - Keine Einheit vorgegeben: Die Schüler wählen sie selbst. Umrechnen ist erlaubt, z. B. 0,6 t statt 600 kg.
+
+**Stand 22.11.2026 (erhöhtes Niveau wie die Gym-Papierarbeit):**
+- Aufgabe 4: Punkte A–D mit Bild, Energien in J eintragen (lageT).
+- E_pot-Aufgabe: Masse in t, mit einer überflüssigen Angabe (p7j).
+- Keine eigene Wirkungsgrad-Rechnung mehr.
+- Zum Schluss zwei Aufgaben mit zwei Rechnungen aus dem Pool ZWEI (5 Typen). Erste Rechnung und umgestellte Größe sind jedes Mal verschieden, damit kein Rechenweg auswendig gelernt wird.
+- Die neuen Typen gibt es auch in „Bereich üben“ auf der höchsten Stufe (Bereiche 4, 7 und 8).
