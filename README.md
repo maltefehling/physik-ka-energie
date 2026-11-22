@@ -36,3 +36,4 @@ Startseite → „Probeklassenarbeit schreiben“ → mittleres oder erhöhtes N
 - Keine eigene Wirkungsgrad-Rechnung mehr.
 - Zum Schluss zwei Aufgaben mit zwei Rechnungen aus dem Pool ZWEI (5 Typen). Erste Rechnung und umgestellte Größe sind jedes Mal verschieden, damit kein Rechenweg auswendig gelernt wird.
 - Die neuen Typen gibt es auch in „Bereich üben“ auf der höchsten Stufe (Bereiche 4, 7 und 8).
+- 22.11.2026, später: Die Leistungsaufgabe hat jetzt ein Typenschild als Material (typenschildPaar). Teil a fragt, was die Leistung bedeutet (Energie pro Sekunde), Teil b ist die Rechnung. Die überflüssige Zeitangabe bei E_pot ist wieder raus.

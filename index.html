@@ -653,7 +653,7 @@ const BER=[
  {nr:5,name:'5 Energieflussdiagramme',info:'',tasks:n=>n===1?[T.led(),e5a(),iqb('wunder',1)]:n===2?[T.richtigesDiagramm(),e5b(),iqb('wunder',2)]:[e5c(),T.erfinder(),iqb('wunder',3)],ka:n=>[n===1?e5a():n===2?e5b():e5c()]},
  {nr:6,name:'6 Wirkungsgrad',info:'',tasks:n=>n===1?[T.jeGroesser(),w6a(),w6b(),iqb('vergleich3',1)]:n===2?[T.typischEta(),w6c(),w6d(),T.unter100(),iqb('vergleich3',2),iqb('antrieb',2)]:[w6e(),w6f(),T.getriebe(),iqb('vergleich3',3),iqb('antrieb',3)],ka:n=>[n===1?pick([w6a,w6b])():n===2?pick([w6c,w6d])():pick([w6e,w6f])()]},
  {nr:7,name:'7 Potenzielle Energie',info:'',tasks:n=>n===1?[T.epotAbh(),p7a(),p7b(),p7c(),iqb('speicher',1)]:n===2?[p7d(),p7e(),p7f(),p7j(),iqb('speicher',2)]:[p7g(),p7h(),...zweiPaar(),iqb('speicher',3)],ka:n=>[n===1?pick([p7a,p7b,p7c])():n===2?pick([p7d,p7e,p7f])():pick([p7g,p7h,p7i])()]},
- {nr:8,name:'8 Leistung',info:'',tasks:n=>n===1?[T.leistungIst(),T.leistungZeichen(),l8a(),l8b(),l8c(),iqb('test3',1)]:n===2?[T.leistungZeichen(),l8d(),l8e(),l8f(),T.vergleich(),iqb('test3',2)]:[l8g(),l8h(),l8i(),...zweiPaar(),iqb('test3',3)],ka:n=>[n===1?pick([l8a,l8b,l8c])():n===2?pick([l8d,l8e,l8f])():pick([l8g,l8h,l8i])()]},
+ {nr:8,name:'8 Leistung',info:'',tasks:n=>n===1?[T.leistungIst(),T.leistungZeichen(),l8a(),l8b(),l8c(),iqb('test3',1)]:n===2?[T.leistungZeichen(),l8d(),...typenschildPaar(),l8e(),l8f(),T.vergleich(),iqb('test3',2)]:[l8g(),l8h(),l8i(),...zweiPaar(),iqb('test3',3)],ka:n=>[n===1?pick([l8a,l8b,l8c])():n===2?pick([l8d,l8e,l8f])():pick([l8g,l8h,l8i])()]},
  {nr:9,name:'Versuch planen',info:'fair oder unfair?',tasks:n=>[T.fair(n),T.fair(n)],ka:n=>[]},
 ];
 function klassenarbeit(n){const L=[];for(const b of BER)for(const t of b.ka(n))L.push({...t,bereich:b.nr});
@@ -687,14 +687,33 @@ function lageT(){const v=pick([
  return {typ:'zahl',titel:'Energie an vier Punkten',svg:lageSVG(v.art,v.hl),frage:`${v.txt} Die Reibung kannst du vernachlässigen. Am Punkt A (Höhe ${v.hl[0]}) hat ${v.wer} die potenzielle Energie ${EP} = ${f(E0)} J (gegenüber dem tiefsten Punkt C). B liegt auf ${v.hl[1]}, D auf ${v.hl[2]}. Gib für alle Punkte die Energien an.`,
   rows:[{l:`A: ${E('kin')} =`,w:0,u:'J'},{l:`B: ${EP} =`,w:E0/2,u:'J'},{l:`B: ${E('kin')} =`,w:E0/2,u:'J'},{l:`C: ${EP} =`,w:0,u:'J'},{l:`C: ${E('kin')} =`,w:E0,u:'J'},{l:`D: ${EP} =`,w:E0*3/4,u:'J'},{l:`D: ${E('kin')} =`,w:E0/4,u:'J'}],
   erkl:`Ohne Reibung bleibt die Summe immer ${f(E0)} J. ${EP} ist proportional zur Höhe: B auf halber Höhe → ${f(E0/2)} J, D auf ¾ der Höhe → ${f(E0*3/4)} J. Der Rest ist kinetische Energie: B ${f(E0/2)} J, C ${f(E0)} J, D ${f(E0/4)} J.`};}
-// E_pot: Masse in t, gesucht h, mit einer Angabe, die man nicht braucht (wechselt)
+// E_pot: Masse in t, gesucht h (die überflüssige Angabe steckt seit 22.11.2026 im Typenschild)
 function p7j(){const mt=pick([0.35,0.5,0.75,0.8,0.9,1.3]),h=R(2,25),Ep=mt*1000*g*h,v=pick([
   {t:'Ein Hubschrauber hebt einen Wassertank an.',w:'der Wassertank'},{t:'Eine Seilbahn zieht eine Gondel nach oben.',w:'die Gondel'},{t:'Ein Kran hebt eine Last an.',w:'die Last'},
   {t:'Ein Gabelstapler hebt eine Palette an.',w:'die Palette'},{t:'Ein Lastenaufzug bringt einen Rollwagen nach oben.',w:'der Rollwagen'}]),
-  x=pick([`Das dauert ${R(8,40)} Sekunden.`,`Die Fahrt dauert ${R(2,6)} Minuten.`,`Dabei legt ${v.w} einen Weg von ${R(20,90)} m zurück.`,`Die Geschwindigkeit beträgt ${R(2,6)} m/s.`]);
- return RE({titel:'Wie hoch geht es hinauf?',text:`${v.t} ${x} ${cap(v.w)} hat eine Masse von ${f(mt)} t und gewinnt dabei ${f(Ep)} J potenzielle Energie.`,frage:`Wie hoch wird ${v.w} gehoben?`,
+  x='';
+ return RE({titel:'Wie hoch geht es hinauf?',text:`${v.t} ${cap(v.w)} hat eine Masse von ${f(mt)} t und gewinnt dabei ${f(Ep)} J potenzielle Energie.`,frage:`Wie hoch wird ${v.w} gehoben?`,
   geg:[`m = ${f(mt)} t = ${f(mt*1000)} kg`,`${EP} = ${f(Ep)} J`,'g = 9,81 N/kg'],ges:'h in m',schritte:[{formel:`h = ${EP} : (m · g)`,rechnung:[`h = ${f(Ep)} J : (${f(mt*1000)} kg · 9,81 N/kg)`,`h = ${f(h)} m`]}],
-  erg:{w:h,u:'m',l:'h'},F:umst(Ep,mt*1000,g,'m','g'),antwort:`${cap(v.w)} wird h = ${f(h)} m hoch gehoben.`,hin:`„${x}“ brauchst du nicht. t in kg umrechnen, dann umstellen.`});}
+  erg:{w:h,u:'m',l:'h'},F:umst(Ep,mt*1000,g,'m','g'),antwort:`${cap(v.w)} wird h = ${f(h)} m hoch gehoben.`,hin:'t in kg umrechnen, dann umstellen.'});}
+
+// Typenschild als Material (22.11.2026, wie in der Gym-Arbeit): a) Bedeutung der Leistung, b) Energie berechnen. Spannung, Frequenz, Typ braucht man nicht.
+function typenschildSVG(o){const C='#1F2A44',T=(x,y,t,sz=15,w=600)=>`<text x="${x}" y="${y}" font-size="${sz}" font-weight="${w}" fill="${C}">${t}</text>`;
+ return `<svg viewBox="0 0 380 160" width="380" role="img" aria-label="Typenschild ${o.geraet}"><rect x="2" y="2" width="376" height="156" rx="10" fill="#E9ECF0" stroke="#8A94A6" stroke-width="2"/>
+ ${[[14,14],[366,14],[14,146],[366,146]].map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="4" fill="#B5BDC9"/>`).join('')}
+ ${T(22,38,o.marke,19,800)}${T(22,62,o.geraet+' · Modell '+o.modell)}${T(22,92,'230 V ~ 50 Hz')}${T(192,92,f(o.P)+' kW')}${T(22,118,'Typ '+o.typ)}${T(192,118,o.ip)}${T(262,118,'CE',15,700)}${T(22,142,'Herstellungsjahr '+o.jahr,13,400)}</svg>`;}
+const GERAETE=[
+ {marke:'HAUSWERK',geraet:'Bodenstaubsauger',modell:'VS 300',typ:'VS-300-EU',ip:'IPX4',P:[0.8,1,1.2],satz:m=>`Lena saugt ihr Zimmer ${m} Minuten lang.`,gen:'ihres Staubsaugers'},
+ {marke:'KÜCHENSTAR',geraet:'Mikrowelle',modell:'MW 20',typ:'MW-20-S',ip:'IPX0',P:[0.6,0.8,1],satz:m=>`Tim wärmt sein Essen ${m} Minuten lang in der Mikrowelle auf.`,gen:'der Mikrowelle'},
+ {marke:'HAUSWERK',geraet:'Dampfbügeleisen',modell:'DB 22',typ:'DB-22-PRO',ip:'IPX4',P:[1.8,2,2.2],satz:m=>`Emma bügelt ${m} Minuten lang ihre Bluse.`,gen:'ihres Bügeleisens'},
+ {marke:'KÜCHENSTAR',geraet:'Wasserkocher',modell:'WK 17',typ:'WK-17-1,7L',ip:'IPX4',P:[2,2.2,2.4],satz:m=>`Noah kocht ${m} Minuten lang Wasser für Tee.`,gen:'seines Wasserkochers'},
+ {marke:'HAUSWERK',geraet:'Haartrockner',modell:'HT 18',typ:'HT-18-ION',ip:'IPX0',P:[1.2,1.8,2],satz:m=>`Mia föhnt sich ${m} Minuten lang die Haare.`,gen:'ihres Föhns'},
+ {marke:'WARMLUFT',geraet:'Heizlüfter',modell:'HL 25',typ:'HL-25-T',ip:'IPX1',P:[1.5,2,2.5],satz:m=>`Ben wärmt sein Zimmer ${m} Minuten lang mit einem Heizlüfter.`,gen:'des Heizlüfters'}];
+function typenschildPaar(){const d=pick(GERAETE),P=pick(d.P),mi=R(3,10),Ej=P*1000*mi*60,o={...d,P,jahr:pick(['2024','2025','2026'])},svg=typenschildSVG(o),txt=`${d.satz(mi)} Das Bild zeigt das Typenschild ${d.gen}.`;
+ return [{typ:'offen',titel:'Das Typenschild',punkte:1.5,svg,frage:`${txt} Auf dem Typenschild steht auch die Leistung des Geräts. Gib diese Angabe an und erkläre, was sie bedeutet.`,
+   ideal:`<b>P = ${f(P)} kW = ${f(P*1000)} W.</b> Das bedeutet: Das Gerät wandelt <b>in jeder Sekunde ${f(P*1000)} J</b> elektrische Energie um (1 W = 1 J pro Sekunde).`,krit:[`Leistung ${f(P)} kW gefunden`,'umgewandelte Energie',`pro Sekunde (${f(P*1000)} J in 1 s)`]},
+  RE({titel:'Das Typenschild',svg,text:txt,frage:'Wie viel Energie wird dabei umgewandelt?',geg:[`P = ${f(P)} kW = ${f(P*1000)} W (vom Typenschild)`,`t = ${mi} min = ${mi*60} s`],ges:'E in J',
+   schritte:[{formel:'E = P · t',rechnung:[`E = ${f(P*1000)} W · ${mi*60} s`,`E = ${f(Ej)} J`]}],erg:{w:Ej,u:'J',l:'E'},F:[[P*1000/(mi*60),UM],[230*mi*60,'Die 230 V sind keine Leistung – die Leistung steht in kW auf dem Schild.'],[230*mi,'Die 230 V sind keine Leistung – die Leistung steht in kW auf dem Schild.']],
+   antwort:`Es werden E = ${f(Ej)} J umgewandelt.`,hin:'Such die Leistung auf dem Schild (Einheit kW). Spannung, Frequenz und Typ brauchst du nicht. kW in W und min in s umrechnen.'})];}
 
 /* Aufgaben mit zwei Rechnungen (22.11.2026, Malte: nicht immer dieselben zwei Rechnungen, auch mal anders umgestellt –
    die Schüler sollen den Weg selbst finden, nicht auswendig lernen). Titel verraten den Weg nicht.
@@ -752,7 +771,7 @@ function probeKA(lvl){const M=lvl==='M',L=[],add=(b,t)=>L.push({...t,bereich:b})
   add(3,tag(T.kette(),'II'));
   add(4,tag(lageT(),'II',3.5));
   add(7,tag(p7j(),'II',4));
-  add(8,tag(l8d(),'II',4));
+  {const [a,b]=typenschildPaar();add(8,tag(a,'II',1.5));add(8,tag(b,'II',4));}
   add(9,tag(T.fair(2),'II'));
   // Material wie in der Papierarbeit: Antriebe (Niveau ★★★: b, c, d) und „Höhe nimmt ab“ (Niveau ★★: a, c, d)
   L.push(iqb('antrieb',3),iqb('abnahme',2));
