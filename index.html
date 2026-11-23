@@ -122,6 +122,7 @@ textarea.antw{width:100%;min-height:96px;font:17px/1.45 "Nunito",sans-serif;colo
 .is .k{font-weight:800;color:var(--dblue);white-space:nowrap}
 .is .zw{grid-column:1/-1;font-weight:800;color:var(--lila);margin-top:4px}
 .hin{color:#8A5A12;font-weight:700}
+.weg{background:#FFF6DA;border:1.5px solid #F0D58A;border-radius:12px;padding:10px 14px 10px 30px;margin:0 0 14px}.weg li{margin:4px 0}
 .rate{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .rate span{font-weight:800}
 .rate button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font:700 15px "Nunito",sans-serif;cursor:pointer;min-height:40px;color:var(--ink)}
@@ -264,7 +265,7 @@ function w6e(){const B=R(5,9)*10000,A=R(1,4)*10000,eta=pick([30,35,40,45]),N=(A+
   {t:`Ein Pedelec-Fahrer (75 kg) fährt 20 s lang an. Seine Muskeln geben ${f(B)} J ab, der Elektromotor nimmt zusätzlich ${f(A)} J aus dem Akku. Am Ende haben Fahrer und Rad ${f(N)} J Bewegungsenergie.`,s1:'Muskeln',s2:'Akku',x:'Masse und Zeit'},
   {t:`Ein Hybridbus mit 40 Fahrgästen fährt 15 s lang an. Der Dieselmotor setzt ${f(B)} J aus dem Diesel frei, der Elektromotor nimmt ${f(A)} J aus der Batterie. Am Ende hat der Bus ${f(N)} J Bewegungsenergie.`,s1:'Diesel',s2:'Batterie',x:'Fahrgastzahl und Zeit'}]);
  return RE({titel:'Wirkungsgrad – zwei Energiequellen',punkte:5,text:v.t,frage:'Berechne den Wirkungsgrad des Antriebs.',geg:[`${E(v.s1)} = ${f(B)} J`,`${E(v.s2)} = ${f(A)} J`,`${NU} = ${f(N)} J`],ges:'η in %',
- schritte:[{t:'Zwischenschritt: zugeführte Energie',formel:`${ZU} = ${E(v.s1)} + ${E(v.s2)}`,rechnung:[`${ZU} = ${f(B)} J + ${f(A)} J = ${f(A+B)} J`]},
+ weg:[ZU,`${E(v.s1)} und ${E(v.s2)}`,'Beide Energiequellen zusammen sind die zugeführte Energie.'],schritte:[{t:'Zwischenschritt: zugeführte Energie',formel:`${ZU} = ${E(v.s1)} + ${E(v.s2)}`,rechnung:[`${ZU} = ${f(B)} J + ${f(A)} J = ${f(A+B)} J`]},
   {t:'Wirkungsgrad',formel:`η = ${NU} : ${ZU}`,rechnung:[`η = ${f(N)} J : ${f(A+B)} J`,`η = ${f(eta/100)} = ${f(eta)} %`]}],
  erg:{w:eta,u:'%',l:'η'},F:[[N/B*100,EINE],[N/A*100,EINE],[(A+B)/N*100,BRUCH]],antwort:`Der Wirkungsgrad des Antriebs beträgt η = ${f(eta)} %.`,hin:`Beide Quellen zusammen sind die zugeführte Energie. ${v.x} brauchst du nicht.`});}
 function w6f(){const Zk=R(4,9)*100,eta=pick([75,80,85,90]),Ek=Zk*eta/100,W=(Zk-Ek)*1000,v=pick([
@@ -273,7 +274,7 @@ function w6f(){const Zk=R(4,9)*100,eta=pick([75,80,85,90]),Ek=Zk*eta/100,W=(Zk-E
   {n:'Der Elektromotor einer Straßenbahn läuft 30 Sekunden lang. Dabei entstehen',nu:'Bewegungsenergie',w:'des Motors'}]);
  return RE({titel:'Wirkungsgrad – zugeführte Energie fehlt',punkte:5,text:`${v.n} ${f(Ek)} kJ ${v.nu}. Durch Reibung werden ${f(W)} J in Wärme umgewandelt. Andere Energieumwandlungen gibt es nicht.`,
  frage:`Wie groß ist der Wirkungsgrad ${v.w}?`,geg:[`${NU} = ${f(Ek)} kJ = ${f(Ek*1000)} J`,`${EN} = ${f(W)} J`],ges:'η in %',
- schritte:[{t:'Zwischenschritt: zugeführte Energie',formel:`${ZU} = ${NU} + ${EN}`,rechnung:[`${ZU} = ${f(Ek*1000)} J + ${f(W)} J = ${f(Zk*1000)} J`]},
+ weg:[ZU,`${NU} und ${EN}`,'Was zugeführt wird, wird entweder genutzt oder entwertet.'],schritte:[{t:'Zwischenschritt: zugeführte Energie',formel:`${ZU} = ${NU} + ${EN}`,rechnung:[`${ZU} = ${f(Ek*1000)} J + ${f(W)} J = ${f(Zk*1000)} J`]},
   {t:'Wirkungsgrad',formel:`η = ${NU} : ${ZU}`,rechnung:[`η = ${f(Ek*1000)} J : ${f(Zk*1000)} J`,`η = ${f(eta/100)} = ${f(eta)} %`]}],
  erg:{w:eta,u:'%',l:'η'},F:[[Ek*1000/W*100,'Im Nenner steht die zugeführte Energie (Nutzenergie + entwertete Energie), nicht die entwertete.'],[Zk/Ek*100,BRUCH]],antwort:`Der Wirkungsgrad ${v.w} beträgt η = ${f(eta)} %.`,hin:'Es geht keine Energie verloren: zugeführte Energie = Nutzenergie + entwertete Energie. Die Zeit brauchst du nicht.'});}
 
@@ -298,7 +299,7 @@ function e5c(){const Zk=R(3,8)*1000,el=Zk*R(30,40,5)/100,wa=Zk*R(40,50,5)/100,W=
   {t:'Ein Biogas-Kraftwerk auf einem Bauernhof verbrennt in 20 Minuten Biogas mit',a:'Strom ins Netz',b:'Wärme für den Stall',n:'Im Biogas-Kraftwerk'}]);
  return RE({titel:'Energiefluss mit zwei Nutzenergien',punkte:5,text:`${v.t} ${f(Zk)} kJ chemischer Energie. Es liefert ${f(el)} kJ elektrische Energie (${v.a}) und ${f(wa)} kJ ${v.b}.`,
  frage:'Wie viel Energie wird entwertet?',geg:[`${ZU} = ${f(Zk)} kJ = ${f(Zk*1000)} J`,`${E('el')} = ${f(el)} kJ = ${f(el*1000)} J`,`${E('Wärme')} = ${f(wa)} kJ = ${f(wa*1000)} J`],ges:`${EN} in J`,
- schritte:[{t:'Zwischenschritt: gesamte Nutzenergie',formel:`${NU} = ${E('el')} + ${E('Wärme')}`,rechnung:[`${NU} = ${f(el*1000)} J + ${f(wa*1000)} J = ${f((el+wa)*1000)} J`]},
+ weg:[NU,`${E('el')} und ${E('Wärme')}`,'Beide genutzten Energien zusammen sind die Nutzenergie.'],schritte:[{t:'Zwischenschritt: gesamte Nutzenergie',formel:`${NU} = ${E('el')} + ${E('Wärme')}`,rechnung:[`${NU} = ${f(el*1000)} J + ${f(wa*1000)} J = ${f((el+wa)*1000)} J`]},
   {t:'entwertete Energie',formel:`${EN} = ${ZU} − ${NU}`,rechnung:[`${EN} = ${f(Zk*1000)} J − ${f((el+wa)*1000)} J`,`${EN} = ${f(W)} J`]}],
  erg:{w:W,u:'J',l:EN},F:[[(Zk-el)*1000,'Die Wärme zum Heizen ist auch Nutzenergie.'],[(Zk-wa)*1000,'Der Strom ist auch Nutzenergie.'],[(el+wa)*1000,ZW('Nutzenergie')]],antwort:`${v.n} werden ${EN} = ${f(W)} J entwertet.`,hin:'Strom und Wärme werden beide genutzt. Die Zeit brauchst du nicht.'});}
 
@@ -345,7 +346,7 @@ function p7g(){const t=R(2,6),h=R(150,400,10),Ep=t*1000*g*h,eta=pick([75,80,85])
   {t:`Ein Baukran hebt ${t} t Stahlträger auf ein Hochhaus, ${h} m über dem Boden. Das dauert 3 Minuten. Der Elektromotor des Krans nimmt dafür ${f(Zk)} kJ elektrische Energie auf.`,n:'des Kranmotors',x:'der Stahlträger'},
   {t:`Eine Seilbahn bringt ${t} t Material zu einer Berghütte, die ${h} m höher liegt. Die Fahrt dauert 6 Minuten. Der Motor nimmt dafür ${f(Zk)} kJ elektrische Energie auf.`,n:'des Seilbahnmotors',x:'des Materials'}]);
  return RE({titel:'Wirkungsgrad beim Heben',punkte:5,text:v.t,frage:`Wie groß ist der Wirkungsgrad ${v.n}?`,geg:[`m = ${t} t = ${f(t*1000)} kg`,`h = ${h} m`,'g = 9,81 N/kg',`${ZU} = ${f(Zk)} kJ = ${f(Zk*1000)} J`],ges:'η in %',
- schritte:[{t:`Zwischenschritt: Nutzenergie = potenzielle Energie ${v.x}`,formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(t*1000)} kg · 9,81 N/kg · ${h} m = ${f(Ep)} J`]},
+ weg:[NU,'m, g und h','Die Nutzenergie ist hier die potenzielle Energie.'],schritte:[{t:`Zwischenschritt: Nutzenergie = potenzielle Energie ${v.x}`,formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(t*1000)} kg · 9,81 N/kg · ${h} m = ${f(Ep)} J`]},
   {t:'Wirkungsgrad',formel:`η = ${NU} : ${ZU} = ${EP} : ${ZU}`,rechnung:[`η = ${f(Ep)} J : ${f(Zk*1000)} J`,`η ${eq(e)} ${f(e/100,4)} = ${f(e)} %`]}],
  erg:{w:e,u:'%',l:'η'},F:[[Ep,ZW(EP)],[Zk*1000/Ep*100,BRUCH]],antwort:`Der Wirkungsgrad ${v.n} beträgt etwa η = ${f(e)} %.`,hin:`Genutzt wird die potenzielle Energie ${v.x}. Die Zeit brauchst du nicht.`});}
 function p7h(){const m1=R(45,70),m2=R(4,10),tal=R(900,1300,10),dh=R(400,900,10),gip=tal+dh,w=R(5,12),st=R(2,5),Ep=(m1+m2)*g*dh,v=pick([
@@ -353,13 +354,13 @@ function p7h(){const m1=R(45,70),m2=R(4,10),tal=R(900,1300,10),dh=R(400,900,10),
   {p:'Jonas',d:'sein Fahrrad',dn:'Fahrrad',t:`Jonas (${m1} kg) fährt mit seinem Fahrrad (${m2} kg) von einem Dorf auf ${f(tal)} m Höhe auf einen Pass in ${f(gip)} m Höhe. Die Straße ist ${w} km lang, er braucht ${st} Stunden.`},
   {p:'Lea',d:'ihre Skiausrüstung',dn:'Ski',t:`Lea (${m1} kg) fährt mit ihrer Skiausrüstung (${m2} kg) mit dem Sessellift von ${f(tal)} m auf ${f(gip)} m Höhe. Der Lift ist ${w} km lang, die Fahrt dauert ${st*5} Minuten.`}]);
  return RE({titel:'Höhenunterschied und zwei Massen',punkte:5,text:v.t,frage:`Wie viel potenzielle Energie gewinnen ${v.p} und ${v.d} zusammen?`,geg:[`m<sub>${v.p}</sub> = ${m1} kg`,`m<sub>${v.dn}</sub> = ${m2} kg`,`Höhe unten = ${f(tal)} m`,`Höhe oben = ${f(gip)} m`,'g = 9,81 N/kg'],ges:`${EP} in J`,
- schritte:[{t:'Zwischenschritt: Masse und Höhenunterschied',formel:`m = m<sub>${v.p}</sub> + m<sub>${v.dn}</sub> &nbsp; und &nbsp; h = Höhe oben − Höhe unten`,rechnung:[`m = ${m1} kg + ${m2} kg = ${m1+m2} kg`,`h = ${f(gip)} m − ${f(tal)} m = ${dh} m`]},
+ weg:['m (gesamt) und h (Unterschied)','die beiden Massen und die beiden Höhen','Erst zusammenzählen bzw. abziehen, dann einsetzen.'],schritte:[{t:'Zwischenschritt: Masse und Höhenunterschied',formel:`m = m<sub>${v.p}</sub> + m<sub>${v.dn}</sub> &nbsp; und &nbsp; h = Höhe oben − Höhe unten`,rechnung:[`m = ${m1} kg + ${m2} kg = ${m1+m2} kg`,`h = ${f(gip)} m − ${f(tal)} m = ${dh} m`]},
   {t:'potenzielle Energie',formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${m1+m2} kg · 9,81 N/kg · ${dh} m`,`${EP} ${eq(Ep)} ${f(Ep)} J`]}],
  erg:{w:Ep,u:'J',l:EP},F:[[(m1+m2)*g*gip,'Du hast die Höhe oben statt des Höhenunterschieds genommen.'],[(m1+m2)*g*tal,'Du hast die Höhe unten statt des Höhenunterschieds genommen.'],[m1*g*dh,`Masse ${v.dn==='Ski'?'der Skiausrüstung':v.dn==='Fahrrad'?'des Fahrrads':'des Rucksacks'} vergessen?`],[(m1+m2)*g*w*1000,'Weglänge statt Höhenunterschied genommen?'],[(m1+m2)*g*w,'Weglänge statt Höhenunterschied genommen?']],antwort:`${v.p} und ${v.d} gewinnen zusammen ${EP} = ${f(Ep)} J potenzielle Energie.`,hin:'Es zählt nur der Höhenunterschied, nicht die Weglänge. Weglänge und Zeit brauchst du nicht.'});}
 function p7i(){const food=pick([['Ein Schokoriegel',R(800,1200,50)],['Eine Portion Nudeln',R(1600,2400,100)],['Eine Banane',R(350,450,10)],['Ein Müsliriegel',R(400,600,20)]]),Ek=food[1],m=pick([50,55,60]),eta=pick([20,25]),N=eta/100*Ek*1000,h=N/(m*g),p=pick(['Ein Bergsteiger','Eine Wanderin','Ein Treppenläufer']);
  return RE({titel:'Nahrung: Wie hoch komme ich?',punkte:5,text:`${food[0]} liefert dem Körper ${f(Ek)} kJ Energie. Die Muskeln können davon nur ${eta} % nutzen, um den Körper anzuheben – der Rest wird zu Wärme. ${p} hat eine Masse von ${m} kg.`,
  frage:'Wie hoch könnte die Person mit dieser Energie höchstens steigen?',geg:[`${ZU} = ${f(Ek)} kJ = ${f(Ek*1000)} J`,`η = ${eta} % = ${f(eta/100)}`,`m = ${m} kg`,'g = 9,81 N/kg'],ges:'h in m',
- schritte:[{t:'Zwischenschritt: Nutzenergie',formel:`${NU} = η · ${ZU}`,rechnung:[`${NU} = ${f(eta/100)} · ${f(Ek*1000)} J = ${f(N)} J`]},
+ weg:[EP,`η und ${ZU}`,'Die Nutzenergie wird zu potenzieller Energie.'],schritte:[{t:'Zwischenschritt: Nutzenergie',formel:`${NU} = η · ${ZU}`,rechnung:[`${NU} = ${f(eta/100)} · ${f(Ek*1000)} J = ${f(N)} J`]},
   {t:'Höhe (die Nutzenergie wird zu potenzieller Energie)',formel:`h = ${EP} : (m · g)`,rechnung:[`h = ${f(N)} J : (${m} kg · 9,81 N/kg)`,`h ${eq(h)} ${f(h)} m`]}],
  erg:{w:h,u:'m',l:'h'},F:[[Ek*1000/(m*g),'Wirkungsgrad vergessen? Nur '+eta+' % der Energie werden genutzt.'],[N,ZW(NU)]],antwort:`Die Person könnte etwa h = ${f(h)} m hochsteigen.`,hin:'Nur die Nutzenergie wird zu potenzieller Energie.'});}
 
@@ -387,12 +388,12 @@ function l8g(){const t=R(10,40)/10,h=R(10,30),s=R(20,60,5),Ep=t*1000*g*h,P=Ep/s,
   {t:`Ein Lastenaufzug in einem 60 m hohen Hochhaus bringt ${f(t)} t Baumaterial in ${s} s um ${h} m nach oben.`,x:'Die Höhe des Hochhauses (60 m) brauchst du nicht.',n:'Der Aufzug',d:60},
   {t:`Ein Hubschrauber (Rotordurchmesser 11 m) hebt einen ${f(t)} t schweren Wassertank in ${s} s um ${h} m an.`,x:'Den Rotordurchmesser brauchst du nicht.',n:'Der Hubschrauber',d:11}]);
  return RE({titel:'Energie und Leistung beim Heben',punkte:5,text:v.t,frage:'Welche Leistung ist dafür mindestens nötig?',geg:[`m = ${f(t)} t = ${f(t*1000)} kg`,`h = ${h} m`,`t = ${s} s`,'g = 9,81 N/kg'],ges:'P in W',
- schritte:[{t:'Zwischenschritt: potenzielle Energie',formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(t*1000)} kg · 9,81 N/kg · ${h} m = ${f(Ep)} J`]},{t:'Leistung',formel:'P = E : t',rechnung:[`P = ${f(Ep)} J : ${s} s`,`P ${eq(P)} ${f(P)} W`]}],
+ weg:['E','m, g und h','Die Energie, die gebraucht wird, ist die potenzielle Energie.'],schritte:[{t:'Zwischenschritt: potenzielle Energie',formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(t*1000)} kg · 9,81 N/kg · ${h} m = ${f(Ep)} J`]},{t:'Leistung',formel:'P = E : t',rechnung:[`P = ${f(Ep)} J : ${s} s`,`P ${eq(P)} ${f(P)} W`]}],
  erg:{w:P,u:'W',l:'P'},F:[[Ep,ZW(EP)],[Ep*s,UM],[t*1000*g*v.d/s,'Falsche Höhe? '+v.x]],antwort:`${v.n} braucht mindestens eine Leistung von P = ${f(P)} W.`,hin:v.x});}
 function l8h(){const P=pick([500,600,750,800]),gm=R(30,60)*1000,s=R(15,30),Ej=P*s,h=Ej/(gm/1000*g),v=pick([{t:`Ein ${P}-Watt-Motor hebt einen Sack Zement`,w:'der Sack',a:'Der Sack'},{t:`Eine Seilwinde mit ${P} W zieht eine Kiste Fliesen`,w:'die Kiste',a:'Die Kiste'},{t:`Ein Lastenaufzug mit ${P} W hebt einen Eimer Mörtel`,w:'der Eimer',a:'Der Eimer'}]);
  return RE({titel:'Leistung und Höhe',punkte:5,text:`${v.t} (${f(gm)} g) in ${s} Sekunden nach oben. Nimm an, dass die ganze Energie in potenzielle Energie umgewandelt wird.`,frage:`Berechne, wie hoch ${v.w} gehoben wird.`,
  geg:[`P = ${P} W`,`m = ${f(gm)} g = ${f(gm/1000)} kg`,`t = ${s} s`,'g = 9,81 N/kg'],ges:'h in m',
- schritte:[{t:'Zwischenschritt: umgewandelte Energie',formel:'E = P · t',rechnung:[`E = ${P} W · ${s} s = ${f(Ej)} J`]},{t:'Höhe',formel:`h = ${EP} : (m · g)`,rechnung:[`h = ${f(Ej)} J : (${f(gm/1000)} kg · 9,81 N/kg)`,`h ${eq(h)} ${f(h)} m`]}],
+ weg:[EP,'P und t','Die umgewandelte Energie wird ganz zu potenzieller Energie.'],schritte:[{t:'Zwischenschritt: umgewandelte Energie',formel:'E = P · t',rechnung:[`E = ${P} W · ${s} s = ${f(Ej)} J`]},{t:'Höhe',formel:`h = ${EP} : (m · g)`,rechnung:[`h = ${f(Ej)} J : (${f(gm/1000)} kg · 9,81 N/kg)`,`h ${eq(h)} ${f(h)} m`]}],
  erg:{w:h,u:'m',l:'h'},F:[[Ej,ZW('E')],[P/s,UM]],antwort:`${v.a} wird etwa h = ${f(h)} m hoch gehoben.`});}
 function l8i(){const v=pick([{n:'Ein Wasserkocher mit 1 Liter Wasser',P:pick([1.8,2,2.2]),eta:pick([80,85,90]),q:'Wie viel Energie bekommt das Wasser?',a:'Das Wasser bekommt',e:'',xh:'Die Wassermenge (1 Liter) brauchst du nicht.'},
   {n:'Der Motor eines E-Scooters (Fahrer 70 kg)',P:pick([0.4,0.5,0.6]),eta:pick([75,80,85]),q:'Wie viel Bewegungsenergie gibt der Motor ab?',a:'Der Motor gibt',e:' ab',xh:'Die Masse des Fahrers brauchst du nicht.'},
@@ -400,7 +401,7 @@ function l8i(){const v=pick([{n:'Ein Wasserkocher mit 1 Liter Wasser',P:pick([1.
  const mi=pick([2,3,4]),Z=v.P*1000*mi*60,N=Z*v.eta/100;
  return RE({titel:'Leistung und Wirkungsgrad',punkte:5,text:`${v.n} hat eine Leistung von ${f(v.P)} kW und ist ${mi} Minuten lang eingeschaltet. Der Wirkungsgrad beträgt ${v.eta} %.`,frage:v.q+'',
  geg:[`P = ${f(v.P)} kW = ${f(v.P*1000)} W`,`t = ${mi} min = ${mi*60} s`,`η = ${v.eta} % = ${f(v.eta/100)}`],ges:`${NU} in J`,
- schritte:[{t:'Zwischenschritt: zugeführte elektrische Energie',formel:`${ZU} = P · t`,rechnung:[`${ZU} = ${f(v.P*1000)} W · ${mi*60} s = ${f(Z)} J`]},{t:'Nutzenergie',formel:`${NU} = η · ${ZU}`,rechnung:[`${NU} = ${f(v.eta/100)} · ${f(Z)} J`,`${NU} = ${f(N)} J`]}],
+ weg:[ZU,'P und t','Was das Gerät in dieser Zeit aufnimmt, ist die zugeführte Energie.'],schritte:[{t:'Zwischenschritt: zugeführte elektrische Energie',formel:`${ZU} = P · t`,rechnung:[`${ZU} = ${f(v.P*1000)} W · ${mi*60} s = ${f(Z)} J`]},{t:'Nutzenergie',formel:`${NU} = η · ${ZU}`,rechnung:[`${NU} = ${f(v.eta/100)} · ${f(Z)} J`,`${NU} = ${f(N)} J`]}],
  erg:{w:N,u:'J',l:NU},F:[[Z,ZW(ZU)+' Der Wirkungsgrad fehlt noch.'],[Z/(v.eta/100),'Durch η geteilt statt mal η?'],[Z*v.eta,'Prozent als Dezimalzahl einsetzen: '+v.eta+' % = '+f(v.eta/100)+'.']],antwort:`${v.a} ${NU} = ${f(N)} J${v.e}.`,hin:v.xh});}
 
 /* ---------- Wissensaufgaben (mit Kontext-Varianten) ---------- */
@@ -725,24 +726,24 @@ const ZWEI=[
    Pk=v.m>=500?pick([2,2.5,3]):pick([0.4,0.8,1.2]),mi=pick([1,1.5,2]),E=Pk*1000*mi*60,h=E/(v.m*g);
    return RE({titel:'Wie hoch geht es?',punkte:6,text:`${v.n} hat eine Leistung von ${f(Pk)} kW. ${v.n.startsWith('Eine')?'Sie':'Er'} zieht ${v.l} mit einer Masse von ${f(v.m)} kg ${f(mi)} Minuten lang nach oben. Verluste durch Reibung kannst du vernachlässigen.`,frage:`Wie hoch kommt ${v.w} höchstens?`,
     geg:[`P = ${f(Pk)} kW = ${f(Pk*1000)} W`,`t = ${f(mi)} min = ${f(mi*60)} s`,`m = ${f(v.m)} kg`,'g = 9,81 N/kg'],ges:'h in m',
-    schritte:[{t:'Zwischenschritt: Energie des Motors',formel:'E = P · t',rechnung:[`E = ${f(Pk*1000)} W · ${f(mi*60)} s = ${f(E)} J`]},{t:'Höhe (die Energie wird zu potenzieller Energie)',formel:`h = ${EP} : (m · g)`,rechnung:[`h = ${f(E)} J : (${f(v.m)} kg · 9,81 N/kg)`,`h ${eq(h)} ${f(h)} m`]}],
+    weg:[EP,'P und t','Die Energie des Motors wird ganz zu potenzieller Energie.'],schritte:[{t:'Zwischenschritt: Energie des Motors',formel:'E = P · t',rechnung:[`E = ${f(Pk*1000)} W · ${f(mi*60)} s = ${f(E)} J`]},{t:'Höhe (die Energie wird zu potenzieller Energie)',formel:`h = ${EP} : (m · g)`,rechnung:[`h = ${f(E)} J : (${f(v.m)} kg · 9,81 N/kg)`,`h ${eq(h)} ${f(h)} m`]}],
     erg:{w:h,u:'m',l:'h'},F:[[E,ZW('Energie')],...umst(E,v.m,g,'m','g')],antwort:`${cap(v.w)} kommt höchstens etwa h = ${f(h)} m hoch.`,hin:'Erst die Energie aus Leistung und Zeit, dann die Höhe.'});}},
  {s1:'Pt',s2:'m',f:()=>{const v=pick([{n:'Ein Lastenaufzug',w:'die Ladung',pr:'Er'},{n:'Ein Baukran',w:'die Last',pr:'Er'},{n:'Eine Hebebühne',w:'das Auto',pr:'Sie'}]),Pk=pick([1.5,2,2.5,3]),s=R(20,60,5),h=R(4,20),E=Pk*1000*s,m=E/(g*h);
    return RE({titel:'Wie viel schafft der Motor?',punkte:6,text:`${v.n} hat einen Motor mit einer Leistung von ${f(Pk)} kW. ${v.pr} hebt ${v.w} in ${s} s um ${h} m an. Verluste durch Reibung kannst du vernachlässigen.`,frage:`Wie schwer darf ${v.w} höchstens sein?`,
     geg:[`P = ${f(Pk)} kW = ${f(Pk*1000)} W`,`t = ${s} s`,`h = ${h} m`,'g = 9,81 N/kg'],ges:'m in kg',
-    schritte:[{t:'Zwischenschritt: Energie des Motors',formel:'E = P · t',rechnung:[`E = ${f(Pk*1000)} W · ${s} s = ${f(E)} J`]},{t:'Masse (die Energie wird zu potenzieller Energie)',formel:`m = ${EP} : (g · h)`,rechnung:[`m = ${f(E)} J : (9,81 N/kg · ${h} m)`,`m ${eq(m)} ${f(m)} kg`]}],
+    weg:[EP,'P und t','Die Energie des Motors wird ganz zu potenzieller Energie.'],schritte:[{t:'Zwischenschritt: Energie des Motors',formel:'E = P · t',rechnung:[`E = ${f(Pk*1000)} W · ${s} s = ${f(E)} J`]},{t:'Masse (die Energie wird zu potenzieller Energie)',formel:`m = ${EP} : (g · h)`,rechnung:[`m = ${f(E)} J : (9,81 N/kg · ${h} m)`,`m ${eq(m)} ${f(m)} kg`]}],
     erg:{w:m,u:'kg',l:'m'},F:[[E,ZW('Energie')],...umst(E,g,h,'g','h')],antwort:`${cap(v.w)} darf höchstens etwa m = ${f(m)} kg schwer sein.`,hin:'Erst die Energie aus Leistung und Zeit, dann die Masse.'});}},
  {s1:'Epot',s2:'t',f:()=>{const v=pick([{n:'Eine Wasserpumpe',x:'Wasser',z:'in einen Hochbehälter'},{n:'Ein Förderband',x:'Kies',z:'auf einen Haufen'},{n:'Ein Getreideheber',x:'Getreide',z:'in ein Silo'}]),m=R(4,12)*100,h=R(5,20),P=pick([400,500,800,1000]),E=m*g*h,t=E/P;
    return RE({titel:'Wie lange dauert das?',punkte:6,text:`${v.n} mit einer Leistung von ${f(P)} W bringt ${f(m)} kg ${v.x} ${v.z}, der ${h} m höher liegt. Verluste kannst du vernachlässigen.`,frage:'Wie lange dauert das mindestens?',
     geg:[`m = ${f(m)} kg`,`h = ${h} m`,`P = ${f(P)} W`,'g = 9,81 N/kg'],ges:'t in s',
-    schritte:[{t:`Zwischenschritt: potenzielle Energie des ${v.x==='Kies'?'Kieses':v.x==='Wasser'?'Wassers':'Getreides'}`,formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(m)} kg · 9,81 N/kg · ${h} m = ${f(E)} J`]},{t:'Zeit',formel:`t = E : P`,rechnung:[`t = ${f(E)} J : ${f(P)} W`,`t ${eq(t)} ${f(t)} s`]}],
+    weg:['E','m, g und h','Die Energie, die die Maschine aufbringen muss, ist die potenzielle Energie.'],schritte:[{t:`Zwischenschritt: potenzielle Energie des ${v.x==='Kies'?'Kieses':v.x==='Wasser'?'Wassers':'Getreides'}`,formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(m)} kg · 9,81 N/kg · ${h} m = ${f(E)} J`]},{t:'Zeit',formel:`t = E : P`,rechnung:[`t = ${f(E)} J : ${f(P)} W`,`t ${eq(t)} ${f(t)} s`]}],
     erg:{w:t,u:'s',l:'t'},F:[[E,ZW(EP)],[P/E,UM],[E*P,UM]],antwort:`Das dauert mindestens etwa t = ${f(t)} s (≈ ${f(t/60)} min).`,hin:'Erst die potenzielle Energie, dann die Zeit.'});}},
  {s1:'Epot',s2:'Ezu',f:()=>{const motor=Math.random()<.5,eta=motor?pick([75,80,85]):pick([20,25]),m=motor?R(3,9)*100:pick([50,55,60]),h=motor?R(6,20):R(200,600,50),E=m*g*h,Z=E/(eta/100),
    v=motor?pick([{t:`Ein Elektromotor mit dem Wirkungsgrad ${eta} % hebt eine Last von ${f(m)} kg ${h} m hoch.`,q:'Wie viel elektrische Energie muss man ihm zuführen?'},{t:`Eine Seilbahn hat einen Antrieb mit dem Wirkungsgrad ${eta} %. Sie bringt ${f(m)} kg Material zu einer Hütte, die ${h} m höher liegt.`,q:'Wie viel elektrische Energie braucht der Antrieb dafür?'}])
     :{t:`${pick(['Mia','Ben','Lea'])} hat eine Masse von ${m} kg und will ${h} m hoch auf einen Berg steigen. Die Muskeln nutzen nur ${eta} % der Energie aus der Nahrung, um den Körper anzuheben.`,q:'Wie viel Energie muss die Nahrung mindestens liefern?'};
    return RE({titel:motor?'Wie viel Energie braucht der Antrieb?':'Wie viel muss ich essen?',punkte:6,text:v.t,frage:v.q,
     geg:[`m = ${f(m)} kg`,`h = ${h} m`,`η = ${eta} % = ${f(eta/100)}`,'g = 9,81 N/kg'],ges:`${ZU} in J`,
-    schritte:[{t:'Zwischenschritt: Nutzenergie = potenzielle Energie',formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(m)} kg · 9,81 N/kg · ${h} m = ${f(E)} J`]},{t:'zugeführte Energie (Formel umgestellt)',formel:`${ZU} = ${NU} : η`,rechnung:[`${ZU} = ${f(E)} J : ${f(eta/100)}`,`${ZU} ${eq(Z)} ${f(Z)} J`]}],
+    weg:[NU,'m, g und h','Die Nutzenergie ist hier die potenzielle Energie.'],schritte:[{t:'Zwischenschritt: Nutzenergie = potenzielle Energie',formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(m)} kg · 9,81 N/kg · ${h} m = ${f(E)} J`]},{t:'zugeführte Energie (Formel umgestellt)',formel:`${ZU} = ${NU} : η`,rechnung:[`${ZU} = ${f(E)} J : ${f(eta/100)}`,`${ZU} ${eq(Z)} ${f(Z)} J`]}],
     erg:{w:Z,u:'J',l:ZU},F:[[E,ZW(EP)],[E*eta/100,'Umgestellt? Die zugeführte Energie ist größer als die Nutzenergie – also teilen durch η.']],antwort:`Es müssen mindestens etwa ${ZU} = ${f(Z)} J (≈ ${f(Z/1000)} kJ) zugeführt werden.`,hin:'Erst die potenzielle Energie, dann mit dem Wirkungsgrad zurückrechnen.'});}},
 ];
 function zweiPaar(){const a=pick(ZWEI),b=pick(ZWEI.filter(x=>x.s1!==a.s1&&x.s2!==a.s2));return [a.f(),b.f()];}
@@ -902,8 +903,11 @@ function go(){S.list=S.mode==='ka'?klassenarbeit(S.niv):BER[S.ber].tasks(S.niv).
 function tipps(t){
  if(t.typ==='rechnen'){const L=[`Gesucht ist <b>${t.ges}</b>. Schreib zuerst ① gegeben: alle Größen mit Formelzeichen und Einheit.`];
   const um=t.geg.filter(x=>(x.match(/=/g)||[]).length>1);if(um.length)L.push('Erst umrechnen: '+um.join(' · '));
-  if(t.schritte.length>1)L.push(`Das geht in ${t.schritte.length} Schritten. Rechne zuerst: ${t.schritte[0].t.replace('Zwischenschritt: ','')}. Formel: ${t.schritte[0].formel}`);
-  L.push(`Diese Formel brauchst du${t.schritte.length>1?' danach':''}: ${t.schritte[t.schritte.length-1].formel}`);
+  if(t.weg){const [fe,be,br]=t.weg,zf=t.schritte[t.schritte.length-1].formel,sy=t.ges.split(' in ')[0];
+   L.push(`Du siehst den Weg nicht gleich? Kein Problem. Schreib die Formel für <b>${sy}</b> auf: ${zf}. Prüfe in ① gegeben: Welche Größe in dieser Formel hast du <b>nicht</b>?`);
+   L.push(`Dir ${/ und /.test(fe)?'fehlen':'fehlt'} <b>${fe}</b>. Geh deine Formeln durch: Welche kannst du mit den gegebenen Größen <b>vollständig</b> ausrechnen? ${t.schritte[0].formel} – ${be} sind gegeben. Das ist dein erster Schritt. ${br}`);}
+  else{if(t.schritte.length>1)L.push(`Das geht in ${t.schritte.length} Schritten. Rechne zuerst: ${t.schritte[0].t.replace('Zwischenschritt: ','')}. Formel: ${t.schritte[0].formel}`);
+   L.push(`Diese Formel brauchst du${t.schritte.length>1?' danach':''}: ${t.schritte[t.schritte.length-1].formel}`);}
   if(t.hin)L.push(t.hin);return L;}
  const x=t.tipp||TIPP[t.titel]||(t.titel&&t.titel.startsWith('Umwandlungskette')?TIPP_KETTE:null);
  return x?[].concat(x):['Lies die Aufgabe noch einmal genau und unterstreiche die wichtigen Wörter.'];}
@@ -923,6 +927,8 @@ function subHTML(t,k,lab){
 function idealHTML(t){
  if(t.typ==='rechnen'){let h=`<h4>Ideallösung im Fünf-Schritt</h4><div class="is"><span class="k">① gegeben:</span><span>${t.geg.join('<br>')}</span><span class="k">② gesucht:</span><span>${t.ges}</span>`;
   const multi=t.schritte.length>1;
+  if(t.weg){const [fe,be,br]=t.weg,zf=t.schritte[t.schritte.length-1].formel,sy=t.ges.split(' in ')[0];
+   h=`<h4>So findest du den Weg</h4><ol class="weg"><li>Gesucht ist <b>${sy}</b>. Formel: ${zf}. Was davon ist gegeben? <b>${fe}</b> ${/ und /.test(fe)?'fehlen':'fehlt'} noch.</li><li>Welche Formel kannst du mit den gegebenen Größen vollständig ausrechnen? <b>${t.schritte[0].formel}</b> – ${be} sind gegeben ✓</li><li>Also: zuerst mit ${t.schritte[0].formel} rechnen. ${br} Dann das Ergebnis in die Formel für ${sy} einsetzen.</li></ol>`+h;}
   t.schritte.forEach(s=>{if(multi)h+=`<span class="zw">${s.t}</span>`;h+=`<span class="k">③ Formel:</span><span>${s.formel}</span><span class="k">④ Rechnung:</span><span>${s.rechnung.join('<br>')}</span>`;});
   h+=`<span class="k">⑤ Antwort:</span><span>${t.antwort}</span></div>`;if(t.hin)h+=`<p class="hin">Tipp: ${t.hin}</p>`;return h;}
  if(t.typ==='mc'){const r=[].concat(t.richtig);return `<h4>Ideallösung</h4>${t.diag?`<p>Richtig ist <b>${r.map(i=>LET[i]).join(', ')}</b>.</p>`:`<ul>${r.map(i=>`<li><b>${t.opts[i]}</b></li>`).join('')}</ul>`}${t.erkl?`<p>${t.erkl}</p>`:''}`;}
