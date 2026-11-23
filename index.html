@@ -745,6 +745,16 @@ const ZWEI=[
     geg:[`m = ${f(m)} kg`,`h = ${h} m`,`η = ${eta} % = ${f(eta/100)}`,'g = 9,81 N/kg'],ges:`${ZU} in J`,
     weg:[NU,'m, g und h','Die Nutzenergie ist hier die potenzielle Energie.'],schritte:[{t:'Zwischenschritt: Nutzenergie = potenzielle Energie',formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(m)} kg · 9,81 N/kg · ${h} m = ${f(E)} J`]},{t:'zugeführte Energie (Formel umgestellt)',formel:`${ZU} = ${NU} : η`,rechnung:[`${ZU} = ${f(E)} J : ${f(eta/100)}`,`${ZU} ${eq(Z)} ${f(Z)} J`]}],
     erg:{w:Z,u:'J',l:ZU},F:[[E,ZW(EP)],[E*eta/100,'Umgestellt? Die zugeführte Energie ist größer als die Nutzenergie – also teilen durch η.']],antwort:`Es müssen mindestens etwa ${ZU} = ${f(Z)} J (≈ ${f(Z/1000)} kJ) zugeführt werden.`,hin:'Erst die potenzielle Energie, dann mit dem Wirkungsgrad zurückrechnen.'});}},
+ {s1:'Epot',s2:'P',f:()=>{const v=pick([{n:'Der Elektromotor eines Baukrans',l:'eine Palette Ziegel',w:'die Ziegel'},{n:'Der Elektromotor eines Lastenaufzugs',l:'eine Ladung',w:'die Ladung'},{n:'Eine elektrische Seilwinde',l:'eine Kiste',w:'die Kiste'}]),
+   eta=pick([75,80,90]),m=R(2,8)*100,h=R(6,20),t=pick([20,30,40,60]),Ep=m*g*h,Z=Ep/(eta/100),P=Z/t;
+   return RE({titel:'Welche Leistung braucht der Motor?',punkte:6,text:`${v.n} hebt ${v.l} mit einer Masse von ${f(m)} kg in ${t} s um ${h} m nach oben. Der Motor hat einen Wirkungsgrad von ${eta} %.`,frage:'Welche elektrische Leistung muss der Motor dabei mindestens aufnehmen?',
+    weg:[ZU,'m, g und h',`Die potenzielle Energie ist die Nutzenergie. Mit ${ZU} = ${NU} : η (umgestellt) kommst du von der Nutzenergie zur zugeführten Energie.`],
+    geg:[`m = ${f(m)} kg`,`h = ${h} m`,`t = ${t} s`,`η = ${eta} % = ${f(eta/100)}`,'g = 9,81 N/kg'],ges:'P in W',
+    schritte:[{t:'Zwischenschritt: Nutzenergie = potenzielle Energie',formel:`${EP} = m · g · h`,rechnung:[`${EP} = ${f(m)} kg · 9,81 N/kg · ${h} m = ${f(Ep)} J`]},
+     {t:'Zwischenschritt: zugeführte Energie (Formel umgestellt)',formel:`${ZU} = ${NU} : η`,rechnung:[`${ZU} = ${f(Ep)} J : ${f(eta/100)}`,`${ZU} ${eq(Z)} ${f(Z)} J`]},
+     {t:'elektrische Leistung',formel:`P = ${ZU} : t`,rechnung:[`P = ${f(Z)} J : ${t} s`,`P ${eq(P)} ${f(P)} W`]}],
+    erg:{w:P,u:'W',l:'P'},F:[[Ep,ZW(EP)],[Z,ZW(ZU)],[Ep/t,'Das ist die Leistung ohne Verluste. Der Motor muss mehr aufnehmen – der Wirkungsgrad fehlt noch.'],[Ep*eta/100/t,'Mal η statt durch η? Die zugeführte Energie ist größer als die Nutzenergie.']],
+    antwort:`Der Motor muss mindestens etwa P = ${f(P)} W (≈ ${f(P/1000)} kW) aufnehmen.`,hin:'Erst die potenzielle Energie, dann mit dem Wirkungsgrad zur zugeführten Energie zurückrechnen, dann die Leistung.'});}},
 ];
 function zweiPaar(){const a=pick(ZWEI),b=pick(ZWEI.filter(x=>x.s1!==a.s1&&x.s2!==a.s2));return [a.f(),b.f()];}
 
